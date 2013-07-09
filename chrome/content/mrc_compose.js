@@ -225,7 +225,7 @@ function LoadIdentity(startup)
 
     if (identityElement) {
         var idKey = identityElement.value;
-        gCurrentIdentity = gAccountManager.getIdentity(idKey);
+        gCurrentIdentity = Components.classes["@mozilla.org/messenger/account-manager;1"].getService(Components.interfaces.nsIMsgAccountManager).getIdentity(idKey);
         
         if (!startup && prevIdentity && idKey != prevIdentity.key)
         {
