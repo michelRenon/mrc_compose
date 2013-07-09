@@ -1470,7 +1470,7 @@ var mrcAComplete = {
         return temp;
     },
     
-    _search_mode_1 : function(aString) {
+    _search_mode_1 : function(aString, event, element) {
         /*
          * search for mode 1, put results in internal fields
          * 
@@ -1514,9 +1514,77 @@ var mrcAComplete = {
                         }
                     }
                 }
-            }  
-        }
+                this._search_mode_1_finish(res1);
+                search_finish(aString, event, element);
+            } else {
+                if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
+                    var acDirURI = null;
+                    if (gCurrentIdentity.overrideGlobalPref) {
+                        acDirURI = gCurrentIdentity.directoryServer;
+                    }
+                    else {
+                        if (Services.prefs.getBoolPref("ldap_2.autoComplete.useDirectory")) {
+                            acDirURI = Services.prefs.getCharPref("ldap_2.autoComplete.directoryServer");
+                        }
+                    }
+                    if (!acDirURI) {
+                        continue;
+                    }
+                    var query =
+                        Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
+                                .createInstance(Components.interfaces.nsIAbDirectoryQuery);
 
+                    var attributes =
+                        Components.classes["@mozilla.org/addressbook/ldap-attribute-map;1"]
+                                .createInstance(Components.interfaces.nsIAbLDAPAttributeMap);
+                    attributes.setAttributeList("DisplayName",
+                        ab.attributeMap.getAttributeList("DisplayName", {}), true);
+                    attributes.setAttributeList("PrimaryEmail",
+                        ab.attributeMap.getAttributeList("PrimaryEmail", {}), true);
+
+                    var args =
+                        Components.classes["@mozilla.org/addressbook/directory/query-arguments;1"]
+                                .createInstance(Components.interfaces.nsIAbDirectoryQueryArguments);
+
+                    var filterTemplate = ab.getStringValue("autoComplete.filterTemplate", "");
+
+                    // Use default value when preference is not set or it contains empty string    
+                    if (!filterTemplate)
+                        filterTemplate = "(|(cn=%v1*%v2-*)(mail=%v1*%v2-*)(sn=%v1*%v2-*))";
+
+                    // Create filter from filter template and search string
+                    var ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
+                                            .getService(Components.interfaces.nsILDAPService);
+                    var filter = ldapSvc.createFilter(1024, filterTemplate, "", "", "", aString);
+                    dump(filter + "\n");
+                    if (!filter)
+                        throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
+
+                    args.typeSpecificArg = attributes;
+                    args.querySubDirectories = true;
+                    args.filter = filter;
+
+                    var that = this;
+                    var abDirSearchListener = {
+                        onSearchFinished : function(aResult, aErrorMesg) {
+                            if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
+                                that._search_mode_1_finish.call(that, res1);
+                                search_finish(aString, event, element);
+                            }
+                        },
+
+                        onSearchFoundCard : function(aCard) {
+                            res1.push(that._createMyCard(aCard));
+                        }
+                    };
+
+                    query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
+                }
+            }
+        }
+    },
+
+    _search_mode_1_finish : function(res1) {
         res1.sort(this._sort_card);
         res1 = this._removeDuplicatecards(res1);
 
@@ -1524,7 +1592,7 @@ var mrcAComplete = {
         this.nbDatas = res1.length;
     },
     
-    _search_mode_2 : function(aString) {
+    _search_mode_2 : function(aString, event, element) {
         /*
          * search for mode 2, put results in internal fields
          * 
@@ -1622,7 +1690,7 @@ var mrcAComplete = {
         this.nbDatas = res1.length+res2.length+res3.length;
     },
 
-    _search_mode_3 : function(aString) {
+    _search_mode_3 : function(aString, event, element) {
         /*
          * search for mode 3, put results in internal fields
          * 
@@ -2323,7 +2391,7 @@ var mrcAComplete = {
         return ((this.lastQuery != newQuery) || ((now - this.lastQueryTime) > this.param_min_search_delay));
     },
     
-    search : function(aString) {
+    search : function(aString, event, element) {
         /*
          * official call to perform search on address book.
          * dynamic call of internal search method
@@ -2336,7 +2404,7 @@ var mrcAComplete = {
         this.datas = {}; // TODO : check if it's the right way to empty dictionary
         this.nbDatas = 0;
         let meth = "_search_mode_"+this.param_mode;
-        this[meth](aString);
+        this[meth](aString, event, element);
         this.lastQuery = aString;
         this.lastQueryTime = new Date().getTime()
     },
@@ -2823,17 +2891,20 @@ function mrcRecipientKeyUp(event, element) {
         if (textPart.length >= mrcAComplete.param_search_min_char) {
             if (mrcAComplete.needSearch(textPart)) {
                 // recherche
-                mrcAComplete.search(textPart);
-                if (mrcAComplete.nbDatas > 0) {
-                    mrcAComplete.buildResultList(textPart);
-                    mrcAComplete.openPopup(event, element);
-                } else {
-                    mrcAComplete.hidePopup();
-                }
+                mrcAComplete.search(textPart, event, element);
             }
         } else {
             mrcAComplete.hidePopup();
         }
+    }
+}
+
+function search_finish(textPart, event, element) {
+    if (mrcAComplete.nbDatas > 0) {
+        mrcAComplete.buildResultList(textPart);
+        mrcAComplete.openPopup(event, element);
+    } else {
+        mrcAComplete.hidePopup();
     }
 }
 
