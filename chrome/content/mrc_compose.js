@@ -1470,12 +1470,13 @@ var mrcAComplete = {
         return temp;
     },
     
-    _search_mode_1 : function(aString, event, element) {
+    _search_mode_1 : function(aString, cbSearch) {
         /*
          * search for mode 1, put results in internal fields
          * 
          * params :
          *   aString : the text to search in fields of address book
+         *   cbSearch : the callback when search is done
          * return:
          *   none
          */
@@ -1515,7 +1516,9 @@ var mrcAComplete = {
                     }
                 }
                 this._search_mode_1_finish(res1);
-                search_finish(aString, event, element);
+                // search_finish(aString, event, element);
+                if (cbSearch) 
+                    cbSearch();
             } else {
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
                     var acDirURI = null;
@@ -1569,7 +1572,9 @@ var mrcAComplete = {
                         onSearchFinished : function(aResult, aErrorMesg) {
                             if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
                                 that._search_mode_1_finish.call(that, res1);
-                                search_finish(aString, event, element);
+                                // search_finish(aString, event, element);
+                                if (cbSearch) 
+                                    cbSearch();
                             }
                         },
 
@@ -1592,7 +1597,7 @@ var mrcAComplete = {
         this.nbDatas = res1.length;
     },
     
-    _search_mode_2 : function(aString, event, element) {
+    _search_mode_2 : function(aString, cbSearch) {
         /*
          * search for mode 2, put results in internal fields
          * 
@@ -1690,7 +1695,7 @@ var mrcAComplete = {
         this.nbDatas = res1.length+res2.length+res3.length;
     },
 
-    _search_mode_3 : function(aString, event, element) {
+    _search_mode_3 : function(aString, cbSearch) {
         /*
          * search for mode 3, put results in internal fields
          * 
@@ -2391,22 +2396,42 @@ var mrcAComplete = {
         return ((this.lastQuery != newQuery) || ((now - this.lastQueryTime) > this.param_min_search_delay));
     },
     
-    search : function(aString, event, element) {
+    search : function(aString, cbSearch) {
         /*
          * official call to perform search on address book.
          * dynamic call of internal search method
          * 
          * params :
          *   aString : the text to search
+         *   cbSearch : the callback when search is done
          * return :
          *   none
          */
         this.datas = {}; // TODO : check if it's the right way to empty dictionary
         this.nbDatas = 0;
         let meth = "_search_mode_"+this.param_mode;
-        this[meth](aString, event, element);
+        this[meth](aString, cbSearch);
         this.lastQuery = aString;
         this.lastQueryTime = new Date().getTime()
+    },
+
+    finishSearch : function(aString, event, element) {
+        /*
+         * Perform actions after search is complete.
+         * 
+         * params :
+         *   aString : the searched text
+         *   event : the event that generated the search
+         *   element : the html textfield associated to the event
+         * return:
+         *   non
+         */ 
+        if (this.nbDatas > 0) {
+            this.buildResultList(aString);
+            this.openPopup(event, element);
+        } else {
+            this.hidePopup();
+        }
     },
 
     buildResultList : function(textPart) {
@@ -2891,20 +2916,13 @@ function mrcRecipientKeyUp(event, element) {
         if (textPart.length >= mrcAComplete.param_search_min_char) {
             if (mrcAComplete.needSearch(textPart)) {
                 // recherche
-                mrcAComplete.search(textPart, event, element);
+                mrcAComplete.search(textPart, function callback_search() { 
+                        mrcAComplete.finishSearch(textPart, event, element) 
+                    } );
             }
         } else {
             mrcAComplete.hidePopup();
         }
-    }
-}
-
-function search_finish(textPart, event, element) {
-    if (mrcAComplete.nbDatas > 0) {
-        mrcAComplete.buildResultList(textPart);
-        mrcAComplete.openPopup(event, element);
-    } else {
-        mrcAComplete.hidePopup();
     }
 }
 
