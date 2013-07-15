@@ -1715,9 +1715,11 @@ var mrcAComplete = {
         let searchQuery1 = baseQuery.replace(/@C/g, 'c');
         searchQuery1 = searchQuery1.replace(/@V/g, encodeURIComponent(aString));
         
+        let numRemotes = 0;
         let allAddressBooks = this.abManager.directories;
         while (allAddressBooks.hasMoreElements()) {
             let ab = allAddressBooks.getNext();
+            let res = [];
             if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
                 // recherche 1
                 let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
@@ -1742,15 +1744,92 @@ var mrcAComplete = {
                                 res.push(this._createMyCard(card));
                         }
                     }
-                    
-                    res.sort(this._sort_card);
-                    res = this._removeDuplicatecards(res);
-
-                    this.datas[ab.dirName] = res;
-                    this.nbDatas += res.length;
+                    this._search_mode_3_finish(res, ab);
+                    if  ((!allAddressBooks.hasMoreElements()) && (numRemotes == 0)) {
+                        if (cbSearch)
+                            cbSearch();
+                    }
                 }
-            }  
+            } else {
+                if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
+                    let res = [];
+                    numRemotes++;
+                    var acDirURI = null;
+                    if (gCurrentIdentity.overrideGlobalPref) {
+                        acDirURI = gCurrentIdentity.directoryServer;
+                    }
+                    else {
+                        if (Services.prefs.getBoolPref("ldap_2.autoComplete.useDirectory")) {
+                            acDirURI = Services.prefs.getCharPref("ldap_2.autoComplete.directoryServer");
+                        }
+                    }
+                    if (!acDirURI) {
+                        continue;
+                    }
+                    var query =
+                        Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
+                            .createInstance(Components.interfaces.nsIAbDirectoryQuery);
+
+                    var attributes =
+                        Components.classes["@mozilla.org/addressbook/ldap-attribute-map;1"]
+                            .createInstance(Components.interfaces.nsIAbLDAPAttributeMap);
+                    attributes.setAttributeList("DisplayName",
+                        ab.attributeMap.getAttributeList("DisplayName", {}), true);
+                    attributes.setAttributeList("PrimaryEmail",
+                        ab.attributeMap.getAttributeList("PrimaryEmail", {}), true);
+
+                    var args =
+                        Components.classes["@mozilla.org/addressbook/directory/query-arguments;1"]
+                            .createInstance(Components.interfaces.nsIAbDirectoryQueryArguments);
+
+                    var filterTemplate = ab.getStringValue("autoComplete.filterTemplate", "");
+
+                    // Use default value when preference is not set or it contains empty string
+                    if (!filterTemplate)
+                        filterTemplate = "(|(cn=%v1*%v2-*)(mail=%v1*%v2-*)(sn=%v1*%v2-*))";
+
+                    // Create filter from filter template and search string
+                    var ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
+                        .getService(Components.interfaces.nsILDAPService);
+                    var filter = ldapSvc.createFilter(1024, filterTemplate, "", "", "", aString);
+
+                    if (!filter)
+                        throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
+
+                    args.typeSpecificArg = attributes;
+                    args.querySubDirectories = true;
+                    args.filter = filter;
+
+                    var that = this;
+                    var abDirSearchListener = {
+                        onSearchFinished : function(aResult, aErrorMesg) {
+                            numRemotes--;
+                            if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
+                                that._search_mode_3_finish.call(that, res, ab);
+                                if  ((!allAddressBooks.hasMoreElements()) && (numRemotes == 0)) {
+                                    if (cbSearch)
+                                    cbSearch();
+                                }
+                            }
+                        },
+
+                        onSearchFoundCard : function(aCard) {
+                            res.push(that._createMyCard(aCard));
+                        }
+                    };
+
+                    query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
+                }
+            }
         }
+    },
+
+    _search_mode_3_finish : function(res, ab) {
+        res.sort(this._sort_card);
+        res = this._removeDuplicatecards(res);
+
+        this.datas[ab.dirName] = res;
+        this.nbDatas += res.length;
     },
     
     _buildOneResult_Card : function(card, textBold, typeSearch, primaryEmail) {
