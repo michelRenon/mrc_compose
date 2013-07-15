@@ -1488,6 +1488,7 @@ var mrcAComplete = {
         searchQuery1 = searchQuery1.replace(/@V/g, encodeURIComponent(aString));
         
         let res1 = [];
+        let numRemotes = 0;
         let allAddressBooks = this.abManager.directories;
         while (allAddressBooks.hasMoreElements()) {
             let ab = allAddressBooks.getNext();
@@ -1515,12 +1516,9 @@ var mrcAComplete = {
                         }
                     }
                 }
-                this._search_mode_1_finish(res1);
-                // search_finish(aString, event, element);
-                if (cbSearch) 
-                    cbSearch();
             } else {
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
+                    numRemotes++;
                     var acDirURI = null;
                     if (gCurrentIdentity.overrideGlobalPref) {
                         acDirURI = gCurrentIdentity.directoryServer;
@@ -1559,7 +1557,6 @@ var mrcAComplete = {
                     var ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
                                             .getService(Components.interfaces.nsILDAPService);
                     var filter = ldapSvc.createFilter(1024, filterTemplate, "", "", "", aString);
-                    dump(filter + "\n");
                     if (!filter)
                         throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
 
@@ -1570,11 +1567,13 @@ var mrcAComplete = {
                     var that = this;
                     var abDirSearchListener = {
                         onSearchFinished : function(aResult, aErrorMesg) {
+                            numRemotes--;
                             if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
-                                that._search_mode_1_finish.call(that, res1);
-                                // search_finish(aString, event, element);
-                                if (cbSearch) 
-                                    cbSearch();
+                                if ((!allAddressBooks.hasMoreElements()) && (numRemotes == 0)) {
+                                    that._search_mode_1_finish.call(that, res1);
+                                    if (cbSearch)
+                                        cbSearch();
+                                }
                             }
                         },
 
@@ -1586,6 +1585,11 @@ var mrcAComplete = {
                     query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
                 }
             }
+        }
+        if  (numRemotes == 0) {
+            this._search_mode_1_finish(res1);
+            if (cbSearch)
+                cbSearch();
         }
     },
 
