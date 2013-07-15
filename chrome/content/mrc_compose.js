@@ -2415,8 +2415,6 @@ var mrcAComplete = {
         this.nbDatas = 0;
         let meth = "_search_mode_"+this.param_mode;
         this[meth](aString, cbSearch);
-        this.lastQuery = aString;
-        this.lastQueryTime = new Date().getTime()
     },
 
     finishSearch : function(aString, event, element) {
@@ -2429,7 +2427,9 @@ var mrcAComplete = {
          *   element : the html textfield associated to the event
          * return:
          *   non
-         */ 
+         */
+        this.lastQuery = aString;
+        this.lastQueryTime = new Date().getTime()
         if (this.nbDatas > 0) {
             this.buildResultList(aString);
             this.openPopup(event, element);
