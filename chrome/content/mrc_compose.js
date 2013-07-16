@@ -1470,12 +1470,13 @@ var mrcAComplete = {
         return temp;
     },
     
-    _search_mode_1 : function(aString) {
+    _search_mode_1 : function(aString, cbSearch) {
         /*
          * search for mode 1, put results in internal fields
          * 
          * params :
          *   aString : the text to search in fields of address book
+         *   cbSearch : the callback when search is done
          * return:
          *   none
          */
@@ -1487,6 +1488,7 @@ var mrcAComplete = {
         searchQuery1 = searchQuery1.replace(/@V/g, encodeURIComponent(aString));
         
         let res1 = [];
+        let numRemotes = 0;
         let allAddressBooks = this.abManager.directories;
         while (allAddressBooks.hasMoreElements()) {
             let ab = allAddressBooks.getNext();
@@ -1514,9 +1516,84 @@ var mrcAComplete = {
                         }
                     }
                 }
-            }  
-        }
+            } else {
+                if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
+                    numRemotes++;
+                    var acDirURI = null;
+                    if (gCurrentIdentity.overrideGlobalPref) {
+                        acDirURI = gCurrentIdentity.directoryServer;
+                    }
+                    else {
+                        if (Services.prefs.getBoolPref("ldap_2.autoComplete.useDirectory")) {
+                            acDirURI = Services.prefs.getCharPref("ldap_2.autoComplete.directoryServer");
+                        }
+                    }
+                    if (!acDirURI) {
+                        continue;
+                    }
+                    var query =
+                        Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
+                                .createInstance(Components.interfaces.nsIAbDirectoryQuery);
 
+                    var attributes =
+                        Components.classes["@mozilla.org/addressbook/ldap-attribute-map;1"]
+                                .createInstance(Components.interfaces.nsIAbLDAPAttributeMap);
+                    attributes.setAttributeList("DisplayName",
+                        ab.attributeMap.getAttributeList("DisplayName", {}), true);
+                    attributes.setAttributeList("PrimaryEmail",
+                        ab.attributeMap.getAttributeList("PrimaryEmail", {}), true);
+
+                    var args =
+                        Components.classes["@mozilla.org/addressbook/directory/query-arguments;1"]
+                                .createInstance(Components.interfaces.nsIAbDirectoryQueryArguments);
+
+                    var filterTemplate = ab.getStringValue("autoComplete.filterTemplate", "");
+
+                    // Use default value when preference is not set or it contains empty string    
+                    if (!filterTemplate)
+                        filterTemplate = "(|(cn=%v1*%v2-*)(mail=%v1*%v2-*)(sn=%v1*%v2-*))";
+
+                    // Create filter from filter template and search string
+                    var ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
+                                            .getService(Components.interfaces.nsILDAPService);
+                    var filter = ldapSvc.createFilter(1024, filterTemplate, "", "", "", aString);
+                    if (!filter)
+                        throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
+
+                    args.typeSpecificArg = attributes;
+                    args.querySubDirectories = true;
+                    args.filter = filter;
+
+                    var that = this;
+                    var abDirSearchListener = {
+                        onSearchFinished : function(aResult, aErrorMesg) {
+                            numRemotes--;
+                            if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
+                                if ((!allAddressBooks.hasMoreElements()) && (numRemotes == 0)) {
+                                    that._search_mode_1_finish.call(that, res1);
+                                    if (cbSearch)
+                                        cbSearch();
+                                }
+                            }
+                        },
+
+                        onSearchFoundCard : function(aCard) {
+                            res1.push(that._createMyCard(aCard));
+                        }
+                    };
+
+                    query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
+                }
+            }
+        }
+        if  (numRemotes == 0) {
+            this._search_mode_1_finish(res1);
+            if (cbSearch)
+                cbSearch();
+        }
+    },
+
+    _search_mode_1_finish : function(res1) {
         res1.sort(this._sort_card);
         res1 = this._removeDuplicatecards(res1);
 
@@ -1524,7 +1601,7 @@ var mrcAComplete = {
         this.nbDatas = res1.length;
     },
     
-    _search_mode_2 : function(aString) {
+    _search_mode_2 : function(aString, cbSearch) {
         /*
          * search for mode 2, put results in internal fields
          * 
@@ -1622,7 +1699,7 @@ var mrcAComplete = {
         this.nbDatas = res1.length+res2.length+res3.length;
     },
 
-    _search_mode_3 : function(aString) {
+    _search_mode_3 : function(aString, cbSearch) {
         /*
          * search for mode 3, put results in internal fields
          * 
@@ -2323,22 +2400,42 @@ var mrcAComplete = {
         return ((this.lastQuery != newQuery) || ((now - this.lastQueryTime) > this.param_min_search_delay));
     },
     
-    search : function(aString) {
+    search : function(aString, cbSearch) {
         /*
          * official call to perform search on address book.
          * dynamic call of internal search method
          * 
          * params :
          *   aString : the text to search
+         *   cbSearch : the callback when search is done
          * return :
          *   none
          */
         this.datas = {}; // TODO : check if it's the right way to empty dictionary
         this.nbDatas = 0;
         let meth = "_search_mode_"+this.param_mode;
-        this[meth](aString);
+        this[meth](aString, cbSearch);
         this.lastQuery = aString;
         this.lastQueryTime = new Date().getTime()
+    },
+
+    finishSearch : function(aString, event, element) {
+        /*
+         * Perform actions after search is complete.
+         * 
+         * params :
+         *   aString : the searched text
+         *   event : the event that generated the search
+         *   element : the html textfield associated to the event
+         * return:
+         *   non
+         */ 
+        if (this.nbDatas > 0) {
+            this.buildResultList(aString);
+            this.openPopup(event, element);
+        } else {
+            this.hidePopup();
+        }
     },
 
     buildResultList : function(textPart) {
@@ -2823,13 +2920,9 @@ function mrcRecipientKeyUp(event, element) {
         if (textPart.length >= mrcAComplete.param_search_min_char) {
             if (mrcAComplete.needSearch(textPart)) {
                 // recherche
-                mrcAComplete.search(textPart);
-                if (mrcAComplete.nbDatas > 0) {
-                    mrcAComplete.buildResultList(textPart);
-                    mrcAComplete.openPopup(event, element);
-                } else {
-                    mrcAComplete.hidePopup();
-                }
+                mrcAComplete.search(textPart, function callback_search() { 
+                        mrcAComplete.finishSearch(textPart, event, element) 
+                    } );
             }
         } else {
             mrcAComplete.hidePopup();
