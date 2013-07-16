@@ -1630,7 +1630,7 @@ var mrcAComplete = {
         let res1 = [];
         let res2 = [];
         let res3 = [];
-
+        let numRemotes = 0;
 
         let allAddressBooks = this.abManager.directories;
         while (allAddressBooks.hasMoreElements()) {
@@ -1684,9 +1684,84 @@ var mrcAComplete = {
                     }
                     */ 
                 }
-            }  
+            } else {
+                if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
+                    numRemotes++;
+                    var acDirURI = null;
+                    if (gCurrentIdentity.overrideGlobalPref) {
+                        acDirURI = gCurrentIdentity.directoryServer;
+                    }
+                    else {
+                        if (Services.prefs.getBoolPref("ldap_2.autoComplete.useDirectory")) {
+                            acDirURI = Services.prefs.getCharPref("ldap_2.autoComplete.directoryServer");
+                        }
+                    }
+                    if (!acDirURI) {
+                        continue;
+                    }
+                    var query =
+                        Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
+                            .createInstance(Components.interfaces.nsIAbDirectoryQuery);
+
+                    var attributes =
+                        Components.classes["@mozilla.org/addressbook/ldap-attribute-map;1"]
+                            .createInstance(Components.interfaces.nsIAbLDAPAttributeMap);
+                    attributes.setAttributeList("DisplayName",
+                        ab.attributeMap.getAttributeList("DisplayName", {}), true);
+                    attributes.setAttributeList("PrimaryEmail",
+                        ab.attributeMap.getAttributeList("PrimaryEmail", {}), true);
+
+                    var args =
+                        Components.classes["@mozilla.org/addressbook/directory/query-arguments;1"]
+                            .createInstance(Components.interfaces.nsIAbDirectoryQueryArguments);
+
+                    var filterTemplate = ab.getStringValue("autoComplete.filterTemplate", "");
+
+                    // Use default value when preference is not set or it contains empty string
+                    if (!filterTemplate)
+                        filterTemplate = "(|(cn=%v1*%v2-*)(mail=%v1*%v2-*)(sn=%v1*%v2-*))";
+
+                    // Create filter from filter template and search string
+                    var ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
+                        .getService(Components.interfaces.nsILDAPService);
+                    var filter = ldapSvc.createFilter(1024, filterTemplate, "", "", "", aString);
+                    if (!filter)
+                        throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
+
+                    args.typeSpecificArg = attributes;
+                    args.querySubDirectories = true;
+                    args.filter = filter;
+
+                    var that = this;
+                    var abDirSearchListener = {
+                        onSearchFinished : function(aResult, aErrorMesg) {
+                            numRemotes--;
+                            if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
+                                if ((!allAddressBooks.hasMoreElements()) && (numRemotes == 0)) {
+                                    that._search_mode_2_finish.call(that, res1, res2, res3);
+                                    if (cbSearch)
+                                        cbSearch();
+                                }
+                            }
+                        },
+
+                        onSearchFoundCard : function(aCard) {
+                            res2.push(that._createMyCard(aCard));
+                        }
+                    };
+
+                    query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
+                }
+            }
+            if (numRemotes == 0) {
+                this._search_mode_2_finish(res1, res2, res3);
+                if (cbSearch)
+                    cbSearch();
+            }
         }
-        
+    },
+
+    _search_mode_2_finish : function(res1, res2, res3) {
         res1.sort(this._sort_card);
         res2.sort(this._sort_card);
         res3.sort(this._sort_card);
