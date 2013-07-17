@@ -13,11 +13,20 @@
  * License.
  *
  * The Original Code is MRC Compose
+ * Parts of this code are Thunderbird
  *
  * The Initial Developer of the Original Code is
  * Michel Renon (renon@mrc-consultant.net)
+ * The developer of the Thunderbird Code is Mozilla
+ *
  * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
+ * Portions created by Mozilla is Mozilla Public License, v. 2.0.
+ * If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * Contributor(s):
+ * Andreas Wagner <mail@andreaswagner.org>
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -1517,6 +1526,8 @@ var mrcAComplete = {
                     }
                 }
             } else {
+                // Parts of the code in this block are copied from
+                //http://hg.mozilla.org/comm-central/file/tip/mailnews/addrbook/src/nsAbLDAPAutoCompleteSearch.js
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
                     numRemotes++;
                     var acDirURI = null;
@@ -1685,6 +1696,8 @@ var mrcAComplete = {
                     */ 
                 }
             } else {
+                // Parts of the code in this block are copied from
+                //http://hg.mozilla.org/comm-central/file/tip/mailnews/addrbook/src/nsAbLDAPAutoCompleteSearch.js
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
                     numRemotes++;
                     var acDirURI = null;
@@ -1826,6 +1839,8 @@ var mrcAComplete = {
                     }
                 }
             } else {
+                // Parts of the code in this block are copied from
+                //http://hg.mozilla.org/comm-central/file/tip/mailnews/addrbook/src/nsAbLDAPAutoCompleteSearch.js
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
                     let res = [];
                     numRemotes++;
