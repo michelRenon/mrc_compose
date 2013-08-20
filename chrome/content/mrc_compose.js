@@ -1479,9 +1479,91 @@ var mrcAComplete = {
         return temp;
     },
     
-    _search_mode_1 : function(aString, cbSearch) {
+    
+    _initSearchListeners : function() {
+        this.searchListeners = [];
+        this.allListenersStarted = false;
+        this.numRemotes = 0;
+        
+        this.search_res1 = [];
+    },
+    
+    _addLocalSearchListener : function() {
+        // nothing to do.
+    },
+    
+    _addSearchListener : function(abSearchListener, isRemote) {
+        this.searchListeners.push(abSearchListener);
+        if (isRemote) {
+            this.numRemotes++;
+        }
+    },
+    
+    cbSearchListeners : function(ab, isRemote) {
+        switch(this.param_mode) {
+            case 1:
+                this._search_mode_1_finish(this.search_res1);
+                break;
+                
+            case 2:
+                this._search_mode_2_finish(this.search_res1, this.search_res2, this.search_res3);
+                break;
+                
+            case 3:
+                this._search_mode_3_finish(this.search_res1, ab);
+                break;
+        }
+        if (isRemote == true) {
+            this.numRemotes--;
+        }
+        this._testSearchComplete();
+    },
+        
+    _testSearchComplete : function() {
+        if (this.numRemotes == 0 && this.allListenersStarted == true) {
+            if (this.cbSearch)
+                this.cbSearch();
+        }
+    },
+
+    _startWaitingSearchListeners : function() {
+        this.allListenersStarted = true;
+        this._testSearchListeners();
+    },
+
+    /*
+    _create_search_listener : function() {
+    
+        var search_listener = {
+
+                // callback for LDAP search
+                onSearchFoundCard : function(aCard) {
+                    res1.push(that._createMyCard(aCard));
+                },
+                
+                // callback for LDAP search
+                onSearchFinished : function(aResult, aErrorMesg) {
+                    numRemotes--;
+                    if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
+                        if ((!allAddressBooks.hasMoreElements()) && (numRemotes == 0)) {
+                            that._search_mode_1_finish.call(that, res1);
+                            if (cbSearch)
+                                cbSearch();
+                        }
+                    }
+                },
+
+            };
+    
+        return search_listener;
+    },
+    */
+    _search_mode_1 : function(aString) {
         /*
          * search for mode 1, put results in internal fields
+         * 
+         * the list contains 1 part :
+         *   'contains' : contacts & lists whose fields contains X
          * 
          * params :
          *   aString : the text to search in fields of address book
@@ -1496,40 +1578,42 @@ var mrcAComplete = {
         let searchQuery1 = baseQuery.replace(/@C/g, 'c');
         searchQuery1 = searchQuery1.replace(/@V/g, encodeURIComponent(aString));
         
-        let res1 = [];
-        let numRemotes = 0;
+        //      let res1 = [];
+        //      let numRemotes = 0;
         let allAddressBooks = this.abManager.directories;
+        
+        // INIT LISTENERS
+        this._initSearchListeners();
+        
         while (allAddressBooks.hasMoreElements()) {
             let ab = allAddressBooks.getNext();
             if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
                 // recherche 1
                 let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
-                /*
-                let doSearch = true;
-                if (ab.URI.indexOf(this.COLLECTED_ADDRESS_BOOK_URI) == 0) {
-                    doSearch = this.param_search_collected_ab;
-                    // Application.console.log(ab.dirName+"==> excluded from search");
-                }
-                */
-                if (doSearch) {
+                if (doSearch) {                    
+                    // ADD A LISTENER
+                    this._addSearchListener(null, false);
+
                     let childCards1 = this.abManager.getDirectory(ab.URI + "?" + searchQuery1).childCards;  
                     while (childCards1.hasMoreElements()) {
                         card = childCards1.getNext();
                         if (card instanceof Components.interfaces.nsIAbCard) {
                             // a list has no email, but we want to keep it
                             if (card.isMailList) {
-                                res1.push(this._createMyCard(card));
+                                this.search_res1.push(this._createMyCard(card));
                             } else if (card.primaryEmail != "")
                                 // filter real cards without email
-                                res1.push(this._createMyCard(card));
+                                this.search_res1.push(this._createMyCard(card));
                         }
                     }
+                    
+                    // FINISH THE LISTENER
+                    this.cbSearchListeners(ab, false);
                 }
             } else {
                 // Parts of the code in this block are copied from
                 //http://hg.mozilla.org/comm-central/file/tip/mailnews/addrbook/src/nsAbLDAPAutoCompleteSearch.js
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
-                    numRemotes++;
                     var acDirURI = null;
                     if (gCurrentIdentity.overrideGlobalPref) {
                         acDirURI = gCurrentIdentity.directoryServer;
@@ -1575,33 +1659,30 @@ var mrcAComplete = {
                     args.querySubDirectories = true;
                     args.filter = filter;
 
-                    var that = this;
+                    let that = this;
                     var abDirSearchListener = {
+                        
+                        ldapAB : ab,
+                        cbObject : that,
+                        
                         onSearchFinished : function(aResult, aErrorMesg) {
-                            numRemotes--;
                             if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
-                                if ((!allAddressBooks.hasMoreElements()) && (numRemotes == 0)) {
-                                    that._search_mode_1_finish.call(that, res1);
-                                    if (cbSearch)
-                                        cbSearch();
-                                }
+                                this.cbObject.cbSearchListeners(this.ldapAB, true);
                             }
                         },
 
                         onSearchFoundCard : function(aCard) {
-                            res1.push(that._createMyCard(aCard));
+                            this.cbObject.search_res1.push(this.cbObject._createMyCard(aCard));
                         }
                     };
 
+                    this._addSearchListener(abDirSearchListener, true);
                     query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
                 }
             }
         }
-        if  (numRemotes == 0) {
-            this._search_mode_1_finish(res1);
-            if (cbSearch)
-                cbSearch();
-        }
+        
+        this._startWaitingSearchListeners();
     },
 
     _search_mode_1_finish : function(res1) {
@@ -1615,6 +1696,11 @@ var mrcAComplete = {
     _search_mode_2 : function(aString, cbSearch) {
         /*
          * search for mode 2, put results in internal fields
+         * 
+         * the list contains 3 parts :
+         *    'begin' :    contacts whose fields begin with X
+         *    'contains' : contacts whose fields contains X (except those in part 1)
+         *    'list' :     groups whose fields begin or contains X
          * 
          * params :
          *   aString : the text to search in fields of address book
@@ -1790,6 +1876,9 @@ var mrcAComplete = {
     _search_mode_3 : function(aString, cbSearch) {
         /*
          * search for mode 3, put results in internal fields
+         * 
+         * the list contains 1 part for each AddressBook :
+         *    contacts & lists whose fields contains X
          * 
          * params :
          *   aString : the text to search in fields of address book
@@ -2583,7 +2672,8 @@ var mrcAComplete = {
         this.datas = {}; // TODO : check if it's the right way to empty dictionary
         this.nbDatas = 0;
         let meth = "_search_mode_"+this.param_mode;
-        this[meth](aString, cbSearch);
+        this.cbSearch = cbSearch
+        this[meth](aString);
     },
 
     finishSearch : function(aString, event, element) {
