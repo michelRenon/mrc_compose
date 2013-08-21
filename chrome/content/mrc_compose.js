@@ -1513,11 +1513,15 @@ var mrcAComplete = {
                 
             case 3:
                 // 
+                // dump("_completeSearchListener : res="+abSearchListener.localRes.length+"\n");
+                // dump("_completeSearchListener : dirname="+abSearchListener.addressBook.dirName+"\n");
+                // dump("nbDatas avant ="+this.nbDatas+"\n");
                 abSearchListener.localRes.sort(this._sort_card);
                 abSearchListener.localRes = this._removeDuplicatecards(abSearchListener.localRes);
 
                 this.datas[abSearchListener.addressBook.dirName] = abSearchListener.localRes;
                 this.nbDatas += abSearchListener.localRes.length;
+                // dump("nbDatas apres ="+this.nbDatas+"\n");
                 break;
         }
         if (abSearchListener.isRemote == true) {
@@ -1528,10 +1532,12 @@ var mrcAComplete = {
     },
         
     _testSearchComplete : function() {
+        // dump("_testSearchComplete, numRemotes="+this.numRemotes+", allListenersStarted="+this.allListenersStarted+"\n");
         if (this.numRemotes == 0 && this.allListenersStarted == true) {
             /*
              * Perform actions when ALL searches are completed.
              */
+            // dump("_testSearchComplete = COMPLETED, cb="+this.cbSearch+"\n");
             switch(this.param_mode) {
                 case 1:
                     // 
@@ -1884,7 +1890,7 @@ var mrcAComplete = {
         this.nbDatas = res1.length+res2.length+res3.length;
     },
 
-    _search_mode_3 : function(aString, cbSearch) {
+    _search_mode_3 : function(aString) {
         /*
          * search for mode 3, put results in internal fields
          * 
@@ -1903,47 +1909,45 @@ var mrcAComplete = {
         let searchQuery1 = baseQuery.replace(/@C/g, 'c');
         searchQuery1 = searchQuery1.replace(/@V/g, encodeURIComponent(aString));
         
-        let numRemotes = 0;
+        // init listeners
+        this._initSearchListeners();
+
         let allAddressBooks = this.abManager.directories;
         while (allAddressBooks.hasMoreElements()) {
             let ab = allAddressBooks.getNext();
-            let res = [];
             if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
                 // recherche 1
                 let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
-                /*
-                let doSearch = true;
-                if (ab.URI.indexOf(this.COLLECTED_ADDRESS_BOOK_URI) == 0) {
-                    doSearch = this.param_search_collected_ab;
-                    // Application.console.log(ab.dirName+"==> excluded from search");
-                }
-                */
                 if (doSearch) {
-                    let res = [];
+                    // add a sync search listener
+                    let that = this;
+                    var abSearchListener = {
+                        addressBook : ab,
+                        isRemote : false,
+                        cbObject : that,
+                        localRes : [],
+                    }
+                    this._addSearchListener(abSearchListener);
+
                     let childCards1 = this.abManager.getDirectory(ab.URI + "?" + searchQuery1).childCards;  
                     while (childCards1.hasMoreElements()) {
                         card = childCards1.getNext();
                         if (card instanceof Components.interfaces.nsIAbCard) {
                             // a list has no email, but we want to keep it
                             if (card.isMailList) {
-                                res.push(this._createMyCard(card));
+                                abSearchListener.localRes.push(this._createMyCard(card));
                             } else if (card.primaryEmail != "")
                                 // filter real cards without email
-                                res.push(this._createMyCard(card));
+                                abSearchListener.localRes.push(this._createMyCard(card));
                         }
                     }
-                    this._search_mode_3_finish(res, ab);
-                    if  ((!allAddressBooks.hasMoreElements()) && (numRemotes == 0)) {
-                        if (cbSearch)
-                            cbSearch();
-                    }
+                    // finish the listener
+                    this._completeSearchListener(abSearchListener);
                 }
             } else {
                 // Parts of the code in this block are copied from
                 //http://hg.mozilla.org/comm-central/file/tip/mailnews/addrbook/src/nsAbLDAPAutoCompleteSearch.js
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
-                    let res = [];
-                    numRemotes++;
                     var acDirURI = null;
                     if (gCurrentIdentity.overrideGlobalPref) {
                         acDirURI = gCurrentIdentity.directoryServer;
@@ -1990,38 +1994,34 @@ var mrcAComplete = {
                     args.querySubDirectories = true;
                     args.filter = filter;
 
-                    var that = this;
+                    // add an async search listener
+                    let that = this;
                     var abDirSearchListener = {
+                        addressBook : ab,
+                        isRemote : true,
+                        cbObject : that,
+                        localRes : [],
+                        
                         onSearchFinished : function(aResult, aErrorMesg) {
-                            numRemotes--;
                             if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
-                                that._search_mode_3_finish.call(that, res, ab);
-                                if  ((!allAddressBooks.hasMoreElements()) && (numRemotes == 0)) {
-                                    if (cbSearch)
-                                    cbSearch();
-                                }
+                                this.cbObject._completeSearchListener(this);
                             }
                         },
 
                         onSearchFoundCard : function(aCard) {
-                            res.push(that._createMyCard(aCard));
+                            this.localRes.push(this.cbObject._createMyCard(aCard));
                         }
                     };
 
+                    this._addSearchListener(abDirSearchListener);
                     query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
                 }
             }
         }
+
+        this._startWaitingSearchListeners();
     },
 
-    _search_mode_3_finish : function(res, ab) {
-        res.sort(this._sort_card);
-        res = this._removeDuplicatecards(res);
-
-        this.datas[ab.dirName] = res;
-        this.nbDatas += res.length;
-    },
-    
     _buildOneResult_Card : function(card, textBold, typeSearch, primaryEmail) {
         /*
          * call-back to build text for one card.
