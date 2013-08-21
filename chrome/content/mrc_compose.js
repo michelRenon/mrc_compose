@@ -1590,8 +1590,6 @@ var mrcAComplete = {
         let searchQuery1 = baseQuery.replace(/@C/g, 'c');
         searchQuery1 = searchQuery1.replace(/@V/g, encodeURIComponent(aString));
         
-        //      let res1 = [];
-        //      let numRemotes = 0;
         let allAddressBooks = this.abManager.directories;
         
         // init listeners
@@ -1706,14 +1704,6 @@ var mrcAComplete = {
         this._startWaitingSearchListeners();
     },
 
-    _search_mode_1_finish : function(res1) {
-        res1.sort(this._sort_card);
-        res1 = this._removeDuplicatecards(res1);
-
-        this.datas = {'contains' : res1};
-        this.nbDatas = res1.length;
-    },
-    
     _search_mode_2 : function(aString, cbSearch) {
         /*
          * search for mode 2, put results in internal fields
