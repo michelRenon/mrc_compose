@@ -1481,46 +1481,85 @@ var mrcAComplete = {
     
     
     _initSearchListeners : function() {
-        this.searchListeners = [];
+        // this.searchListeners = [];
         this.allListenersStarted = false;
         this.numRemotes = 0;
         
         this.search_res1 = [];
+        this.search_res2 = [];
+        this.search_res3 = [];
     },
-    
-    _addLocalSearchListener : function() {
-        // nothing to do.
-    },
-    
-    _addSearchListener : function(abSearchListener, isRemote) {
-        this.searchListeners.push(abSearchListener);
-        if (isRemote) {
+        
+    _addSearchListener : function(abSearchListener) {
+        // this.searchListeners.push(abSearchListener);
+        if (abSearchListener.isRemote) {
             this.numRemotes++;
         }
     },
     
-    cbSearchListeners : function(ab, isRemote) {
+    _completeSearchListener : function(abSearchListener) {
+        /*
+         * Perform actions when a search is finished on ONE addressbook.
+         */
+         
         switch(this.param_mode) {
             case 1:
-                this._search_mode_1_finish(this.search_res1);
+                // nothing
                 break;
                 
             case 2:
-                this._search_mode_2_finish(this.search_res1, this.search_res2, this.search_res3);
+                // nothing
                 break;
                 
             case 3:
-                this._search_mode_3_finish(this.search_res1, ab);
+                // 
+                abSearchListener.localRes.sort(this._sort_card);
+                abSearchListener.localRes = this._removeDuplicatecards(abSearchListener.localRes);
+
+                this.datas[abSearchListener.addressBook.dirName] = abSearchListener.localRes;
+                this.nbDatas += abSearchListener.localRes.length;
                 break;
         }
-        if (isRemote == true) {
+        if (abSearchListener.isRemote == true) {
             this.numRemotes--;
         }
+        // Then test if search is complete for all addressbooks.
         this._testSearchComplete();
     },
         
     _testSearchComplete : function() {
         if (this.numRemotes == 0 && this.allListenersStarted == true) {
+            /*
+             * Perform actions when ALL searches are completed.
+             */
+            switch(this.param_mode) {
+                case 1:
+                    // 
+                    this.search_res1.sort(this._sort_card);
+                    this.search_res1 = this._removeDuplicatecards(this.search_res1);
+
+                    this.datas = {'contains' : this.search_res1};
+                    this.nbDatas = this.search_res1.length;
+                    break;
+                    
+                case 2:
+                    // 
+                    this.search_res1.sort(this._sort_card);
+                    this.search_res2.sort(this._sort_card);
+                    this.search_res3.sort(this._sort_card);
+
+                    this.search_res1 = this._removeDuplicatecards(this.search_res1);
+                    this.search_res2 = this._removeDuplicatecards(this.search_res2);
+                    this.search_res3 = this._removeDuplicatecards(this.search_res3);
+
+                    this.datas = {'begin' : this.search_res1, 'contains' : this.search_res2, 'list' : this.search_res3};
+                    this.nbDatas = this.search_res1.length+this.search_res2.length+this.search_res3.length;
+                    break;
+                    
+                case 3:
+                    // Nothing, already done.
+                    break;
+            }
             if (this.cbSearch)
                 this.cbSearch();
         }
@@ -1528,36 +1567,9 @@ var mrcAComplete = {
 
     _startWaitingSearchListeners : function() {
         this.allListenersStarted = true;
-        this._testSearchListeners();
+        this._testSearchComplete();
     },
 
-    /*
-    _create_search_listener : function() {
-    
-        var search_listener = {
-
-                // callback for LDAP search
-                onSearchFoundCard : function(aCard) {
-                    res1.push(that._createMyCard(aCard));
-                },
-                
-                // callback for LDAP search
-                onSearchFinished : function(aResult, aErrorMesg) {
-                    numRemotes--;
-                    if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
-                        if ((!allAddressBooks.hasMoreElements()) && (numRemotes == 0)) {
-                            that._search_mode_1_finish.call(that, res1);
-                            if (cbSearch)
-                                cbSearch();
-                        }
-                    }
-                },
-
-            };
-    
-        return search_listener;
-    },
-    */
     _search_mode_1 : function(aString) {
         /*
          * search for mode 1, put results in internal fields
@@ -1582,7 +1594,7 @@ var mrcAComplete = {
         //      let numRemotes = 0;
         let allAddressBooks = this.abManager.directories;
         
-        // INIT LISTENERS
+        // init listeners
         this._initSearchListeners();
         
         while (allAddressBooks.hasMoreElements()) {
@@ -1590,9 +1602,16 @@ var mrcAComplete = {
             if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
                 // recherche 1
                 let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
-                if (doSearch) {                    
-                    // ADD A LISTENER
-                    this._addSearchListener(null, false);
+                if (doSearch) {
+                    // add a sync search listener
+                    let that = this;
+                    var abSearchListener = {
+                        addressBook : ab,
+                        isRemote : false,
+                        cbObject : that,
+                        localRes : null,
+                    }
+                    this._addSearchListener(abSearchListener);
 
                     let childCards1 = this.abManager.getDirectory(ab.URI + "?" + searchQuery1).childCards;  
                     while (childCards1.hasMoreElements()) {
@@ -1607,8 +1626,8 @@ var mrcAComplete = {
                         }
                     }
                     
-                    // FINISH THE LISTENER
-                    this.cbSearchListeners(ab, false);
+                    // finish the listener
+                    this._completeSearchListener(abSearchListener);
                 }
             } else {
                 // Parts of the code in this block are copied from
@@ -1659,15 +1678,17 @@ var mrcAComplete = {
                     args.querySubDirectories = true;
                     args.filter = filter;
 
+                    // add an async search listener
                     let that = this;
                     var abDirSearchListener = {
-                        
-                        ldapAB : ab,
+                        addressBook : ab,
+                        isRemote : true,
                         cbObject : that,
+                        localRes : null,
                         
                         onSearchFinished : function(aResult, aErrorMesg) {
                             if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
-                                this.cbObject.cbSearchListeners(this.ldapAB, true);
+                                this.cbObject._completeSearchListener(this);
                             }
                         },
 
@@ -1676,7 +1697,7 @@ var mrcAComplete = {
                         }
                     };
 
-                    this._addSearchListener(abDirSearchListener, true);
+                    this._addSearchListener(abDirSearchListener);
                     query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
                 }
             }

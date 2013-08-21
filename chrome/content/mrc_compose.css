@@ -49,7 +49,7 @@
     height:10px;
     
     
-    /* TEST TB23 */
+    /* TEST TB23 * /
     background-color: #f80;
     border: 3px solid #fcc;
    /* box-shadow: 6px 6px 12px #888; */
@@ -61,8 +61,8 @@
     display:block; 
     min-width:100px;
 
-    /* TEST TB23 */
-    border: 3px solid #fcc;
+    /* TEST TB23 * /
+    border: 3px solid #fcc; */
 }
 
 
