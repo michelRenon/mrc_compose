@@ -1861,40 +1861,42 @@ var mrcAComplete = {
                     if (!acDirURI) {
                         continue;
                     }
-                    var query =
-                        Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
-                            .createInstance(Components.interfaces.nsIAbDirectoryQuery);
 
-                    var attributes =
-                        Components.classes["@mozilla.org/addressbook/ldap-attribute-map;1"]
-                            .createInstance(Components.interfaces.nsIAbLDAPAttributeMap);
-                    attributes.setAttributeList("DisplayName",
-                        ab.attributeMap.getAttributeList("DisplayName", {}), true);
-                    attributes.setAttributeList("PrimaryEmail",
-                        ab.attributeMap.getAttributeList("PrimaryEmail", {}), true);
+                    let that = this;
 
-                    var args =
-                        Components.classes["@mozilla.org/addressbook/directory/query-arguments;1"]
-                            .createInstance(Components.interfaces.nsIAbDirectoryQueryArguments);
-                    
-                    // Create filter from filter template and search string
                     var ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
                         .getService(Components.interfaces.nsILDAPService);
                     var filterPrefix = "";
                     var filterSuffix = "";
                     var filterAttr = "";
-                    
+
                     // search 1 : BEGINS WITH
+                    // Create filter from filter template and search string
                     var filter1 = ldapSvc.createFilter(1024, filterTemplate1, filterPrefix, filterSuffix, filterAttr, aString);
                     if (!filter1)
                         throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
 
-                    args.typeSpecificArg = attributes;
-                    args.querySubDirectories = true;
-                    args.filter = filter1;
+                    var query1 =
+                        Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
+                            .createInstance(Components.interfaces.nsIAbDirectoryQuery);
+
+                    var attributes1 =
+                        Components.classes["@mozilla.org/addressbook/ldap-attribute-map;1"]
+                            .createInstance(Components.interfaces.nsIAbLDAPAttributeMap);
+                    attributes1.setAttributeList("DisplayName",
+                        ab.attributeMap.getAttributeList("DisplayName", {}), true);
+                    attributes1.setAttributeList("PrimaryEmail",
+                        ab.attributeMap.getAttributeList("PrimaryEmail", {}), true);
+
+                    var args1 =
+                        Components.classes["@mozilla.org/addressbook/directory/query-arguments;1"]
+                            .createInstance(Components.interfaces.nsIAbDirectoryQueryArguments);
+
+                    args1.typeSpecificArg = attributes1;
+                    args1.querySubDirectories = true;
+                    args1.filter = filter1;
 
                     // add an async search listener
-                    let that = this;
                     var abDirSearchListener1 = {
                         addressBook : ab,
                         isRemote : true,
@@ -1918,19 +1920,35 @@ var mrcAComplete = {
                     };
 
                     this._addSearchListener(abDirSearchListener1);
-                    query.doQuery(ab, args, abDirSearchListener1, ab.maxHits, 0);
+                    query1.doQuery(ab, args1, abDirSearchListener1, ab.maxHits, 0);
 
                     // search 2 : CONTAINS
+                    // Create filter from filter template and search string
                     var filter2 = ldapSvc.createFilter(1024, filterTemplate2, filterPrefix, filterSuffix, filterAttr, aString);
                     if (!filter2)
                         throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
 
-                    args.typeSpecificArg = attributes;
-                    args.querySubDirectories = true;
-                    args.filter = filter2;
+                    var query2 =
+                        Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
+                            .createInstance(Components.interfaces.nsIAbDirectoryQuery);
+
+                    var attributes2 =
+                        Components.classes["@mozilla.org/addressbook/ldap-attribute-map;1"]
+                            .createInstance(Components.interfaces.nsIAbLDAPAttributeMap);
+                    attributes2.setAttributeList("DisplayName",
+                        ab.attributeMap.getAttributeList("DisplayName", {}), true);
+                    attributes2.setAttributeList("PrimaryEmail",
+                        ab.attributeMap.getAttributeList("PrimaryEmail", {}), true);
+
+                    var args2 =
+                        Components.classes["@mozilla.org/addressbook/directory/query-arguments;1"]
+                            .createInstance(Components.interfaces.nsIAbDirectoryQueryArguments);
+
+                    args2.typeSpecificArg = attributes2;
+                    args2.querySubDirectories = true;
+                    args2.filter = filter2;
 
                     // add an async search listener
-                    let that = this;
                     var abDirSearchListener2 = {
                         addressBook : ab,
                         isRemote : true,
@@ -1954,7 +1972,7 @@ var mrcAComplete = {
                     };
 
                     this._addSearchListener(abDirSearchListener2);
-                    query.doQuery(ab, args, abDirSearchListener2, ab.maxHits, 0);
+                    query2.doQuery(ab, args2, abDirSearchListener2, ab.maxHits, 0);
 
 
                     // search 3 : GROUP
