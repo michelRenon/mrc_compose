@@ -1792,8 +1792,6 @@ var mrcAComplete = {
         let filterTemplate1 = "(|(mail=%v*)(givenName=%v*)(sn=%v*)(displayName=%v*)(cn=%v*))";
         
         // second search : CONTAINS
-        //// // we must exclude the results from first search : it's the 'not' part of query
-        //// let searchQuery2 = "(and"+baseQuery.replace(/@C/g, 'c')+"(not"+searchQuery1+"))";
         // We will make the exclusion manually, after all searches completed.
         let searchQuery2 = baseQuery.replace(/@C/g, 'c');
         searchQuery2 = searchQuery2.replace(/@V/g, encodeURIComponent(aString));
@@ -1802,11 +1800,14 @@ var mrcAComplete = {
         
         // third search : GROUP CONTAINS
         // unused because first query uses field 'LastName'
+        /*
         let searchQuery3 = "(and(IsMailList,=,TRUE)(LastName,c,@V))";  
         searchQuery3 = searchQuery3.replace(/@V/g, encodeURIComponent(aString));
         // ldap query template
+        // TODO : add field to search group
         let filterTemplate3 = "(|(mail=*%v*)(givenName=*%v*)(sn=*%v*)(displayName=*%v*)(cn=*%v*))";
-
+        */
+        
         // init listeners
         this._initSearchListeners();
 
@@ -1905,17 +1906,19 @@ var mrcAComplete = {
                     var filterPrefix = "";
                     var filterSuffix = "";
                     var filterAttr = "";
-                    var filter = ldapSvc.createFilter(1024, filterTemplate, filterPrefix, filterSuffix, filterAttr, aString);
-                    if (!filter)
+                    
+                    // search 1 : BEGINS WITH
+                    var filter1 = ldapSvc.createFilter(1024, filterTemplate1, filterPrefix, filterSuffix, filterAttr, aString);
+                    if (!filter1)
                         throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
 
                     args.typeSpecificArg = attributes;
                     args.querySubDirectories = true;
-                    args.filter = filter;
+                    args.filter = filter1;
 
                     // add an async search listener
                     let that = this;
-                    var abDirSearchListener = {
+                    var abDirSearchListener1 = {
                         addressBook : ab,
                         isRemote : true,
                         cbObject : that,
@@ -1928,12 +1931,88 @@ var mrcAComplete = {
                         },
 
                         onSearchFoundCard : function(aCard) {
-                            this.cbObject.search_res2.push(this.cbObject._createMyCard(aCard));
+                            // TODO : check if "card.isMailList" is OK
+                            if (card.isMailList) { 
+                                this.cbObject.search_res3.push(this.cbObject._createMyCard(aCard));
+                            } else {
+                                this.cbObject.search_res1.push(this.cbObject._createMyCard(aCard));
+                            }
                         }
                     };
 
-                    this._addSearchListener(abDirSearchListener);
-                    query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
+                    this._addSearchListener(abDirSearchListener1);
+                    query.doQuery(ab, args, abDirSearchListener1, ab.maxHits, 0);
+
+                    // search 2 : CONTAINS
+                    var filter2 = ldapSvc.createFilter(1024, filterTemplate2, filterPrefix, filterSuffix, filterAttr, aString);
+                    if (!filter2)
+                        throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
+
+                    args.typeSpecificArg = attributes;
+                    args.querySubDirectories = true;
+                    args.filter = filter2;
+
+                    // add an async search listener
+                    let that = this;
+                    var abDirSearchListener2 = {
+                        addressBook : ab,
+                        isRemote : true,
+                        cbObject : that,
+                        localRes : null,
+
+                        onSearchFinished : function(aResult, aErrorMesg) {
+                            if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
+                                this.cbObject._completeSearchListener(this);
+                            }
+                        },
+
+                        onSearchFoundCard : function(aCard) {
+                            // TODO : check if "card.isMailList" is OK
+                            if (card.isMailList) { 
+                                this.cbObject.search_res3.push(this.cbObject._createMyCard(aCard));
+                            } else {
+                                this.cbObject.search_res2.push(this.cbObject._createMyCard(aCard));
+                            }
+                        }
+                    };
+
+                    this._addSearchListener(abDirSearchListener2);
+                    query.doQuery(ab, args, abDirSearchListener2, ab.maxHits, 0);
+
+
+                    // search 3 : GROUP
+                    // unused
+                    /*
+                    var filter3 = ldapSvc.createFilter(1024, filterTemplate3, filterPrefix, filterSuffix, filterAttr, aString);
+                    if (!filter3)
+                        throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
+
+                    args.typeSpecificArg = attributes;
+                    args.querySubDirectories = true;
+                    args.filter = filter3;
+
+                    // add an async search listener
+                    let that = this;
+                    var abDirSearchListener3 = {
+                        addressBook : ab,
+                        isRemote : true,
+                        cbObject : that,
+                        localRes : null,
+
+                        onSearchFinished : function(aResult, aErrorMesg) {
+                            if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
+                                this.cbObject._completeSearchListener(this);
+                            }
+                        },
+
+                        onSearchFoundCard : function(aCard) {
+                            this.cbObject.search_res3.push(this.cbObject._createMyCard(aCard));
+                        }
+                    };
+
+                    this._addSearchListener(abDirSearchListener3);
+                    query.doQuery(ab, args, abDirSearchListener3, ab.maxHits, 0);
+                    */
                 }
             }
         }
