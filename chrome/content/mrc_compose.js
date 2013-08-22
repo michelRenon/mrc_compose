@@ -767,6 +767,12 @@ var mrcAComplete = {
      */
 
 
+    _hashCode : function(s) {
+        return s.split("").reduce(function(a,b) {
+                a=((a<<5)-a)+b.charCodeAt(0);
+                return a&a;
+            });
+    },
 
     _prefLoaded : function() {
         /*
@@ -1455,7 +1461,12 @@ var mrcAComplete = {
             'mrcPopularity' : card.getProperty("PopularityIndex", "0"),
             'isMailList' : abcard.isMailList,
             'mailListURI' : abcard.mailListURI,
-            };        
+            };
+        // create a hash of all properties
+        let props = "";
+        for(prop in temp) {props += temp[prop];}
+        temp.hash = this._hashCode(props);
+        // dump("props="+props+";;; hash="+temp.hash+"\n");
         return temp;
     },
 
@@ -1516,8 +1527,9 @@ var mrcAComplete = {
                 // dump("_completeSearchListener : res="+abSearchListener.localRes.length+"\n");
                 // dump("_completeSearchListener : dirname="+abSearchListener.addressBook.dirName+"\n");
                 // dump("nbDatas avant ="+this.nbDatas+"\n");
-                abSearchListener.localRes.sort(this._sort_card);
                 abSearchListener.localRes = this._removeDuplicatecards(abSearchListener.localRes);
+                abSearchListener.localRes.sort(this._sort_card);
+                // abSearchListener.localRes = this._removeDuplicatecards(abSearchListener.localRes);
 
                 this.datas[abSearchListener.addressBook.dirName] = abSearchListener.localRes;
                 this.nbDatas += abSearchListener.localRes.length;
@@ -1541,8 +1553,9 @@ var mrcAComplete = {
             switch(this.param_mode) {
                 case 1:
                     // 
-                    this.search_res1.sort(this._sort_card);
                     this.search_res1 = this._removeDuplicatecards(this.search_res1);
+                    this.search_res1.sort(this._sort_card);
+                    // this.search_res1 = this._removeDuplicatecards(this.search_res1);
 
                     this.datas = {'contains' : this.search_res1};
                     this.nbDatas = this.search_res1.length;
@@ -1550,13 +1563,39 @@ var mrcAComplete = {
                     
                 case 2:
                     // 
+                    this.search_res1 = this._removeDuplicatecards(this.search_res1);
+                    this.search_res2 = this._removeDuplicatecards(this.search_res2);
+                    this.search_res3 = this._removeDuplicatecards(this.search_res3);
+                    /*
+                    dump("\n\nRES1=\n");
+                    for(let i =0,l=this.search_res1.length ; i < l; i++) {
+                        dump(""+this.search_res1[i].hash+"\n");
+                    }
+                    dump("----------------------");
+                    dump("\n\nRES2=\n");
+                    for(let i =0,l=this.search_res2.length ; i < l; i++) {
+                        dump(""+this.search_res2[i].hash+"\n");
+                    }
+                    dump("----------------------");
+                    */
+                    // special : we exclude  items of list2 that are in list1
+                    // we use the hash code of each card,
+                    // and we create a list of hashes of res1.
+                    let res1 = this.search_res1.map(function(e) {return e.hash});
+                    let res2 = []
+                    for(let i=0, l=this.search_res2.length ; i < l; i++) {
+                        if (res1.indexOf(this.search_res2[i].hash) == -1)
+                            res2.push(this.search_res2[i]);
+                    }
+                    this.search_res2 = res2;
+                    
                     this.search_res1.sort(this._sort_card);
                     this.search_res2.sort(this._sort_card);
                     this.search_res3.sort(this._sort_card);
 
-                    this.search_res1 = this._removeDuplicatecards(this.search_res1);
-                    this.search_res2 = this._removeDuplicatecards(this.search_res2);
-                    this.search_res3 = this._removeDuplicatecards(this.search_res3);
+                    // this.search_res1 = this._removeDuplicatecards(this.search_res1);
+                    // this.search_res2 = this._removeDuplicatecards(this.search_res2);
+                    // this.search_res3 = this._removeDuplicatecards(this.search_res3);
 
                     this.datas = {'begin' : this.search_res1, 'contains' : this.search_res2, 'list' : this.search_res3};
                     this.nbDatas = this.search_res1.length+this.search_res2.length+this.search_res3.length;
@@ -1575,6 +1614,20 @@ var mrcAComplete = {
         this.allListenersStarted = true;
         this._testSearchComplete();
     },
+    
+    /*
+     * 
+    Infos for LDAP searches :
+        https://wiki.mozilla.org/MailNews:LDAP_Address_Books
+
+        https://wiki.mozilla.org/Mozilla_LDAP_SDK_Programmer%27s_Guide/Using_Filter_Configuration_Files_With_LDAP_C_SDK
+    
+        NS_SCRIPTABLE NS_IMETHOD CreateFilter(PRUint32 aMaxSize, const nsACString & aPattern, 
+                                            const nsACString & aPrefix, const nsACString & aSuffix, 
+                                            const nsACString & aAttr, const nsACString & aValue, 
+                                            nsACString & _retval NS_OUTPARAM) = 0;
+
+     */
 
     _search_mode_1 : function(aString) {
         /*
@@ -1590,11 +1643,13 @@ var mrcAComplete = {
          *   none
          */
         // use DisplayName and NickName
-        let baseQuery = "(or(PrimaryEmail,@C,@V)(FirstName,@C,@V)(LastName,@C,@V)(DisplayName,@C,@V)(NickName,@C,@V))";  
+        let baseQuery = "(or(PrimaryEmail,@C,@V)(FirstName,@C,@V)(LastName,@C,@V)(DisplayName,@C,@V)(NickName,@C,@V))";
         
         // one search : CONTAINS     
         let searchQuery1 = baseQuery.replace(/@C/g, 'c');
         searchQuery1 = searchQuery1.replace(/@V/g, encodeURIComponent(aString));
+        // ldap query template
+        let filterTemplate = "(|(mail=*%v*)(givenName=*%v*)(sn=*%v*)(displayName=*%v*)(cn=*%v*))";
         
         let allAddressBooks = this.abManager.directories;
         
@@ -1665,16 +1720,13 @@ var mrcAComplete = {
                         Components.classes["@mozilla.org/addressbook/directory/query-arguments;1"]
                                 .createInstance(Components.interfaces.nsIAbDirectoryQueryArguments);
 
-                    var filterTemplate = ab.getStringValue("autoComplete.filterTemplate", "");
-
-                    // Use default value when preference is not set or it contains empty string    
-                    if (!filterTemplate)
-                        filterTemplate = "(|(cn=%v1*%v2-*)(mail=%v1*%v2-*)(sn=%v1*%v2-*))";
-
                     // Create filter from filter template and search string
                     var ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
                                             .getService(Components.interfaces.nsILDAPService);
-                    var filter = ldapSvc.createFilter(1024, filterTemplate, "", "", "", aString);
+                    var filterPrefix = "";
+                    var filterSuffix = "";
+                    var filterAttr = "";
+                    var filter = ldapSvc.createFilter(1024, filterTemplate, filterPrefix, filterSuffix, filterAttr, aString);
                     if (!filter)
                         throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
 
@@ -1730,21 +1782,27 @@ var mrcAComplete = {
         // first search : BEGIN WITH     
         let searchQuery1 = baseQuery.replace(/@C/g, 'bw');
         searchQuery1 = searchQuery1.replace(/@V/g, encodeURIComponent(aString));
+        // ldap query template
+        let filterTemplate1 = "(|(mail=%v*)(givenName=%v*)(sn=%v*)(displayName=%v*)(cn=%v*))";
         
         // second search : CONTAINS
-        // we must exclude the results from first search : it's the 'not' part of query
-        let searchQuery2 = "(and"+baseQuery.replace(/@C/g, 'c')+"(not"+searchQuery1+"))";
+        //// // we must exclude the results from first search : it's the 'not' part of query
+        //// let searchQuery2 = "(and"+baseQuery.replace(/@C/g, 'c')+"(not"+searchQuery1+"))";
+        // We will make the exclusion manually, after all searches completed.
+        let searchQuery2 = baseQuery.replace(/@C/g, 'c');
         searchQuery2 = searchQuery2.replace(/@V/g, encodeURIComponent(aString));
+        // ldap query template
+        let filterTemplate2 = "(|(mail=*%v*)(givenName=*%v*)(sn=*%v*)(displayName=*%v*)(cn=*%v*))";
         
         // third search : GROUP CONTAINS
         // unused because first query uses field 'LastName'
         let searchQuery3 = "(and(IsMailList,=,TRUE)(LastName,c,@V))";  
         searchQuery3 = searchQuery3.replace(/@V/g, encodeURIComponent(aString));
+        // ldap query template
+        let filterTemplate3 = "(|(mail=*%v*)(givenName=*%v*)(sn=*%v*)(displayName=*%v*)(cn=*%v*))";
 
-        let res1 = [];
-        let res2 = [];
-        let res3 = [];
-        let numRemotes = 0;
+        // init listeners
+        this._initSearchListeners();
 
         let allAddressBooks = this.abManager.directories;
         while (allAddressBooks.hasMoreElements()) {
@@ -1752,23 +1810,26 @@ var mrcAComplete = {
             if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
 
                 let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
-                /*
-                let doSearch = true;
-                if (ab.URI.indexOf(this.COLLECTED_ADDRESS_BOOK_URI) == 0) {
-                    doSearch = this.param_search_collected_ab;
-                    // Application.console.log(ab.dirName+"==> excluded from search");
-                }
-                */
                 if (doSearch) {
+                    // add a sync search listener
+                    let that = this;
+                    var abSearchListener = {
+                        addressBook : ab,
+                        isRemote : false,
+                        cbObject : that,
+                        localRes : null,
+                    }
+                    this._addSearchListener(abSearchListener);
+
                     // search 1
                     let childCards1 = this.abManager.getDirectory(ab.URI + "?" + searchQuery1).childCards;  
                     while (childCards1.hasMoreElements()) {
                         card = childCards1.getNext();
                         if (card instanceof Components.interfaces.nsIAbCard) {
                             if (card.isMailList) { // necessary
-                                res3.push(this._createMyCard(card));
+                                this.search_res3.push(this._createMyCard(card));
                             } else if (card.primaryEmail != "")
-                                res1.push(this._createMyCard(card));
+                                this.search_res1.push(this._createMyCard(card));
                         }
                     }
 
@@ -1779,9 +1840,9 @@ var mrcAComplete = {
                         card = childCards2.getNext();
                         if (card instanceof Components.interfaces.nsIAbCard) {
                             if (card.isMailList) { // necessary 
-                                res3.push(this._createMyCard(card));
+                                this.search_res3.push(this._createMyCard(card));
                             } else if (card.primaryEmail != "")
-                                res2.push(this._createMyCard(card));
+                                this.search_res2.push(this._createMyCard(card));
                         }
                     }
                     // search 3
@@ -1797,12 +1858,13 @@ var mrcAComplete = {
                         }
                     }
                     */ 
+                    // finish the listener
+                    this._completeSearchListener(abSearchListener);
                 }
             } else {
                 // Parts of the code in this block are copied from
                 //http://hg.mozilla.org/comm-central/file/tip/mailnews/addrbook/src/nsAbLDAPAutoCompleteSearch.js
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
-                    numRemotes++;
                     var acDirURI = null;
                     if (gCurrentIdentity.overrideGlobalPref) {
                         acDirURI = gCurrentIdentity.directoryServer;
@@ -1830,17 +1892,14 @@ var mrcAComplete = {
                     var args =
                         Components.classes["@mozilla.org/addressbook/directory/query-arguments;1"]
                             .createInstance(Components.interfaces.nsIAbDirectoryQueryArguments);
-
-                    var filterTemplate = ab.getStringValue("autoComplete.filterTemplate", "");
-
-                    // Use default value when preference is not set or it contains empty string
-                    if (!filterTemplate)
-                        filterTemplate = "(|(cn=%v1*%v2-*)(mail=%v1*%v2-*)(sn=%v1*%v2-*))";
-
+                    
                     // Create filter from filter template and search string
                     var ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
                         .getService(Components.interfaces.nsILDAPService);
-                    var filter = ldapSvc.createFilter(1024, filterTemplate, "", "", "", aString);
+                    var filterPrefix = "";
+                    var filterSuffix = "";
+                    var filterAttr = "";
+                    var filter = ldapSvc.createFilter(1024, filterTemplate, filterPrefix, filterSuffix, filterAttr, aString);
                     if (!filter)
                         throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
 
@@ -1848,46 +1907,32 @@ var mrcAComplete = {
                     args.querySubDirectories = true;
                     args.filter = filter;
 
-                    var that = this;
+                    // add an async search listener
+                    let that = this;
                     var abDirSearchListener = {
+                        addressBook : ab,
+                        isRemote : true,
+                        cbObject : that,
+                        localRes : null,
+
                         onSearchFinished : function(aResult, aErrorMesg) {
-                            numRemotes--;
                             if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
-                                if ((!allAddressBooks.hasMoreElements()) && (numRemotes == 0)) {
-                                    that._search_mode_2_finish.call(that, res1, res2, res3);
-                                    if (cbSearch)
-                                        cbSearch();
-                                }
+                                this.cbObject._completeSearchListener(this);
                             }
                         },
 
                         onSearchFoundCard : function(aCard) {
-                            res2.push(that._createMyCard(aCard));
+                            this.cbObject.search_res2.push(this.cbObject._createMyCard(aCard));
                         }
                     };
 
+                    this._addSearchListener(abDirSearchListener);
                     query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
                 }
             }
-            if (numRemotes == 0) {
-                this._search_mode_2_finish(res1, res2, res3);
-                if (cbSearch)
-                    cbSearch();
-            }
         }
-    },
-
-    _search_mode_2_finish : function(res1, res2, res3) {
-        res1.sort(this._sort_card);
-        res2.sort(this._sort_card);
-        res3.sort(this._sort_card);
-
-        res1 = this._removeDuplicatecards(res1);
-        res2 = this._removeDuplicatecards(res2);
-        res3 = this._removeDuplicatecards(res3);
-
-        this.datas = {'begin' : res1, 'contains' : res2, 'list' : res3};
-        this.nbDatas = res1.length+res2.length+res3.length;
+        
+        this._startWaitingSearchListeners();
     },
 
     _search_mode_3 : function(aString) {
@@ -1908,6 +1953,8 @@ var mrcAComplete = {
         // one search : CONTAINS     
         let searchQuery1 = baseQuery.replace(/@C/g, 'c');
         searchQuery1 = searchQuery1.replace(/@V/g, encodeURIComponent(aString));
+        // ldap query template
+        let filterTemplate = "(|(mail=*%v*)(givenName=*%v*)(sn=*%v*)(displayName=*%v*)(cn=*%v*))";
         
         // init listeners
         this._initSearchListeners();
@@ -1976,17 +2023,13 @@ var mrcAComplete = {
                         Components.classes["@mozilla.org/addressbook/directory/query-arguments;1"]
                             .createInstance(Components.interfaces.nsIAbDirectoryQueryArguments);
 
-                    var filterTemplate = ab.getStringValue("autoComplete.filterTemplate", "");
-
-                    // Use default value when preference is not set or it contains empty string
-                    if (!filterTemplate)
-                        filterTemplate = "(|(cn=%v1*%v2-*)(mail=%v1*%v2-*)(sn=%v1*%v2-*))";
-
                     // Create filter from filter template and search string
                     var ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
-                        .getService(Components.interfaces.nsILDAPService);
-                    var filter = ldapSvc.createFilter(1024, filterTemplate, "", "", "", aString);
-
+                                            .getService(Components.interfaces.nsILDAPService);
+                    var filterPrefix = "";
+                    var filterSuffix = "";
+                    var filterAttr = "";
+                    var filter = ldapSvc.createFilter(1024, filterTemplate, filterPrefix, filterSuffix, filterAttr, aString);
                     if (!filter)
                         throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
 
