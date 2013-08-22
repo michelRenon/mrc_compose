@@ -1498,7 +1498,7 @@ var mrcAComplete = {
     
     
     _initSearchListeners : function() {
-        // this.searchListeners = [];
+        // this.searchListeners = []; unused
         this.allListenersStarted = false;
         this.numRemotes = 0;
         
@@ -1508,7 +1508,7 @@ var mrcAComplete = {
     },
         
     _addSearchListener : function(abSearchListener) {
-        // this.searchListeners.push(abSearchListener);
+        // this.searchListeners.push(abSearchListener); unused
         if (abSearchListener.isRemote) {
             this.numRemotes++;
         }
@@ -1529,17 +1529,12 @@ var mrcAComplete = {
                 break;
                 
             case 3:
-                // 
-                // dump("_completeSearchListener : res="+abSearchListener.localRes.length+"\n");
-                // dump("_completeSearchListener : dirname="+abSearchListener.addressBook.dirName+"\n");
-                // dump("nbDatas avant ="+this.nbDatas+"\n");
+                // sum localRes in global res
                 abSearchListener.localRes = this._removeDuplicatecards(abSearchListener.localRes);
                 abSearchListener.localRes.sort(this._sort_card);
-                // abSearchListener.localRes = this._removeDuplicatecards(abSearchListener.localRes);
 
                 this.datas[abSearchListener.addressBook.dirName] = abSearchListener.localRes;
                 this.nbDatas += abSearchListener.localRes.length;
-                // dump("nbDatas apres ="+this.nbDatas+"\n");
                 break;
         }
         if (abSearchListener.isRemote == true) {
@@ -1550,18 +1545,15 @@ var mrcAComplete = {
     },
         
     _testSearchComplete : function() {
-        // dump("_testSearchComplete, numRemotes="+this.numRemotes+", allListenersStarted="+this.allListenersStarted+"\n");
         if (this.numRemotes == 0 && this.allListenersStarted == true) {
             /*
              * Perform actions when ALL searches are completed.
              */
-            // dump("_testSearchComplete = COMPLETED, cb="+this.cbSearch+"\n");
             switch(this.param_mode) {
                 case 1:
                     // 
                     this.search_res1 = this._removeDuplicatecards(this.search_res1);
                     this.search_res1.sort(this._sort_card);
-                    // this.search_res1 = this._removeDuplicatecards(this.search_res1);
 
                     this.datas = {'contains' : this.search_res1};
                     this.nbDatas = this.search_res1.length;
@@ -1572,21 +1564,10 @@ var mrcAComplete = {
                     this.search_res1 = this._removeDuplicatecards(this.search_res1);
                     this.search_res2 = this._removeDuplicatecards(this.search_res2);
                     this.search_res3 = this._removeDuplicatecards(this.search_res3);
-                    /*
-                    dump("\n\nRES1=\n");
-                    for(let i =0,l=this.search_res1.length ; i < l; i++) {
-                        dump(""+this.search_res1[i].hash+"\n");
-                    }
-                    dump("----------------------");
-                    dump("\n\nRES2=\n");
-                    for(let i =0,l=this.search_res2.length ; i < l; i++) {
-                        dump(""+this.search_res2[i].hash+"\n");
-                    }
-                    dump("----------------------");
-                    */
-                    // special : we exclude  items of list2 that are in list1
-                    // we use the hash code of each card,
-                    // and we create a list of hashes of res1.
+
+                    // special : we exclude  items of list2 that are in list1,
+                    // we use the hash code of each card.
+                    // We create a list of hashes of res1.
                     let res1 = this.search_res1.map(function(e) {return e.hash});
                     let res2 = []
                     for(let i=0, l=this.search_res2.length ; i < l; i++) {
@@ -1598,10 +1579,6 @@ var mrcAComplete = {
                     this.search_res1.sort(this._sort_card);
                     this.search_res2.sort(this._sort_card);
                     this.search_res3.sort(this._sort_card);
-
-                    // this.search_res1 = this._removeDuplicatecards(this.search_res1);
-                    // this.search_res2 = this._removeDuplicatecards(this.search_res2);
-                    // this.search_res3 = this._removeDuplicatecards(this.search_res3);
 
                     this.datas = {'begin' : this.search_res1, 'contains' : this.search_res2, 'list' : this.search_res3};
                     this.nbDatas = this.search_res1.length+this.search_res2.length+this.search_res3.length;
