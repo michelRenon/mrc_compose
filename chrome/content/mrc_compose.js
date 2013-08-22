@@ -766,7 +766,13 @@ var mrcAComplete = {
      * 
      */
 
-
+    /*
+     * hash method
+     * 
+     * from http://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascrip-jquery
+     * answer : http://stackoverflow.com/a/15710692
+     * 
+     */
     _hashCode : function(s) {
         return s.split("").reduce(function(a,b) {
                 a=((a<<5)-a)+b.charCodeAt(0);
