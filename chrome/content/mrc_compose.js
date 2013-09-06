@@ -161,8 +161,6 @@ function Recipients2CompFields(msgCompFields)
 function CompFields2Recipients(msgCompFields)
 {
   if (msgCompFields) {
-    // let mimeHeaderParser = MailServices.headerParser;
-    // let mimeConvert = Components.classes["@mozilla.org/messenger/mimeconverter;1"].getService(Components.interfaces.nsIMimeConverter);
     let mimeConvert = MailServices.mimeConverter;
     // Warning in extension validator
     // top.MAX_RECIPIENTS = 0;
@@ -192,7 +190,6 @@ function CompFields2Recipients(msgCompFields)
         let recipient = null;
         if (mimeConvert)
             try {
-                // recipient = mimeHeaderParser.unquotePhraseOrAddrWString(value, true);
                 recipient = value;
                 recipient = mimeConvert.decodeMimeHeader(recipient, null, false, true);
             } catch (ex) {};
@@ -223,9 +220,6 @@ function CompFields2Recipients(msgCompFields)
     // add all of the recipients for this message to the ignore list for spell check
     addRecipientsToIgnoreList((gCurrentIdentity ? gCurrentIdentity.identityName + ', ' : '') + msgTo + ', ' + msgCC + ', ' + msgBCC);
 
-    // mimeHeaderParser = null; //Release the mime parser
-
-
     mrcComposeFocus(); 
   }
 }
@@ -239,8 +233,7 @@ function LoadIdentity(startup)
         var idKey = identityElement.value;
         gCurrentIdentity = Components.classes["@mozilla.org/messenger/account-manager;1"].getService(Components.interfaces.nsIMsgAccountManager).getIdentity(idKey);
         
-        if (!startup && prevIdentity && idKey != prevIdentity.key)
-        {
+        if (!startup && prevIdentity && idKey != prevIdentity.key) {
             var prefstring = "mail.identity." + prevIdentity.key;
             RemoveDirectoryServerObserver(prefstring);
             var prevReplyTo = prevIdentity.replyTo;
@@ -338,9 +331,6 @@ function LoadIdentity(startup)
 
       AddDirectoryServerObserver(false);
       if (!startup) {
-          // if (getPref("mail.autoComplete.highlightNonMatches"))
-          //   document.getElementById('addressCol2#1').highlightNonMatches = true;
-
           try {
               setupLdapAutocompleteSession();
           } catch (ex) {
@@ -553,8 +543,6 @@ var mrcAComplete = {
     //
     param_mode : 1, 
     
-    param_search_options : {}, // TBD
-    param_build_list_options : {}, // TBD
     // the list of ab where search is performed
     param_search_ab_URI : "",
 
@@ -676,9 +664,6 @@ var mrcAComplete = {
         this.param_mode = this.prefs.getIntPref("mode");        
         this.param_automatic_height = this.prefs.getBoolPref("automatic_height");
         this.param_show_popularity = this.prefs.getBoolPref("show_popularity");
-        
-        // this.param_search_options = this.prefs.getIntPref("line_height");//: {}, // TBD
-        // this.param_build_list_options = this.prefs.getIntPref("line_height");// : {}, // TBD
         this.param_search_ab_URI = this.prefs.getCharPref("search_ab_URI");
         this.param_first_load_done = this.prefs.getBoolPref("first_load_done");
         this.field_states['fieldCC'].force = this.prefs.getBoolPref("force_cc");
@@ -686,11 +671,6 @@ var mrcAComplete = {
 
         // update specials values
         this._prefLoaded();
-        
-        // set focus
-        // var msgTo = document.getElementById("msgTO");
-        // msgTo.focus();
-
     },
 
     shutdown: function() {
@@ -1010,7 +990,7 @@ var mrcAComplete = {
          *     ---> replace is case-sensitive
          * txt = txt.replace(new RegExp(part, "gi"), "<b>"+part+"</b>");
          *     txt="firstName lastName <email>", part="na" --> "first<b>na</b>me last<b>na</b>me <email>", should be "first<b>Na</b>me last<b>Na</b>me <email>"
-         *     ---> replaced text has lost is case
+         *     ---> replaced text has lost his case
          * 
          * We must also integrate the encode method.
          * Otherwise, we can have bad results if encoding is applied before :
@@ -1218,7 +1198,6 @@ var mrcAComplete = {
          */
         // we search the beginning and the end of the part
         let res = this._getPartByPos(src, pos);
-        // Application.console.log("_insertInPart src="+src+"   pos="+pos+"  res="+res['b']+","+res['e']+","+res['i']+","+res['isFirstPart']+","+res['isLastPart']);
         let newTxt = "";
         if (res['isFirstPart'] == false)
             newTxt += src.substring(0, res['b']) + this.PART_PREFIX;
@@ -1248,7 +1227,6 @@ var mrcAComplete = {
          */
         let oldTxt = element.value;
         let v = this._insertInPart(oldTxt, pos, txt);
-        // Application.console.log(v['isLastPart']);
         element.value = v['text'];
         
         // optionaly add a comma
@@ -1283,9 +1261,7 @@ var mrcAComplete = {
          *   dict :
          *       'text'         : the text with the part removed
          */
-        // Application.console.log("_removeInPart('"+src+"', '"+txt+"'");
         let addresses = this._splitEmailList(src);
-        // Application.console.log("_removeInPart() adresses = '"+ addresses.join(",")+"'");
         let nb = addresses.length;
         let newAdresses = [];
         // need to count only non-empty values
@@ -1293,12 +1269,9 @@ var mrcAComplete = {
         for (let i=0, l=addresses.length ; i < l ; i++) {
             let t = addresses[i].trim();
             let pos = t.indexOf(txt);
-            // Application.console.log("t='"+t+"', pos="+pos);
             if (pos ==-1) newAdresses.push(t);
         }
-        // Application.console.log("_removeInPart() newAdresses = '"+ newAdresses.join(",")+"'");
         let newTxt = newAdresses.join( this.PART_SUFFIX+this.SEP+this.PART_PREFIX );
-        // Application.console.log("_removeInPart() newTxt = '"+ newTxt+"'");
         values = {
                 'text' : newTxt,
             }
@@ -1495,7 +1468,6 @@ var mrcAComplete = {
         let props = "";
         for(prop in temp) {props += temp[prop];}
         temp.hash = this._hashCode(props);
-        // dump("props="+props+";;; hash="+temp.hash+"\n");
         return temp;
     },
 
@@ -1521,7 +1493,6 @@ var mrcAComplete = {
     
     
     _initSearchListeners : function() {
-        // this.searchListeners = []; unused
         this.allListenersStarted = false;
         this.numRemotes = 0;
         
@@ -1531,7 +1502,6 @@ var mrcAComplete = {
     },
         
     _addSearchListener : function(abSearchListener) {
-        // this.searchListeners.push(abSearchListener); unused
         if (abSearchListener.isRemote) {
             this.numRemotes++;
         }
@@ -2205,18 +2175,6 @@ var mrcAComplete = {
             cardText = mrcAComplete.mhParser.makeFullAddress(names.join(" "), card['primaryEmail']);
             
             // ----------------
-            // html version : UNUSED
-            /*
-            for (let i=0,l=fields['name'].length ; i<l ; i++) {
-                cardHtml += mrcAComplete._applyBold(card[fields['name'][i]], textBold, typeSearch)+" ";
-            }
-            cardHtml += ' <span class="'+mrcAComplete.EMAIL_CLASSNAME+'">&lt;'+mrcAComplete._applyBold(card['primaryEmail'], textBold, typeSearch)+'&gt;</span>';
-            // popularity, only for primary email
-            if (mrcAComplete.param_show_popularity) {
-                cardHtml += '&#160;<span class="'+mrcAComplete.POPULARITY_CLASSNAME+'">('+parseInt(card.mrcPopularity)+")</span>";
-            }
-            */
-            // ----------------
             // node version
             for (let i=0,l=fields['name'].length ; i<l ; i++) {
                 cardNodes.push.apply(cardNodes, mrcAComplete._applyBoldNode(card[fields['name'][i]], textBold, typeSearch));
@@ -2247,16 +2205,6 @@ var mrcAComplete = {
             }
             cardText = mrcAComplete.mhParser.makeFullAddress(names.join(" "), card['secondEmail']);
             
-            // ----------------
-            // html version : UNUSED
-            /*
-            cardHtml += ' <span class="'+mrcAComplete.HIDDENNAME_CLASSNAME+'">';
-            for (let i=0,l=fields['name'].length ; i<l ; i++) {
-                cardHtml += mrcAComplete._applyBold(card[fields['name'][i]], textBold, typeSearch)+" ";
-            }
-            cardHtml += ' </span>';
-            cardHtml += ' <span class="'+mrcAComplete.EMAIL_CLASSNAME+'">&lt;'+mrcAComplete._applyBold(card['secondEmail'], textBold, typeSearch)+'&gt;</span>';
-            */
             // ----------------
             // node version
             let aspan = document.createElementNS(mrcAComplete.HTMLNS, "span");
@@ -2303,19 +2251,13 @@ var mrcAComplete = {
         
         // ----------------
         // text version
-        let cardText = ""; // Wil be defined only when the usres selects it.
+        let cardText = ""; // Wil be defined only when the user selects it.
         // No real options of presentation : a list has only 'lastname' field.
         
         // ----------------
         // html version : UNUSED
         let cardHtml = "";
-        /*
-        let cardHtml = mrcAComplete._applyBold(card.lastName, textBold, typeSearch)+" ";
-        if (nb <= 1)
-            cardHtml += '&#160;<span class="'+mrcAComplete.NBINGROUP_CLASSNAME+'">('+nb+'&#160;'+mrcAComplete.getString('contact')+')</span>';
-        else
-            cardHtml += '&#160;<span class="'+mrcAComplete.NBINGROUP_CLASSNAME+'">('+nb+'&#160;'+mrcAComplete.getString('contacts')+')</span>';
-        */
+
         // ----------------
         // node version
         let cardNodes = [];
@@ -2629,12 +2571,10 @@ var mrcAComplete = {
         if (this.FIELDS[field].menuId != "") {
             let menu = document.getElementById(this.FIELDS[field].menuId);
             if (this.field_states[field].force) {
-                // menu.checked = true; don't work
                 menu.setAttribute("checked", "true");
                 menu.disabled = true;
             } else {
                 menu.disabled = ! (this.field_states[field].enabled);
-                // menu.checked = this.field_states[field].checked;
                 menu.setAttribute("checked", this.field_states[field].checked ? "true" : "false" );
             }
         }
@@ -2675,9 +2615,7 @@ var mrcAComplete = {
         if (this.FIELDS[field]) {
             try{
                 let element = document.getElementById(this.FIELDS[field].txtId);
-                // Application.console.log("_insertRecipient AVANT : txt="+element.value+"   pos="+element.value.length+"   email="+email);
                 this._elementInsertInPart(element, element.value.length, email);
-                // Application.console.log("_insertRecipient APRES : txt="+element.value);
                 this.updateNbRecipients(element);
 
                 // to be coherent : inform TB that content of current Msg has really changed
@@ -2988,7 +2926,6 @@ var mrcAComplete = {
                 let idBox = this.FIELDS[field].boxId;
                 let box = document.getElementById(idBox);
                 box.collapsed = ! box.collapsed;
-                // this.field_states[field].checked = ! this.field_states[field].checked;
                 this.field_states[field].checked = ! box.collapsed;
 
                 // Update UI
@@ -3052,7 +2989,6 @@ var mrcAComplete = {
                 label.collapsed = true;
                 if (idWarning != '') {
                     let item = document.getElementById(idWarning);
-                    // item.collapsed = true;
                     item.hidden = true;
                 }
             } else {
@@ -3064,10 +3000,8 @@ var mrcAComplete = {
                 if (idWarning != '') {
                     let item = document.getElementById(idWarning);
                     if (nbRecipients > this.param_max_recipients_warning) {
-                        // item.collapsed = false;
                         item.hidden = false;
                     } else {
-                        // item.collapsed = true;
                         item.hidden = true;
                     }
                 }
@@ -3335,7 +3269,7 @@ function mrcRecipientKeyUp(event, element) {
     if (canUpdatePanel) {
         if (textPart.length >= mrcAComplete.param_search_min_char) {
             if (mrcAComplete.needSearch(textPart)) {
-                // recherche
+                // perform search
                 mrcAComplete.search(textPart, function callback_search() { 
                         mrcAComplete.finishSearch(textPart, event, element) 
                     } );
@@ -3363,7 +3297,6 @@ function mrcRecipientResize(element, max) {
         let h = Math.min(Math.max(nHeight,mrcAComplete.param_first_line_height),max);  
         element.height = h;
         let sh3 = element.inputField.scrollHeight;
-        // Application.console.log("id="+element.id+"  sh1="+sh1+" sh2="+sh2+" h="+h+" sh3="+sh3);
     } catch (e) {
         Application.console.log("ERREUR mrcRecipientResize()"+e.message);
     }      
@@ -3450,13 +3383,8 @@ function mrcMinimizeFields_2(element) {
      * 
      */
     try {
-        // Application.console.log(i+", height="+element.height+", sh="+element.inputField.scrollHeight);
-        
-        // element.setAttribute("height", 'auto');
-        // element.setAttribute("height", mrcAComplete.param_first_line_height);
         let t = mrcAComplete.param_first_line_height.toString()+'px';
         element.setAttribute("height", t);
-    
     } catch (e) {
         Application.console.log("ERREUR mrcMinimizeFields() : "+e.message);
     }
@@ -3489,30 +3417,4 @@ function mrcOpenPreferences(event) {
     } catch (e) {
         Application.console.log("ERREUR mrcOpenPreferences() : "+e.message);
     }
-}
-
-
-
-
-
-/*
- * 
- * Unused event callbacks
- * 
- */
-
-function mrcRecipientTextCommand(userAction, element) {
-    // Application.console.log('ontextentered : action='+userAction+", elt="+elt.toString());
-}
-
-function mrcRecipientErrorCommand(errItem, element) {
-    // Application.console.log('onerrorcommand');
-}
-
-function mrcRecipientKeyDown(event, element) {
-    // Application.console.log('onkeydown : event='+event.toString()+', event.keycode='+event.keyCode+', elt.value='+element.value);
-}
-
-function mrcRecipientChange(element) {
-    // Application.console.log('onchange: elt.value='+element.value.toString());
 }
