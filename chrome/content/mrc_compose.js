@@ -101,11 +101,14 @@
 
 /*
  * 
- * New versions of 3 existing methods (from Mozilla Thunderbird) :
+ * New versions of 4 existing methods (from Mozilla Thunderbird) :
  *   - Recipients2CompFields()
  *   - CompFields2Recipients()
+ *      --> cf <src>/mail/components/compose/content/addressingWidgetOverlay.js
  *   - LoadIdentity()
- *      --> cf <src>/suite/mailnews/compose/MsgComposeCommand.js, LoadIdentity()
+ *      --> cf <src>/mail/components/compose/content/MsgComposeCommand.js
+ *   - AddRecipient()
+ *      --> cf <src>/mail/components/compose/content/MsgComposeCommand.js
  * 
  */
 
@@ -351,8 +354,28 @@ function LoadIdentity(startup)
     }
 }
 
+// public method called by the address picker sidebar
+function AddRecipient(recipientType, address)
+{
+    // Application.console.log("AddRecipient("+recipientType+", "+address+")");
+    switch(recipientType) {
+        case "addr_to" :
+            mrcAComplete.forceFieldVisibility('fieldTO', true);
+            mrcAComplete._insertRecipient('fieldTO', address);
+            break;
+            
+        case "addr_cc" :
+            mrcAComplete.forceFieldVisibility('fieldCC', true);
+            mrcAComplete._insertRecipient('fieldCC', address);
+            break;
 
-// function AdjustFocus() {}
+        case "addr_bcc" :
+            mrcAComplete.forceFieldVisibility('fieldBCC', true);
+            mrcAComplete._insertRecipient('fieldBCC', address);
+            break;
+    }
+}
+
 
 
 /*
