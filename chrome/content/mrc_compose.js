@@ -3079,6 +3079,8 @@ var mrcAComplete = {
 function mrcComposeLoaded() {
     var headerToolbar = document.getElementById("MsgHeadersToolbar");
     headerToolbar.setAttribute("minheight", "10");
+    // compat TB24
+    headerToolbar.removeAttribute("height");
 }
 
 function mrcComposeFocus() {
