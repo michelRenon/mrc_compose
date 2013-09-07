@@ -7,4 +7,4 @@ Hauteur en pixels des lignes suivantes de chaque champ.<br>
 <h4>Bouton "Hauteur d&eacute;faut"</h4>
 Initialise les valeurs des 2 champs "Hauteur premi&egrave;re ligne" et "hauteur ligne".<br>
 <h4>Hauteur Automatique</h4>
-Adapte la hauteur du champ à chaque caract&egrave;re.<br>
+Adapte la hauteur du champ &agrave; chaque caract&egrave;re.<br>
