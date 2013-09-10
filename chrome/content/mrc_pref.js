@@ -272,7 +272,7 @@ function mrcLoadHelp() {
                   .getService(Components.interfaces.nsIParserUtils);
             let injectHTML = "";
             // special : Gecko 13 does not have 'parseFragment()'
-            if (parserUtils.parseFragment && false)
+            if (parserUtils.parseFragment)
                 injectHTML = parserUtils.parseFragment(txt, 0, false, null, div); 
             else {
                 // Old API to parse html, xml, svg.
