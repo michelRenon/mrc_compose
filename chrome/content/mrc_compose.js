@@ -350,18 +350,21 @@ function AddRecipient(recipientType, address)
     // Application.console.log("AddRecipient("+recipientType+", "+address+")");
     switch(recipientType) {
         case "addr_to" :
-            mrcAComplete.forceFieldVisibility('fieldTO', true);
             mrcAComplete._insertRecipient('fieldTO', address);
+            mrcAComplete.forceFieldVisibility('fieldTO', true);
+            mrcAComplete.updateFieldUI('fieldTO');
             break;
             
         case "addr_cc" :
-            mrcAComplete.forceFieldVisibility('fieldCC', true);
             mrcAComplete._insertRecipient('fieldCC', address);
+            mrcAComplete.forceFieldVisibility('fieldCC', true);
+            mrcAComplete.updateFieldUI('fieldCC');
             break;
 
         case "addr_bcc" :
-            mrcAComplete.forceFieldVisibility('fieldBCC', true);
             mrcAComplete._insertRecipient('fieldBCC', address);
+            mrcAComplete.forceFieldVisibility('fieldBCC', true);
+            mrcAComplete.updateFieldUI('fieldBCC');
             break;
     }
 }
@@ -2903,10 +2906,24 @@ var mrcAComplete = {
          *   none
          */
         let field = this._getFieldFromTextElement(element);
+        this.updateFieldUI(field);
+    },
+
+    updateFieldUI : function(field) {
+        /*
+         * update the UI that handle fields : 
+         * 
+         * params :
+         *   field : text
+         * return :
+         *   none
+         */
         if (field != "" && this.field_states[field]) {
             let idBox = this.FIELDS[field].boxId;
             let box = document.getElementById(idBox);
-            if (element.value == "") {
+            let idTxt = this.FIELDS[field].txtId;
+            let txt = document.getElementById(idTxt);
+            if (txt.value == "") {
                 this.field_states[field].enabled = true;
             } else {
                 this.field_states[field].enabled = false;
