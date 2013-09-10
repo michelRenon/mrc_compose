@@ -270,7 +270,17 @@ function mrcLoadHelp() {
             //safely convert HTML string to a simple DOM object, striping it of javascript and more complex tags
             var parserUtils = Components.classes["@mozilla.org/parserutils;1"]
                   .getService(Components.interfaces.nsIParserUtils);
-            let injectHTML = parserUtils.parseFragment(txt, 0, false, null, div); 
+            let injectHTML = "";
+            // special : Gecko 13 does not have 'parseFragment()'
+            if (parserUtils.parseFragment && false)
+                injectHTML = parserUtils.parseFragment(txt, 0, false, null, div); 
+            else {
+                // Old API to parse html, xml, svg.
+                var parser = Components.classes["@mozilla.org/xmlextras/domparser;1"]
+                            .createInstance(Components.interfaces.nsIDOMParser);
+                var htmlDoc = parser.parseFromString(txt, "text/html");
+                injectHTML = htmlDoc.firstChild;
+            }
 
             //attach the DOM object to the HTML div element 
             div.appendChild(injectHTML); 
