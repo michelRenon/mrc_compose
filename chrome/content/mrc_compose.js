@@ -93,7 +93,7 @@
  */
 
 
-
+"use strict";
 
 
 
@@ -131,8 +131,8 @@ function Recipients2CompFields(msgCompFields)
     var ng_Sep = "";
     var follow_Sep = "";
     
-    getValue = function(elementId) {
-        inputField = document.getElementById(elementId);
+    let getValue = function(elementId) {
+        let inputField = document.getElementById(elementId);
         fieldValue = inputField.value;
         if (fieldValue == null) fieldValue = inputField.getAttribute("value");
         return fieldValue;
@@ -387,7 +387,7 @@ function AddRecipient(recipientType, address)
 function removeChildren(element) {
     var children = element.childNodes;
     var nbChildren = children.length;
-    for (c = nbChildren-1 ; c >= 0 ; c--) {
+    for (let c = nbChildren-1 ; c >= 0 ; c--) {
         element.removeChild(children[c]);
     }
 }
@@ -917,7 +917,7 @@ var mrcAComplete = {
         var doEscapeNextChar = false;
         
         // we parse the data, iterate over each character
-        for(var i=0 ; i<nbData ; i++) {
+        for (let i=0 ; i<nbData ; i++) {
             curChar = data[i];
             doPushPart = false;
             doPushChar = true;
@@ -1124,6 +1124,7 @@ var mrcAComplete = {
         let splitBegin = 0;
         let splitEnd = 0;
         let splitIndex = 0;
+        let splitLength = 0;
         let textLength = 0;
         for (let i = 0 ; i < res.length ; i++) {
             splitLength = res[i].length;
@@ -1164,7 +1165,7 @@ var mrcAComplete = {
         let splitEnd = 0;
         let splitIndex = 0;
         let textLength = 0;
-        for (i = 0 ; i < res.length ; i++) {
+        for (let i = 0 ; i < res.length ; i++) {
             splitLength = res[i].length;
             splitBegin = textLength;
             splitEnd = splitBegin+splitLength;
@@ -1205,7 +1206,7 @@ var mrcAComplete = {
         if (res['isFirstPart'] == false)
             newTxt += src.substring(0, res['b']) + this.PART_PREFIX;
         newTxt += txt + this.PART_SUFFIX + src.substring(res['e']);
-        values = {
+        let values = {
                 'text' : newTxt,
                 'b' : res['b'],
                 'e' : res['b'] + this.PART_PREFIX.length + txt.length + this.PART_SUFFIX.length,
@@ -1238,7 +1239,6 @@ var mrcAComplete = {
             // update text cursor : put it at the end of the text
             let sel = element.value.length;
             element.setSelectionRange(sel, sel);
-        
         } else {
             // update text cursor : put it at the end of the inserted text
             // we just use the returned position of insertion
@@ -1249,9 +1249,6 @@ var mrcAComplete = {
         if (this.param_automatic_height)
             mrcRecipientResize(element);
     },
-
-
-
 
     _removeInPart : function(src, txt) {
         /*
@@ -1265,17 +1262,16 @@ var mrcAComplete = {
          *       'text'         : the text with the part removed
          */
         let addresses = this._splitEmailList(src);
-        let nb = addresses.length;
         let newAdresses = [];
         // need to count only non-empty values
-        nb = 0;
         for (let i=0, l=addresses.length ; i < l ; i++) {
             let t = addresses[i].trim();
             let pos = t.indexOf(txt);
-            if (pos ==-1) newAdresses.push(t);
+            if (pos == -1)
+                newAdresses.push(t);
         }
         let newTxt = newAdresses.join( this.PART_SUFFIX+this.SEP+this.PART_PREFIX );
-        values = {
+        let values = {
                 'text' : newTxt,
             }
         return values;
@@ -1382,7 +1378,7 @@ var mrcAComplete = {
             return da-db;
          */
 
-        f = function(obj, field) {
+        let f = function(obj, field) {
             let v = 0;
             if (field === 'mrcPopularity')
                 // v = parseInt(obj.getProperty("PopularityIndex", "0"));
@@ -1440,8 +1436,8 @@ var mrcAComplete = {
         }
         // obj nows contains unique properties
         // build a std array cards
-        out = [];
-        for (i in obj) {
+        let out = [];
+        for (let i in obj) {
             out.push(obj[i]);
         }
         return out;
@@ -1463,13 +1459,13 @@ var mrcAComplete = {
             'firstName' : abcard.firstName,
             'lastName' : abcard.lastName,
             'nickName' : abcard.nickName,
-            'mrcPopularity' : card.getProperty("PopularityIndex", "0"),
+            'mrcPopularity' : abcard.getProperty("PopularityIndex", "0"),
             'isMailList' : abcard.isMailList,
             'mailListURI' : abcard.mailListURI,
             };
         // create a hash of all properties
         let props = "";
-        for(prop in temp) {props += temp[prop];}
+        for(let prop in temp) {props += temp[prop];}
         temp.hash = this._hashCode(props);
         return temp;
     },
@@ -1653,7 +1649,7 @@ var mrcAComplete = {
 
                     let childCards1 = this.abManager.getDirectory(ab.URI + "?" + searchQuery1).childCards;  
                     while (childCards1.hasMoreElements()) {
-                        card = childCards1.getNext();
+                        let card = childCards1.getNext();
                         if (card instanceof Components.interfaces.nsIAbCard) {
                             // a list has no email, but we want to keep it
                             if (card.isMailList) {
@@ -2599,7 +2595,7 @@ var mrcAComplete = {
     _removeRecipient : function(field, email) {
 
         if (this.FIELDS[field]) {
-            try{
+            try {
                 let element = document.getElementById(this.FIELDS[field].txtId);
                 
                 this._elementRemoveInPart(element, email);
@@ -2616,7 +2612,7 @@ var mrcAComplete = {
     _insertRecipient : function(field, email) {
 
         if (this.FIELDS[field]) {
-            try{
+            try {
                 let element = document.getElementById(this.FIELDS[field].txtId);
                 this._elementInsertInPart(element, element.value.length, email);
                 this.updateNbRecipients(element);
@@ -2675,7 +2671,7 @@ var mrcAComplete = {
          *       'email' : a list of fields names  
          */
         // rules for choosing a name
-        fieldsName = []
+        let fieldsName = [];
         if (card.displayName != "")
             fieldsName.push('displayName');
         else {
@@ -2690,7 +2686,7 @@ var mrcAComplete = {
         }
         // rules for choosing an email
         // no rule today
-        fieldsEmail = ['primaryEmail'];
+        let fieldsEmail = ['primaryEmail'];
         
         return {'name' : fieldsName, 'email' : fieldsEmail};
     },
