@@ -116,25 +116,26 @@ function Recipients2CompFields(msgCompFields)
 {
   if (msgCompFields)
   {
-    var i = 1;
-    var addrTo = "";
-    var addrCc = "";
-    var addrBcc = "";
-    var addrReply = "";
-    var addrNg = "";
-    var addrFollow = "";
-    var addrOther = "";
-    var to_Sep = "";
-    var cc_Sep = "";
-    var bcc_Sep = "";
-    var reply_Sep = "";
-    var ng_Sep = "";
-    var follow_Sep = "";
+    let i = 1;
+    let addrTo = "";
+    let addrCc = "";
+    let addrBcc = "";
+    let addrReply = "";
+    let addrNg = "";
+    let addrFollow = "";
+    let addrOther = "";
+    let to_Sep = "";
+    let cc_Sep = "";
+    let bcc_Sep = "";
+    let reply_Sep = "";
+    let ng_Sep = "";
+    let follow_Sep = "";
     
     let getValue = function(elementId) {
         let inputField = document.getElementById(elementId);
-        fieldValue = inputField.value;
-        if (fieldValue == null) fieldValue = inputField.getAttribute("value");
+        let fieldValue = inputField.value;
+        if (fieldValue == null)
+            fieldValue = inputField.getAttribute("value");
         return fieldValue;
     }
     addrTo = getValue("msgTO");
@@ -151,8 +152,6 @@ function Recipients2CompFields(msgCompFields)
     msgCompFields.newsgroups = addrNg;
     msgCompFields.followupTo = addrFollow;
     msgCompFields.otherRandomHeaders = addrOther;
-
-    mimeHeaderParser = null;
   }
   else
     dump("Message Compose Error: msgCompFields is null (ExtractRecipients)");
@@ -164,20 +163,20 @@ function CompFields2Recipients(msgCompFields)
     let mimeConvert = MailServices.mimeConverter;
     // Warning in extension validator
     // top.MAX_RECIPIENTS = 0;
-    var msgReplyTo = msgCompFields.replyTo;
-    var msgTo = msgCompFields.to;
-    var msgCC = msgCompFields.cc;
-    var msgBCC = msgCompFields.bcc;
-    var msgRandomHeaders = msgCompFields.otherRandomHeaders;
-    var msgNewsgroups = msgCompFields.newsgroups;
-    var msgFollowupTo = msgCompFields.followupTo;
-    var havePrimaryRecipient = false;
-
+    let msgReplyTo = msgCompFields.replyTo;
+    let msgTo = msgCompFields.to;
+    let msgCC = msgCompFields.cc;
+    let msgBCC = msgCompFields.bcc;
+    let msgRandomHeaders = msgCompFields.otherRandomHeaders;
+    let msgNewsgroups = msgCompFields.newsgroups;
+    let msgFollowupTo = msgCompFields.followupTo;
+    let havePrimaryRecipient = false;
+    
     // cleaning CR and LF :
     // TB inserts some \n to have some default formatting ( < 70 cols ?).
     // we don't need it anymore (and we check also for \r )
-    var reN = new RegExp("\n", "g");
-    var reR = new RegExp("\r", "g");
+    let reN = new RegExp("\n", "g");
+    let reR = new RegExp("\r", "g");
     msgTo = msgTo.replace(reN, "").replace(reR, "");
     msgCC = msgCC.replace(reN, "").replace(reR, "");
     msgBCC = msgBCC.replace(reN, "").replace(reR, "");
@@ -186,7 +185,7 @@ function CompFields2Recipients(msgCompFields)
     msgFollowupTo = msgFollowupTo.replace(reN, "").replace(reR, "");
 
     // define values of fields
-    f = function(elt_id, value, field) {
+    let f = function(elt_id, value, field) {
         let recipient = null;
         if (mimeConvert)
             try {
@@ -196,7 +195,7 @@ function CompFields2Recipients(msgCompFields)
         if (!recipient)
             recipient = value;
 
-        inputField = document.getElementById(elt_id);
+        let inputField = document.getElementById(elt_id);
         inputField.value = recipient;
         if (recipient != "" && mrcAComplete.param_add_comma) {
             inputField.value += mrcAComplete.PART_SUFFIX+mrcAComplete.SEP+mrcAComplete.PART_PREFIX;
@@ -226,22 +225,22 @@ function CompFields2Recipients(msgCompFields)
 
 function LoadIdentity(startup)
 {
-    var identityElement = GetMsgIdentityElement();
-    var prevIdentity = gCurrentIdentity;
+    let identityElement = GetMsgIdentityElement();
+    let prevIdentity = gCurrentIdentity;
 
     if (identityElement) {
-        var idKey = identityElement.value;
+        let idKey = identityElement.value;
         gCurrentIdentity = Components.classes["@mozilla.org/messenger/account-manager;1"].getService(Components.interfaces.nsIMsgAccountManager).getIdentity(idKey);
         
         if (!startup && prevIdentity && idKey != prevIdentity.key) {
-            var prefstring = "mail.identity." + prevIdentity.key;
+            let prefstring = "mail.identity." + prevIdentity.key;
             RemoveDirectoryServerObserver(prefstring);
-            var prevReplyTo = prevIdentity.replyTo;
-            var prevCc = "";
-            var prevBcc = "";
-            var prevReceipt = prevIdentity.requestReturnReceipt;
-            var prevDSN = prevIdentity.requestDSN;
-            var prevAttachVCard = prevIdentity.attachVCard;
+            let prevReplyTo = prevIdentity.replyTo;
+            let prevCc = "";
+            let prevBcc = "";
+            let prevReceipt = prevIdentity.requestReturnReceipt;
+            let prevDSN = prevIdentity.requestDSN;
+            let prevAttachVCard = prevIdentity.attachVCard;
 
             if (prevIdentity.doCc)
                 prevCc += prevIdentity.doCcList;
@@ -249,12 +248,12 @@ function LoadIdentity(startup)
             if (prevIdentity.doBcc)
                 prevBcc += prevIdentity.doBccList;
 
-            var newReplyTo = gCurrentIdentity.replyTo;
-            var newCc = "";
-            var newBcc = "";
-            var newReceipt = gCurrentIdentity.requestReturnReceipt;
-            var newDSN = gCurrentIdentity.requestDSN;
-            var newAttachVCard = gCurrentIdentity.attachVCard;
+            let newReplyTo = gCurrentIdentity.replyTo;
+            let newCc = "";
+            let newBcc = "";
+            let newReceipt = gCurrentIdentity.requestReturnReceipt;
+            let newDSN = gCurrentIdentity.requestDSN;
+            let newAttachVCard = gCurrentIdentity.attachVCard;
 
             if (gCurrentIdentity.doCc)
                 newCc += gCurrentIdentity.doCcList;
@@ -264,8 +263,8 @@ function LoadIdentity(startup)
 
 
 
-            var needToCleanUp = false;
-            var msgCompFields = gMsgCompose.compFields;
+            let needToCleanUp = false;
+            let msgCompFields = gMsgCompose.compFields;
 
             if (!gReceiptOptionChanged &&
                 prevReceipt == msgCompFields.returnReceipt &&
@@ -324,7 +323,7 @@ function LoadIdentity(startup)
                 gMsgCompose.identity = gCurrentIdentity;
             } catch (ex) { dump("### Cannot change the identity: " + ex + "\n");}
 
-            var event = document.createEvent('Events');
+            let event = document.createEvent('Events');
             event.initEvent('compose-from-changed', false, true);
             document.getElementById("msgcomposeWindow").dispatchEvent(event);
         }
@@ -385,8 +384,8 @@ function AddRecipient(recipientType, address)
 
 
 function removeChildren(element) {
-    var children = element.childNodes;
-    var nbChildren = children.length;
+    let children = element.childNodes;
+    let nbChildren = children.length;
     for (let c = nbChildren-1 ; c >= 0 ; c--) {
         element.removeChild(children[c]);
     }
@@ -786,6 +785,16 @@ var mrcAComplete = {
             });
     },
 
+    /*
+     * Utility to handle default values.
+     * Used for simulating optional parmeters in fucntions,
+     * because they are available in Gecko 15.
+     * From http://stackoverflow.com/a/894929
+     */
+    _pick : function(arg, def) {
+        return (typeof arg !== "undefined" ? arg : def);
+    },
+    
     _prefLoaded : function() {
         /*
          * 
@@ -873,7 +882,7 @@ var mrcAComplete = {
         return output1;
     },
 
-    _splitEmailList_js_version : function (data, separator, quote, escaper) {
+    _splitEmailList_js_version : function (data, separator, quote, escaper= '\\') {
         /*
          * Split a list of complete emails, separated by commas (default).
          * 
@@ -901,20 +910,23 @@ var mrcAComplete = {
          * returns :
          *    array of emails, still quoted and backslashed
          */
+        // if (!separator) var separator = ',';
+        // if (!quote) var quote = '"';
+        // if (!escaper) var escaper = '\\';
+        separator = this._pick(separator, ',');
+        quote = this._pick(quote, '"');
+        escaper = this._pick(escaper, '\\');
         
-        if (!separator) var separator = ',';
-        if (!quote) var quote = '"';
-        if (!escaper) var escaper = '\\';
         // separator and escaper MUST BE 1 char length
 
-        var output = [];
-        var nbData = data.length;
-        var inQuote = false;
-        var curChar = '';
-        var part = '';
-        var doPushPart = false;
-        var doPushChar = true;
-        var doEscapeNextChar = false;
+        let output = [];
+        let nbData = data.length;
+        let inQuote = false;
+        let curChar = '';
+        let part = '';
+        let doPushPart = false;
+        let doPushChar = true;
+        let doEscapeNextChar = false;
         
         // we parse the data, iterate over each character
         for (let i=0 ; i<nbData ; i++) {
@@ -1639,7 +1651,7 @@ var mrcAComplete = {
                 if (doSearch) {
                     // add a sync search listener
                     let that = this;
-                    var abSearchListener = {
+                    let abSearchListener = {
                         addressBook : ab,
                         isRemote : false,
                         cbObject : that,
@@ -1667,7 +1679,7 @@ var mrcAComplete = {
                 // Parts of the code in this block are copied from
                 //http://hg.mozilla.org/comm-central/file/tip/mailnews/addrbook/src/nsAbLDAPAutoCompleteSearch.js
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
-                    var acDirURI = null;
+                    let acDirURI = null;
                     if (gCurrentIdentity.overrideGlobalPref) {
                         acDirURI = gCurrentIdentity.directoryServer;
                     }
@@ -1679,11 +1691,11 @@ var mrcAComplete = {
                     if (!acDirURI) {
                         continue;
                     }
-                    var query =
+                    let query =
                         Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
                                 .createInstance(Components.interfaces.nsIAbDirectoryQuery);
 
-                    var attributes =
+                    let attributes =
                         Components.classes["@mozilla.org/addressbook/ldap-attribute-map;1"]
                                 .createInstance(Components.interfaces.nsIAbLDAPAttributeMap);
                     attributes.setAttributeList("DisplayName",
@@ -1691,17 +1703,17 @@ var mrcAComplete = {
                     attributes.setAttributeList("PrimaryEmail",
                         ab.attributeMap.getAttributeList("PrimaryEmail", {}), true);
 
-                    var args =
+                    let args =
                         Components.classes["@mozilla.org/addressbook/directory/query-arguments;1"]
                                 .createInstance(Components.interfaces.nsIAbDirectoryQueryArguments);
 
                     // Create filter from filter template and search string
-                    var ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
+                    let ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
                                             .getService(Components.interfaces.nsILDAPService);
-                    var filterPrefix = "";
-                    var filterSuffix = "";
-                    var filterAttr = "";
-                    var filter = ldapSvc.createFilter(1024, filterTemplate, filterPrefix, filterSuffix, filterAttr, aString);
+                    let filterPrefix = "";
+                    let filterSuffix = "";
+                    let filterAttr = "";
+                    let filter = ldapSvc.createFilter(1024, filterTemplate, filterPrefix, filterSuffix, filterAttr, aString);
                     if (!filter)
                         throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
 
@@ -1711,7 +1723,7 @@ var mrcAComplete = {
 
                     // add an async search listener
                     let that = this;
-                    var abDirSearchListener = {
+                    let abDirSearchListener = {
                         addressBook : ab,
                         isRemote : true,
                         cbObject : that,
@@ -1789,7 +1801,7 @@ var mrcAComplete = {
                 if (doSearch) {
                     // add a sync search listener
                     let that = this;
-                    var abSearchListener = {
+                    let abSearchListener = {
                         addressBook : ab,
                         isRemote : false,
                         cbObject : that,
@@ -1841,7 +1853,7 @@ var mrcAComplete = {
                 // Parts of the code in this block are copied from
                 //http://hg.mozilla.org/comm-central/file/tip/mailnews/addrbook/src/nsAbLDAPAutoCompleteSearch.js
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
-                    var acDirURI = null;
+                    let acDirURI = null;
                     if (gCurrentIdentity.overrideGlobalPref) {
                         acDirURI = gCurrentIdentity.directoryServer;
                     }
@@ -1856,23 +1868,23 @@ var mrcAComplete = {
 
                     let that = this;
 
-                    var ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
+                    let ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
                         .getService(Components.interfaces.nsILDAPService);
-                    var filterPrefix = "";
-                    var filterSuffix = "";
-                    var filterAttr = "";
+                    let filterPrefix = "";
+                    let filterSuffix = "";
+                    let filterAttr = "";
 
                     // search 1 : BEGINS WITH
                     // Create filter from filter template and search string
-                    var filter1 = ldapSvc.createFilter(1024, filterTemplate1, filterPrefix, filterSuffix, filterAttr, aString);
+                    let filter1 = ldapSvc.createFilter(1024, filterTemplate1, filterPrefix, filterSuffix, filterAttr, aString);
                     if (!filter1)
                         throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
 
-                    var query1 =
+                    let query1 =
                         Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
                             .createInstance(Components.interfaces.nsIAbDirectoryQuery);
 
-                    var attributes1 =
+                    let attributes1 =
                         Components.classes["@mozilla.org/addressbook/ldap-attribute-map;1"]
                             .createInstance(Components.interfaces.nsIAbLDAPAttributeMap);
                     attributes1.setAttributeList("DisplayName",
@@ -1880,7 +1892,7 @@ var mrcAComplete = {
                     attributes1.setAttributeList("PrimaryEmail",
                         ab.attributeMap.getAttributeList("PrimaryEmail", {}), true);
 
-                    var args1 =
+                    let args1 =
                         Components.classes["@mozilla.org/addressbook/directory/query-arguments;1"]
                             .createInstance(Components.interfaces.nsIAbDirectoryQueryArguments);
 
@@ -1889,7 +1901,7 @@ var mrcAComplete = {
                     args1.filter = filter1;
 
                     // add an async search listener
-                    var abDirSearchListener1 = {
+                    let abDirSearchListener1 = {
                         addressBook : ab,
                         isRemote : true,
                         cbObject : that,
@@ -1916,15 +1928,15 @@ var mrcAComplete = {
 
                     // search 2 : CONTAINS
                     // Create filter from filter template and search string
-                    var filter2 = ldapSvc.createFilter(1024, filterTemplate2, filterPrefix, filterSuffix, filterAttr, aString);
+                    let filter2 = ldapSvc.createFilter(1024, filterTemplate2, filterPrefix, filterSuffix, filterAttr, aString);
                     if (!filter2)
                         throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
 
-                    var query2 =
+                    let query2 =
                         Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
                             .createInstance(Components.interfaces.nsIAbDirectoryQuery);
 
-                    var attributes2 =
+                    let attributes2 =
                         Components.classes["@mozilla.org/addressbook/ldap-attribute-map;1"]
                             .createInstance(Components.interfaces.nsIAbLDAPAttributeMap);
                     attributes2.setAttributeList("DisplayName",
@@ -1932,7 +1944,7 @@ var mrcAComplete = {
                     attributes2.setAttributeList("PrimaryEmail",
                         ab.attributeMap.getAttributeList("PrimaryEmail", {}), true);
 
-                    var args2 =
+                    let args2 =
                         Components.classes["@mozilla.org/addressbook/directory/query-arguments;1"]
                             .createInstance(Components.interfaces.nsIAbDirectoryQueryArguments);
 
@@ -1941,7 +1953,7 @@ var mrcAComplete = {
                     args2.filter = filter2;
 
                     // add an async search listener
-                    var abDirSearchListener2 = {
+                    let abDirSearchListener2 = {
                         addressBook : ab,
                         isRemote : true,
                         cbObject : that,
@@ -2040,7 +2052,7 @@ var mrcAComplete = {
                 if (doSearch) {
                     // add a sync search listener
                     let that = this;
-                    var abSearchListener = {
+                    let abSearchListener = {
                         addressBook : ab,
                         isRemote : false,
                         cbObject : that,
@@ -2067,7 +2079,7 @@ var mrcAComplete = {
                 // Parts of the code in this block are copied from
                 //http://hg.mozilla.org/comm-central/file/tip/mailnews/addrbook/src/nsAbLDAPAutoCompleteSearch.js
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
-                    var acDirURI = null;
+                    let acDirURI = null;
                     if (gCurrentIdentity.overrideGlobalPref) {
                         acDirURI = gCurrentIdentity.directoryServer;
                     }
@@ -2079,11 +2091,11 @@ var mrcAComplete = {
                     if (!acDirURI) {
                         continue;
                     }
-                    var query =
+                    let query =
                         Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
                             .createInstance(Components.interfaces.nsIAbDirectoryQuery);
 
-                    var attributes =
+                    let attributes =
                         Components.classes["@mozilla.org/addressbook/ldap-attribute-map;1"]
                             .createInstance(Components.interfaces.nsIAbLDAPAttributeMap);
                     attributes.setAttributeList("DisplayName",
@@ -2091,17 +2103,17 @@ var mrcAComplete = {
                     attributes.setAttributeList("PrimaryEmail",
                         ab.attributeMap.getAttributeList("PrimaryEmail", {}), true);
 
-                    var args =
+                    let args =
                         Components.classes["@mozilla.org/addressbook/directory/query-arguments;1"]
                             .createInstance(Components.interfaces.nsIAbDirectoryQueryArguments);
 
                     // Create filter from filter template and search string
-                    var ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
+                    let ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
                                             .getService(Components.interfaces.nsILDAPService);
-                    var filterPrefix = "";
-                    var filterSuffix = "";
-                    var filterAttr = "";
-                    var filter = ldapSvc.createFilter(1024, filterTemplate, filterPrefix, filterSuffix, filterAttr, aString);
+                    let filterPrefix = "";
+                    let filterSuffix = "";
+                    let filterAttr = "";
+                    let filter = ldapSvc.createFilter(1024, filterTemplate, filterPrefix, filterSuffix, filterAttr, aString);
                     if (!filter)
                         throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
 
@@ -2111,7 +2123,7 @@ var mrcAComplete = {
 
                     // add an async search listener
                     let that = this;
-                    var abDirSearchListener = {
+                    let abDirSearchListener = {
                         addressBook : ab,
                         isRemote : true,
                         cbObject : that,
@@ -2613,12 +2625,15 @@ var mrcAComplete = {
 
         if (this.FIELDS[field]) {
             try {
-                let element = document.getElementById(this.FIELDS[field].txtId);
-                this._elementInsertInPart(element, element.value.length, email);
-                this.updateNbRecipients(element);
+                if (email != null && email != "") {
+                    Application.console.log("DEBUG _insertRecipient() : "+field+", "+email);
+                    let element = document.getElementById(this.FIELDS[field].txtId);
+                    this._elementInsertInPart(element, element.value.length, email);
+                    this.updateNbRecipients(element);
 
-                // to be coherent : inform TB that content of current Msg has really changed
-                gContentChanged=true;
+                    // to be coherent : inform TB that content of current Msg has really changed
+                    gContentChanged=true;
+                }
             } catch (e) {
                 Application.console.log("ERREUR _insertRecipient() : "+e.message);
             }
@@ -2965,7 +2980,7 @@ var mrcAComplete = {
             try{
                 let idBox = this.FIELDS[field].boxId;
                 let box = document.getElementById(idBox);
-                var newCollapsed = ! visible;
+                let newCollapsed = ! visible;
                 if (newCollapsed != box.collapsed)
                     this.changeFieldVisibility(field);
             } catch (e) {
@@ -2985,7 +3000,9 @@ var mrcAComplete = {
          *   none
          */
         // optional parameter
-        if (!collapseIfZero) var collapseIfZero=false;
+        // if (!collapseIfZero) var collapseIfZero=false;
+        collapseIfZero = this._pick(collapseIfZero, false);
+        
         // check the element : is it one of the 3 fields ?
         let field = this._getFieldFromTextElement(element);
         if (field != "") {
@@ -3090,7 +3107,7 @@ var mrcAComplete = {
 
 // Install load and unload handlers
 function mrcComposeLoaded() {
-    var headerToolbar = document.getElementById("MsgHeadersToolbar");
+    let headerToolbar = document.getElementById("MsgHeadersToolbar");
     headerToolbar.setAttribute("minheight", "10");
     // compat TB24
     headerToolbar.removeAttribute("height");
@@ -3099,8 +3116,8 @@ function mrcComposeLoaded() {
 function mrcComposeFocus() {
     
     // set focus to default "TO" field
-    var fieldFocus = "";
-    var msgTo = document.getElementById("msgTO");
+    let fieldFocus = "";
+    let msgTo = document.getElementById("msgTO");
     
     // gMsgCompose is defined when that callback is fired.
     if (gMsgCompose.composeHTML) {
@@ -3117,12 +3134,12 @@ function mrcComposeFocus() {
         if (fieldFocus != "default"){
             // need a special way to change focus in HTML mode :
             // cf https://bugzilla.mozilla.org/show_bug.cgi?id=207527
-            var myStateListener = {
+            let myStateListener = {
               NotifyComposeFieldsReady: function() {
               },
 
               NotifyComposeBodyReady: function() {
-                var msg = document.getElementById(fieldFocus);
+                let msg = document.getElementById(fieldFocus);
                 msg.focus();
               },
 
@@ -3147,7 +3164,7 @@ function mrcComposeFocus() {
         // change focus only if necessary
         if (fieldFocus != "default"){        
             // simple way in plain text message
-            var msg = document.getElementById(fieldFocus);
+            let msg = document.getElementById(fieldFocus);
             msg.focus();
         }
     }
@@ -3295,13 +3312,15 @@ function mrcRecipientKeyUp(event, element) {
     }
 }
 
-function mrcRecipientResize(element, max) {
+function mrcRecipientResize(element, maxi) {
     /*
      * call-back for 'overflow' event
      * 
      */
     try {
-        if (!max) var max = mrcAComplete.param_max_height;
+        // if (!max) var max = mrcAComplete.param_max_height;
+        // maxi = mrcAComplete._pick(maxi, mrcAComplete.param_max_height);
+        maxi = mrcAComplete.param_max_height;
         
         let sh1 = element.inputField.scrollHeight;
         element.height = 'auto'; // ==> forces the textbox to recompute scrollHeight to adapt to current value
@@ -3309,7 +3328,8 @@ function mrcRecipientResize(element, max) {
         let fnbLines = sh2 / mrcAComplete.param_line_height;
         let nbLines = Math.round(fnbLines);
         let nHeight = mrcAComplete.param_first_line_height + (nbLines-1)*mrcAComplete.param_line_height;
-        let h = Math.min(Math.max(nHeight,mrcAComplete.param_first_line_height),max);  
+        let h = Math.min(Math.max(nHeight,mrcAComplete.param_first_line_height), maxi);  
+        dump("h1="+sh1+"  h2="+sh2+"  fnbLines="+fnbLines+"  nbLines="+nbLines+"  nHeight="+nHeight+"  h="+h+"\n");
         element.height = h;
         let sh3 = element.inputField.scrollHeight;
     } catch (e) {
