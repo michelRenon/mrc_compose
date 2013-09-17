@@ -93,7 +93,7 @@
  */
 
 
-"use strict";
+// "use strict";
 
 
 
@@ -3329,7 +3329,7 @@ function mrcRecipientResize(element, maxi) {
         let nbLines = Math.round(fnbLines);
         let nHeight = mrcAComplete.param_first_line_height + (nbLines-1)*mrcAComplete.param_line_height;
         let h = Math.min(Math.max(nHeight,mrcAComplete.param_first_line_height), maxi);  
-        dump("h1="+sh1+"  h2="+sh2+"  fnbLines="+fnbLines+"  nbLines="+nbLines+"  nHeight="+nHeight+"  h="+h+"\n");
+        // dump("h1="+sh1+"  h2="+sh2+"  fnbLines="+fnbLines+"  nbLines="+nbLines+"  nHeight="+nHeight+"  h="+h+"\n");
         element.height = h;
         let sh3 = element.inputField.scrollHeight;
     } catch (e) {
