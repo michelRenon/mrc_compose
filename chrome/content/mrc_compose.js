@@ -3298,6 +3298,9 @@ function mrcRecipientKeyUp(event, element) {
     // update the # of recipients of the current textbox
     mrcAComplete.updateNbRecipients(element);
 
+    // special TB 24 ; TB17 does not need the parameter
+    updateSendCommands(true);
+
     if (canUpdatePanel) {
         if (textPart.length >= mrcAComplete.param_search_min_char) {
             if (mrcAComplete.needSearch(textPart)) {
