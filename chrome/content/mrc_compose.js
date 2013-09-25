@@ -787,7 +787,7 @@ var mrcAComplete = {
 
     /*
      * Utility to handle default values.
-     * Used for simulating optional parmeters in fucntions,
+     * Used for simulating optional parameters in functions,
      * because they are available in Gecko 15.
      * From http://stackoverflow.com/a/894929
      */
@@ -910,9 +910,6 @@ var mrcAComplete = {
          * returns :
          *    array of emails, still quoted and backslashed
          */
-        // if (!separator) var separator = ',';
-        // if (!quote) var quote = '"';
-        // if (!escaper) var escaper = '\\';
         separator = this._pick(separator, ',');
         quote = this._pick(quote, '"');
         escaper = this._pick(escaper, '\\');
@@ -3000,7 +2997,6 @@ var mrcAComplete = {
          *   none
          */
         // optional parameter
-        // if (!collapseIfZero) var collapseIfZero=false;
         collapseIfZero = this._pick(collapseIfZero, false);
         
         // check the element : is it one of the 3 fields ?
@@ -3298,7 +3294,7 @@ function mrcRecipientKeyUp(event, element) {
     // update the # of recipients of the current textbox
     mrcAComplete.updateNbRecipients(element);
 
-    // special TB 24 ; TB17 does not need the parameter
+    // special TB 24 ; TB 17 does not need the parameter
     updateSendCommands(true);
 
     if (canUpdatePanel) {
@@ -3321,7 +3317,6 @@ function mrcRecipientResize(element, maxi) {
      * 
      */
     try {
-        // if (!max) var max = mrcAComplete.param_max_height;
         // maxi = mrcAComplete._pick(maxi, mrcAComplete.param_max_height);
         maxi = mrcAComplete.param_max_height;
         
