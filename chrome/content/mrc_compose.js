@@ -882,7 +882,7 @@ var mrcAComplete = {
         return output1;
     },
 
-    _splitEmailList_js_version : function (data, separator, quote, escaper= '\\') {
+    _splitEmailList_js_version : function (data, separator, quote, escaper) {
         /*
          * Split a list of complete emails, separated by commas (default).
          * 
