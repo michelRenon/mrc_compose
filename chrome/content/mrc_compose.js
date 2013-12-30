@@ -3129,7 +3129,7 @@ function mrcComposeFocus() {
     // set focus to default "TO" field
     let fieldFocus = "";
     let msgTo = document.getElementById("msgTO");
-    dump("DEBUG mrcComposeFocus\n");
+    // dump("DEBUG mrcComposeFocus\n");
     
     // gMsgCompose is defined when that callback is fired.
     if (gMsgCompose.composeHTML) {
@@ -3153,7 +3153,7 @@ function mrcComposeFocus() {
               NotifyComposeBodyReady: function() {
                 let msg = document.getElementById(fieldFocus);
                 msg.focus();
-                dump("set html focus to '"+fieldFocus+"'\n");
+                // dump("set html focus to '"+fieldFocus+"'\n");
               },
 
               ComposeProcessDone: function(aResult) {
@@ -3164,7 +3164,7 @@ function mrcComposeFocus() {
             };
             gMsgCompose.RegisterStateListener(myStateListener);
         } else {
-            dump("No change for HTML focus");
+            // dump("No change for HTML focus");
         }
     } else {
         if (msgTo.value == "")
@@ -3192,7 +3192,7 @@ function mrcComposeFocus() {
               NotifyComposeBodyReady: function() {
                 let msg = document.getElementById(fieldFocus);
                 msg.focus();
-                dump("set focus to '"+fieldFocus+"'\n");
+                // dump("set focus to '"+fieldFocus+"'\n");
               },
 
               ComposeProcessDone: function(aResult) {
@@ -3205,13 +3205,13 @@ function mrcComposeFocus() {
 
 
         } else {
-            dump("No change for simple text focus");
+            // dump("No change for simple text focus");
         }
     }
 }
 
 window.addEventListener("load", function(e) { 
-        dump("DEBUG : load compose window\n");
+        // dump("DEBUG : load compose window\n");
         mrcAComplete.startup();
     }, false);
 
