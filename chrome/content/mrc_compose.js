@@ -89,7 +89,10 @@
  * 
  *  - allow another view of fields : verticaly ?
  *    I heard of one user being interested in having the email as a vertical list
- *      
+ *   
+ *  - les focus à l'ouverture ne semblent plus marcher correctement avec TB24
+ * 
+ *   - mdoif fenetre prefs : afficher le texte dans des tooltips
  */
 
 
@@ -368,6 +371,11 @@ function AddRecipient(recipientType, address)
     }
 }
 
+
+
+// function AdjustFocus() {
+//    mrcComposeFocus();
+// }
 
 
 /*
@@ -3144,6 +3152,7 @@ function mrcComposeFocus() {
               NotifyComposeBodyReady: function() {
                 let msg = document.getElementById(fieldFocus);
                 msg.focus();
+                dump("set html focus to "+fieldFocus+"\n");
               },
 
               ComposeProcessDone: function(aResult) {
@@ -3169,6 +3178,7 @@ function mrcComposeFocus() {
             // simple way in plain text message
             let msg = document.getElementById(fieldFocus);
             msg.focus();
+            dump("set focus to "+fieldFocus+"\n");
         }
     }
 }
