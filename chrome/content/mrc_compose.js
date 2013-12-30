@@ -3129,6 +3129,7 @@ function mrcComposeFocus() {
     // set focus to default "TO" field
     let fieldFocus = "";
     let msgTo = document.getElementById("msgTO");
+    dump("DEBUG mrcComposeFocus\n");
     
     // gMsgCompose is defined when that callback is fired.
     if (gMsgCompose.composeHTML) {
@@ -3152,7 +3153,7 @@ function mrcComposeFocus() {
               NotifyComposeBodyReady: function() {
                 let msg = document.getElementById(fieldFocus);
                 msg.focus();
-                dump("set html focus to "+fieldFocus+"\n");
+                dump("set html focus to '"+fieldFocus+"'\n");
               },
 
               ComposeProcessDone: function(aResult) {
@@ -3162,6 +3163,8 @@ function mrcComposeFocus() {
               }
             };
             gMsgCompose.RegisterStateListener(myStateListener);
+        } else {
+            dump("No change for HTML focus");
         }
     } else {
         if (msgTo.value == "")
@@ -3175,15 +3178,40 @@ function mrcComposeFocus() {
         // Here, no default focus (maybe in the old adressingWindget ?)
         // change focus only if necessary
         if (fieldFocus != "default"){        
-            // simple way in plain text message
-            let msg = document.getElementById(fieldFocus);
-            msg.focus();
-            dump("set focus to "+fieldFocus+"\n");
+            // simple way in plain text message : doesn't work anymore in TB24
+            // let msg = document.getElementById(fieldFocus);
+            // msg.focus();
+            // dump("set focus to '"+fieldFocus+"'\n");
+
+            // need a special way to change focus in simple mode :
+            // cf https://bugzilla.mozilla.org/show_bug.cgi?id=207527
+            let myStateListener = {
+              NotifyComposeFieldsReady: function() {
+              },
+
+              NotifyComposeBodyReady: function() {
+                let msg = document.getElementById(fieldFocus);
+                msg.focus();
+                dump("set focus to '"+fieldFocus+"'\n");
+              },
+
+              ComposeProcessDone: function(aResult) {
+              },
+
+              SaveInFolderDone: function(folderURI) {
+              }
+            };
+            gMsgCompose.RegisterStateListener(myStateListener);
+
+
+        } else {
+            dump("No change for simple text focus");
         }
     }
 }
 
 window.addEventListener("load", function(e) { 
+        dump("DEBUG : load compose window\n");
         mrcAComplete.startup();
     }, false);
 
