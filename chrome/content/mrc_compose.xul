@@ -161,7 +161,7 @@
                 <label value="&ccAddr.label;" />
             </hbox>
             <vbox flex="1">
-                <textbox id="msgCC" flex="1" class="toolbar" disableonsend="true" spellcheck="true"
+                <textbox id="msgCC" flex="1" class="toolbar" disableonsend="true" spellcheck="true" focus="false"
                              multiline="true"
                              placeholder="&field.placeholder;"
                              onkeypress="mrcRecipientKeyPress(event, this)"

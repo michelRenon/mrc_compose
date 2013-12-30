@@ -86,6 +86,10 @@
 
 
 
+    <tooltip id="moretip" orient="vertical" style="background-color:#dddddd">
+        <html:div  id="helptip" style="height:500px;margin-left:25px;margin:0;padding:0" type="content">
+        </html:div>
+    </tooltip>
 
 
 
@@ -127,7 +131,7 @@
                             </row>
                             <row>
                                 <label control="mode" value="&options.mode.label;"/>
-                                <menulist id="mode" preference="pref_mode" >
+                                <menulist id="mode" preference="pref_mode" tooltip="moretip">
                                     <menupopup>
                                         <menuitem label="1" value="1"/>
                                         <menuitem label="2" value="2"/>

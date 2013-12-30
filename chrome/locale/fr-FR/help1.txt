@@ -1,4 +1,4 @@
-<h4>Mode</h4>
+<h4 style="border:1px solid #00f; color:red">Mode FR</h4>
 <ul>
     <li>"1" : La liste contient 1 partie :
         <ul>

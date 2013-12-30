@@ -286,4 +286,39 @@ function mrcLoadHelp() {
             div.appendChild(injectHTML); 
         }
     }
+
+
+
+
+        let div = document.getElementById("helptip");
+        if (div) {
+            let txt = "";
+            try {
+                txt = getContents("chrome://mrc_compose/locale/help1.txt");
+            } catch(e) {}
+            
+            //clear the HTML div element of any prior shown custom HTML 
+            while(div.firstChild) 
+                div.removeChild(div.firstChild);
+
+            //safely convert HTML string to a simple DOM object, striping it of javascript and more complex tags
+            var parserUtils = Components.classes["@mozilla.org/parserutils;1"]
+                  .getService(Components.interfaces.nsIParserUtils);
+            let injectHTML = "";
+            // special : Gecko 13 does not have 'parseFragment()'
+            if (parserUtils.parseFragment)
+                injectHTML = parserUtils.parseFragment(txt, 0, false, null, div); 
+            else {
+                // Old API to parse html, xml, svg.
+                var parser = Components.classes["@mozilla.org/xmlextras/domparser;1"]
+                            .createInstance(Components.interfaces.nsIDOMParser);
+                var htmlDoc = parser.parseFromString(txt, "text/html");
+                injectHTML = htmlDoc.firstChild;
+            }
+
+            //attach the DOM object to the HTML div element 
+            div.appendChild(injectHTML); 
+        }
+
+
 }
