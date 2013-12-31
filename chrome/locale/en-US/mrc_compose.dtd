@@ -13,6 +13,7 @@
 <!ENTITY maximize.label "Maximize" >
 
 <!ENTITY minimize.style "min-height:22px; height:22px; max-height:22px; font-size:0.75em;" >
+<!ENTITY info_nb.style "font-style:italic; color:gray;">
 
 <!ENTITY preferences.label "Preferences..." >
 
@@ -62,3 +63,6 @@
 <!-- tab 4 -->
 <!ENTITY options.min_search_delay.label "Min search delay (ms): ">
 <!ENTITY options.add_comma.label "Automatic add comma: ">            
+
+<!ENTITY options.special_values.label "These values are special. It's better not to change them.">
+<!ENTITY options.special_values.style "font-size:1.2em; font-style:italic"> 

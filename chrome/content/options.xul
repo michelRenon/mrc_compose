@@ -296,24 +296,24 @@
                                 <checkbox id="force_bcc" preference="pref_force_bcc"  />
                             </row>
                             <row>
-                                <label control="max_nb_line" value="&options.max_nb_line.label;"/>
-                                <textbox id="max_nb_line" preference="pref_max_nb_line" type="number" min="1" max="10" size="3"/>
+                                <label control="max_nb_line" value="&options.max_nb_line.label;" tooltip="mrctip"/>
+                                <textbox id="max_nb_line" preference="pref_max_nb_line" type="number" min="1" max="10" size="3" tooltip="mrctip"/>
                             </row>
                             <row>
-                                <label control="first_line_height" value="&options.first_line_height.label;"/>
-                                <textbox id="first_line_height" preference="pref_first_line_height" type="number" min="10" max="30" size="3" />
+                                <label control="first_line_height" value="&options.first_line_height.label;" tooltip="mrctip"/>
+                                <textbox id="first_line_height" preference="pref_first_line_height" type="number" min="10" max="30" size="3" tooltip="mrctip" />
                             </row>
                             <row>
-                                <label control="line_height" value="&options.line_height.label;"/>
-                                <textbox id="line_height" preference="pref_line_height" type="number" min="10" max="30" size="3" />
+                                <label control="line_height" value="&options.line_height.label;" tooltip="mrctip" />
+                                <textbox id="line_height" preference="pref_line_height" type="number" min="10" max="30" size="3" tooltip="mrctip" />
                             </row>
                             <row>
-                                <label control="default_line_height" value="&options.default_line_height.label;"/>
-                                <button id="default_line_height" label="&options.default_line_height.button;" oncommand="mrcDefaultLineHeight(event);" />
+                                <label control="default_line_height" value="&options.default_line_height.label;" tooltip="mrctip"/>
+                                <button id="default_line_height" label="&options.default_line_height.button;" oncommand="mrcDefaultLineHeight(event);"  tooltip="mrctip"/>
                             </row>
                             <row>
-                                <label control="automatic_height" value="&options.automatic_height.label;"/>
-                                <checkbox id="automatic_height" preference="pref_automatic_height"  />
+                                <label control="automatic_height" value="&options.automatic_height.label;" tooltip="mrctip"/>
+                                <checkbox id="automatic_height" preference="pref_automatic_height" tooltip="mrctip"  />
                             </row>
                         </rows>
                     </grid>
@@ -337,15 +337,16 @@
                         </columns>
                         <rows>
                             <row>
-                                <label control="min_search_delay" value="&options.min_search_delay.label;"/>
-                                <textbox id="min_search_delay" preference="pref_min_search_delay" type="number" min="1" max="1000" size="4"/>     
+                                <label control="min_search_delay" value="&options.min_search_delay.label;" tooltip="mrctip"/>
+                                <textbox id="min_search_delay" preference="pref_min_search_delay" type="number" min="1" max="1000" size="4" tooltip="mrctip"/>     
                             </row>
                             <row>
-                                <label control="add_comma" value="&options.add_comma.label;"/>            
-                                <checkbox id="add_comma" preference="pref_add_comma"  />
+                                <label control="add_comma" value="&options.add_comma.label;" tooltip="mrctip"/>
+                                <checkbox id="add_comma" preference="pref_add_comma" tooltip="mrctip" />
                             </row>
                         </rows>
                     </grid>
+                    <label value="&options.special_values.label;" style="&options.special_values.style;"/>
                 </vbox>
                 <!--
                 <scrollbox flex="1" >

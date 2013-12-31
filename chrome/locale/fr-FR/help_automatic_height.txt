@@ -1,0 +1,2 @@
+<h4>Hauteur Automatique</h4>
+Adapte la hauteur du champ &agrave; chaque caract&egrave;re.

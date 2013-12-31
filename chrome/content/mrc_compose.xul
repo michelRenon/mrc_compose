@@ -137,7 +137,7 @@
                         </menupopup>
                     </toolbarbutton>
                 </hbox>
-                <label value="0 destinataire" id="nbTO" style="font-style:italic; color:gray;" collapsed="true"/>
+                <label value="0 destinataire" id="nbTO" style="&info_nb.style;" collapsed="true"/>
                 <label value="&toAddr.label;" />
             </hbox>
 
@@ -157,7 +157,7 @@
         </hbox>
         <hbox id="box-cc" collapsed="true" >
             <hbox align="center" pack="end" style="&headersSpace.style;">
-                <label value="0 destinataire" id="nbCC" style="font-style:italic; color:gray;" collapsed="true"/>
+                <label value="0 destinataire" id="nbCC" style="&info_nb.style;" collapsed="true"/>
                 <label value="&ccAddr.label;" />
             </hbox>
             <vbox flex="1">
@@ -176,7 +176,7 @@
         </hbox>
         <hbox id="box-bcc" collapsed="true" >
             <hbox align="center" pack="end" style="&headersSpace.style;">
-                <label value="0 destinataire" id="nbBCC" style="font-style:italic; color:gray;" collapsed="true"/>
+                <label value="0 destinataire" id="nbBCC" style="&info_nb.style;" collapsed="true"/>
                 <label value="&bccAddr.label;" />
             </hbox>
             <vbox flex="1">
@@ -195,7 +195,7 @@
 
         <hbox id="box-reply" collapsed="true" >
             <hbox align="center" pack="end" style="&headersSpace.style;">
-                <label value="0 destinataire" id="nbREPLY" style="font-style:italic; color:gray;" collapsed="true"/>
+                <label value="0 destinataire" id="nbREPLY" style="&info_nb.style;" collapsed="true"/>
                 <label value="&replyAddr.label;" />
             </hbox>
             <vbox flex="1">
@@ -213,7 +213,7 @@
         </hbox>
         <hbox id="box-ng" collapsed="true" >
             <hbox align="center" pack="end" style="&headersSpace.style;">
-                <label value="0 destinataire" id="nbNG" style="font-style:italic; color:gray;" collapsed="true"/>
+                <label value="0 destinataire" id="nbNG" style="&info_nb.style;" collapsed="true"/>
                 <label value="&newsgroupsAddr.label;" />
             </hbox>
             <vbox flex="1">
@@ -231,7 +231,7 @@
         </hbox>
         <hbox id="box-follow" collapsed="true" >
             <hbox align="center" pack="end" style="&headersSpace.style;">
-                <label value="0 destinataire" id="nbFOLLOW" style="font-style:italic; color:gray;" collapsed="true"/>
+                <label value="0 destinataire" id="nbFOLLOW" style="&info_nb.style;" collapsed="true"/>
                 <label value="&followupAddr.label;" />
             </hbox>
             <vbox flex="1">

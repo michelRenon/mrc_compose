@@ -1,0 +1,2 @@
+<h4>Line height</h4>
+Height of other lines of each field (pixels).

@@ -13,6 +13,7 @@
 <!ENTITY maximize.label "Agrandir" >
 
 <!ENTITY minimize.style "min-height:22px; height:22px; max-height:22px; font-size:0.75em;" >
+<!ENTITY info_nb.style "font-style:italic; color:gray;">
 
 <!ENTITY preferences.label "Préférences..." >
 
@@ -62,4 +63,7 @@
 
 <!-- tab 4 -->
 <!ENTITY options.min_search_delay.label "Intervalle minimum de recherche (ms): ">
-<!ENTITY options.add_comma.label "Ajout virgule automatique : ">            
+<!ENTITY options.add_comma.label "Ajout virgule automatique : ">
+
+<!ENTITY options.special_values.label "Ces valeurs sont spéciales. Il n'est pas recommandé de les changer.">
+<!ENTITY options.special_values.style "font-size:1.2em; font-style:italic"> 

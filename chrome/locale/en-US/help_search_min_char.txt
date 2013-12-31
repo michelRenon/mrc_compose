@@ -1,0 +1,3 @@
+<h4>Start search after nb characters</h4>
+The search starts after this number of characters entered.<br/>
+On slow machines, it's better to choose "2" or "3".

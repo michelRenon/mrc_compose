@@ -1,0 +1,2 @@
+<h4>Automatic height</h4>
+Adapt the height of field at each typed character.

@@ -1,0 +1,2 @@
+<h4>Automatic add comma</h4>
+Add a coma after a new recipient.
