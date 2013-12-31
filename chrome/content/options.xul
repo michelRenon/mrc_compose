@@ -41,11 +41,12 @@
 ]>
 
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
- 
+<?xml-stylesheet href="chrome://mrc_compose/content/mrc_compose.css" type="text/css"?>
+
 <prefwindow id="mrc-compose-prefs"
      title="MRC Compose Options"
      xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-     
+     xmlns:html="http://www.w3.org/1999/xhtml"
      onload="mrcOnPrefLoaded();"
      onunload="mrcOnPrefUnloaded();"
      >
@@ -53,8 +54,7 @@
  
     <script type="application/javascript" src="chrome://mrc_compose/content/mrc_pref.js"/><!-- A reference to your JavaScript file -->
 
-    <prefpane id="mrc-compose-pane" label=""
-        xmlns:html="http://www.w3.org/1999/xhtml" >
+    <prefpane id="mrc-compose-pane" label="" >
       <preferences>
         <preference id="pref_line_height" name="extensions.mrccompose.line_height" type="int"/>
         <preference id="pref_first_line_height" name="extensions.mrccompose.first_line_height" type="int"/>
@@ -86,9 +86,10 @@
 
 
 
-    <tooltip id="moretip" orient="vertical" style="background-color:#dddddd">
-        <html:div  id="helptip" style="height:500px;margin-left:25px;margin:0;padding:0" type="content">
-        </html:div>
+    <tooltip id="mrctip" orient="vertical" onpopupshowing="mrcTooltip();">
+        <vbox>
+            <html:div  id="helptip" />
+        </vbox>
     </tooltip>
 
 
@@ -130,8 +131,8 @@
                                 <listbox id="search_ab_URI_list" rows="5"/>
                             </row>
                             <row>
-                                <label control="mode" value="&options.mode.label;"/>
-                                <menulist id="mode" preference="pref_mode" tooltip="moretip">
+                                <label control="mode" value="&options.mode.label;" tooltip="mrctip"/>
+                                <menulist id="mode" preference="pref_mode" tooltip="mrctip">
                                     <menupopup>
                                         <menuitem label="1" value="1"/>
                                         <menuitem label="2" value="2"/>
@@ -181,10 +182,12 @@
                         </rows>
                     </grid>
                 </vbox>
+                <!--
                 <scrollbox flex="1" >
                     <html:div  id="help1" style="height:500px;margin-left:25px;">
                     </html:div>
                 </scrollbox>
+                -->
             </hbox>                    
         </tabpanel>
 
@@ -198,25 +201,27 @@
                         </columns>
                         <rows>
                             <row>
-                                <label control="min_recipients_show" value="&options.min_recipients_show.label;"/>
-                                <textbox id="min_recipients_show" preference="pref_min_recipients_show" type="number" min="1" max="50" size="3"/>     
+                                <label control="min_recipients_show" value="&options.min_recipients_show.label;" tooltip="mrctip"/>
+                                <textbox id="min_recipients_show" preference="pref_min_recipients_show" type="number" min="1" max="50" size="3" tooltip="mrctip"/>     
                             </row>
                             <row>
-                                <label control="max_recipients_warning" value="&options.max_recipients_warning.label;"/>
-                                <textbox id="max_recipients_warning" preference="pref_max_recipients_warning" type="number" min="1" max="50" size="3"/>     
+                                <label control="max_recipients_warning" value="&options.max_recipients_warning.label;" tooltip="mrctip"/>
+                                <textbox id="max_recipients_warning" preference="pref_max_recipients_warning" type="number" min="1" max="50" size="3" tooltip="mrctip"/>     
                             </row>
                             <row>
-                                <label control="search_min_char" value="&options.search_min_char.label;"/>
-                                <textbox id="search_min_char" preference="pref_search_min_char" type="number" min="1" max="50" size="3"/>     
+                                <label control="search_min_char" value="&options.search_min_char.label;" tooltip="mrctip"/>
+                                <textbox id="search_min_char" preference="pref_search_min_char" type="number" min="1" max="50" size="3" tooltip="mrctip"/>     
                             </row>
 
                         </rows>
                     </grid>
                 </vbox>
+                <!--
                 <scrollbox flex="1" >
                     <html:div  id="help2" style="height:500px;margin-left:25px;">
                     </html:div>
                 </scrollbox>
+                -->
             </hbox>
         </tabpanel>
 
@@ -313,10 +318,12 @@
                         </rows>
                     </grid>
                 </vbox>
+                <!--
                 <scrollbox flex="1" >
                     <html:div  id="help3" style="height:500px;margin-left:25px;">
                     </html:div>
                 </scrollbox>
+                -->
             </hbox>
         </tabpanel>
 
@@ -340,10 +347,12 @@
                         </rows>
                     </grid>
                 </vbox>
+                <!--
                 <scrollbox flex="1" >
                     <html:div  id="help4" style="height:500px;margin-left:25px;">
                     </html:div>
                 </scrollbox>
+                -->
             </hbox>
         </tabpanel>
 
