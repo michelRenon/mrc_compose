@@ -1,0 +1,5 @@
+Le nombre d'&eacute;l&eacute;ments maximum dans chaque partie de la liste.
+
+Avec le "mode" "1", il est pr&eacute;f&eacute;rable de le mettre &agrave; 15-30.
+Avec le "mode" "2", il est pr&eacute;f&eacute;rable de le mettre &agrave; 5-10.
+Avec le "mode" "3", il est pr&eacute;f&eacute;rable de le mettre &agrave; 5-10.
