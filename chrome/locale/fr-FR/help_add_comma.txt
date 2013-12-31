@@ -1,2 +1,1 @@
-<h4>Ajout virgule automatique</h4>
 Ajoute une virgule apr&egrave;s un nouveau destinataire.

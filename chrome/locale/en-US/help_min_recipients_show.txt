@@ -1,3 +1,2 @@
-<h4>Show nb recipients if above</h4>
-The number of recipients is indicated on the left of the label of each field.<br/>
+The number of recipients is indicated on the left of the label of each field.
 It is shown only if above that number.

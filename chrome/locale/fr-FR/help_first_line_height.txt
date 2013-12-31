@@ -1,2 +1,1 @@
-<h4>Hauteur premi&egrave;re ligne</h4>
 Hauteur en pixels de la premi&egrave;re ligne de chaque champ.

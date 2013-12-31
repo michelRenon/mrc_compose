@@ -1,2 +1,1 @@
-<h4>Button "Default height"</h4>
 Reset fields "First line height" and "Line height".

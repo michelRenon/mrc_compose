@@ -1,2 +1,1 @@
-<h4>Intervalle minimum de recherche (ms)</h4>
 L'intervalle minimum entre 2 recherches identiques (en millisecondes).

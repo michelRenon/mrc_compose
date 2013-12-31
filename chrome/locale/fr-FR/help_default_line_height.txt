@@ -1,2 +1,1 @@
-<h4>Bouton "Hauteur d&eacute;faut"</h4>
 Initialise les valeurs des 2 champs "Hauteur premi&egrave;re ligne" et "hauteur ligne".
