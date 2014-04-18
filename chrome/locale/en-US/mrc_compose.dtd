@@ -26,23 +26,23 @@
 
 <!-- tab 1 -->
 <!ENTITY options.search_ab_URI_list.label "Search in addressbook: ">
-<!ENTITY options.mode.label "Mode: ">
+<!ENTITY options.mode.label "Mode (?): ">
 <!ENTITY options.mode_value1.label "1 : All contacts contain">
 <!ENTITY options.mode_value2.label "2 : All contacts begin with / All contacts contain">
 <!ENTITY options.mode_value3.label "3 : Each AddressBook">
-<!ENTITY options.max_elements_part_menu.label "Max nb line in each part: ">
+<!ENTITY options.max_elements_part_menu.label "Max nb line in each part (?): ">
 <!ENTITY options.sort_field_level_1.label "Sort 1: ">
 <!ENTITY options.sort_field_level_2.label "Sort 2: ">
 <!ENTITY options.sort_field_level_3.label "Sort 3: ">
 <!ENTITY options.sort_field_1.label "Popularity">
 <!ENTITY options.sort_field_2.label "lastName">
 <!ENTITY options.sort_field_3.label "firstName">
-<!ENTITY options.show_popularity.label "Show Popularity: ">            
+<!ENTITY options.show_popularity.label "Show Popularity (?): ">            
 
 <!-- tab 2 -->
-<!ENTITY options.min_recipients_show.label "Show nb recipients if above: "> <!-- min_recipients_show -->
-<!ENTITY options.max_recipients_warning.label "Suggested max nb of recipients: "> <!-- recimax_recipients_warning -->
-<!ENTITY options.search_min_char.label "Start search after nb characters: " > <!-- pref_search_min_char-->
+<!ENTITY options.min_recipients_show.label "Show nb recipients if above (?): "> <!-- min_recipients_show -->
+<!ENTITY options.max_recipients_warning.label "Suggested max nb of recipients (?): "> <!-- recimax_recipients_warning -->
+<!ENTITY options.search_min_char.label "Start search after nb characters (?): " > <!-- pref_search_min_char-->
 
 <!-- tab 3 -->
 <!ENTITY options.first_focus.label "Set default focus to :" >
@@ -56,16 +56,16 @@
 
 <!ENTITY options.showcc.label "Always show field '&ccAddr.label;' " >
 <!ENTITY options.showbcc.label "Always show field '&bccAddr.label;' " >
-<!ENTITY options.max_nb_line.label "Nb line max: ">
-<!ENTITY options.first_line_height.label "First line height: ">
-<!ENTITY options.line_height.label "Line height: ">
+<!ENTITY options.max_nb_line.label "Nb line max (?): ">
+<!ENTITY options.first_line_height.label "First line height (?): ">
+<!ENTITY options.line_height.label "Line height (?): ">
 <!ENTITY options.default_line_height.label "">
 <!ENTITY options.default_line_height.button "Default height">
-<!ENTITY options.automatic_height.label "Automatic height: ">
+<!ENTITY options.automatic_height.label "Automatic height (?): ">
 
 <!-- tab 4 -->
-<!ENTITY options.min_search_delay.label "Min search delay (ms): ">
-<!ENTITY options.add_comma.label "Automatic add comma: ">            
+<!ENTITY options.min_search_delay.label "Min search delay (ms) (?): ">
+<!ENTITY options.add_comma.label "Automatic add comma (?): ">            
 
 <!ENTITY options.special_values.label "These values are special. It's better not to change them.">
 <!ENTITY options.special_values.style "font-size:1.2em; font-style:italic"> 
