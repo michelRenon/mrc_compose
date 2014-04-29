@@ -2153,7 +2153,7 @@ var mrcAComplete = {
                 if (card[fields['name'][i]] != "")
                     names.push(card[fields['name'][i]]);
             }
-            cardText = mrcAComplete.mhParser.makeFullAddress(names.join(" "), card['primaryEmail']);
+            cardText = mrcAComplete.mhParser.makeMailboxObject(names.join(" "), card['primaryEmail']).toString();
             
             // ----------------
             // node version
@@ -2184,7 +2184,7 @@ var mrcAComplete = {
                 if (card[fields['name'][i]] != "")
                     names.push(card[fields['name'][i]]);
             }
-            cardText = mrcAComplete.mhParser.makeFullAddress(names.join(" "), card['secondEmail']);
+            cardText = mrcAComplete.mhParser.makeMailboxObject(names.join(" "), card['secondEmail']).toString();
             
             // ----------------
             // node version
@@ -2703,7 +2703,7 @@ var mrcAComplete = {
             if (card[fields['email'][i]] != "")
                 emails.push(card[fields['email'][i]]);
         }
-        let cardText = this.mhParser.makeFullAddress(names.join(" "), emails.join(" "));
+        let cardText = this.mhParser.makeMailboxObject(names.join(" "), emails.join(" ")).toString();
         return cardText;
     },
     
