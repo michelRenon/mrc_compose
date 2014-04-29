@@ -1684,33 +1684,32 @@ var mrcAComplete = {
                     acObserver.prototype = {
                         _search: null,
                         _result: null,
-                        abDirSearchListener : null,
-                        addressBook : null,
-                        isRemote : null,
-                        cbObject : null,
+                        addressBook : ab,
+                        isRemote : true,
+                        cbObject : that,
                         localRes : null,
 
                         onSearchResult: function (aSearch, aResult) {
                             this._search = aSearch;
                             this._result = aResult;
-                            this.addressBook = ab;
-                            this.isRemote = true;
-                            this.cbObject = that;
-                            this.ocalRes = null;
                             for (var i = 0; i < aResult.matchCount; i++) {
                                 aResult.QueryInterface(Components.interfaces.nsIAbAutoCompleteResult);
                                 var aCard = aResult.getCardAt(i);
                                 this.cbObject.search_res1.push(this.cbObject._createMyCard(aCard));
                             }
                             this.cbObject._completeSearchListener(this);
-                        }
+                        },
+
+                        onUpdateSearchResult: function(search, result) {}
                     };
 
-                    var acs = Components.classes["@mozilla.org/autocomplete/search;1?name=addrbook"]
+                    var acs = Components.classes["@mozilla.org/autocomplete/search;1?name=ldap"]
                         .getService(Components.interfaces.nsIAutoCompleteSearch);
 
+                    var params = JSON.stringify({ idKey: gCurrentIdentity.key });
+
                     var obs = new acObserver();
-                    acs.startSearch("mail", gCurrentIdentity.key, null, obs);
+                    acs.startSearch(aString, params, null, obs);
 
                     this._addSearchListener(obs);
                 }
