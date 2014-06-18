@@ -327,3 +327,10 @@ function mrcLoadHelp() {
 }
 
 
+
+
+
+function mrcOnPrefComposeLoaded() {
+    
+    Application.console.log("mrcOnPrefComposeLoaded() YEEEEEEEEEEEES !!!!!!!!!");
+}
