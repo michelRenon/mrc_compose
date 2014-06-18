@@ -80,8 +80,8 @@ function mrcOnPrefLoaded() {
             
         // We skip mailing lists and remote address books.
         // if (ab.isMailList || ab.isRemote)
-        if (ab.isRemote)
-            continue;
+        // if (ab.isRemote)
+        //    continue;
 
         let abItem = document.createElement("listitem");
         abItem.setAttribute("type", "checkbox");
