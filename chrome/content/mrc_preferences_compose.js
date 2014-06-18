@@ -74,24 +74,46 @@ function getString(key) {
 
 window.addEventListener("load", function(e) { 
         // dump("DEBUG : load compose window\n");
-        Application.console.log("load preferences compose window() YEEEEEEEEEEEES !!!!!!!!!");
+        // Application.console.log("load preferences compose window() YEEEEEEEEEEEES !!!!!!!!!");
         /*
         chercher le checkbox d'id 'autocompleteLDAP' dans la fenetre id 'MailPreferences'
         remonter au parent (hbox)
         puis y ajouter à la fin le label/texte d'info
         */
         let text = getString('autocomplete');
-        Application.console.log("text="+text);
+        let text2 = getString('autocomplete2');
+        // Application.console.log("text="+text);
         
         let src = document.getElementById('emailCollectionOutgoing');
-        Application.console.log("src="+src.nodeName);
+        // Application.console.log("src="+src.nodeName);
         let tab = src.parentNode.parentNode;
-        Application.console.log("tab="+tab.nodeName);
-        let description = tab.childNodes[0].childNodes[1];
-        Application.console.log("description="+description.value);
+        // Application.console.log("tab="+tab.nodeName);
+        let groupbox = tab.childNodes[0];
+        let description = groupbox.childNodes[1];
+        // Application.console.log("description="+description.value);
         description.value = text;
-        Application.console.log("description apres="+description.value);
+        // Application.console.log("description apres="+description.value);
+
+        var label = document.createElement("label");
+        label.setAttribute("class","text-link");
+        label.setAttribute("onclick","window.openDialog('chrome://mrc_compose/content/options.xul',' My Option Dialog','chrome,toolbar');");
+        label.setAttribute("value",text2);
+        groupbox.appendChild(label);
+        
+        /*
+        var button = document.createElement("button");
+        button.setAttribute("label","Open MRC Compose Options");
+        groupbox.appendChild(button);
+        
+
+      <label id="downloadDictionaries" class="text-link"
+             onclick="if (event.button == 0) { openDictionaryList('tab'); }"
+             value="&downloadDictionaries.label;"/>
+      <spacer flex="1"/>
+
+
+         */
         
     }, false);
 
-Application.console.log("window.addEventListener() YEEEEEEEEEEEES !!!!!!!!!");
+// Application.console.log("window.addEventListener() YEEEEEEEEEEEES !!!!!!!!!");
