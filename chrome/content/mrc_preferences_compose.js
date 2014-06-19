@@ -74,7 +74,7 @@ function getString(key) {
 
 window.addEventListener("load", function(e) { 
         // dump("DEBUG : load compose window\n");
-        // Application.console.log("load preferences compose window() YEEEEEEEEEEEES !!!!!!!!!");
+        // Application.console.log("load preferences compose window()");
         /*
         chercher le checkbox d'id 'autocompleteLDAP' dans la fenetre id 'MailPreferences'
         remonter au parent (hbox)
@@ -94,26 +94,27 @@ window.addEventListener("load", function(e) {
         description.value = text;
         // Application.console.log("description apres="+description.value);
 
+        var hbox = document.createElement("hbox");
+
         var label = document.createElement("label");
-        label.setAttribute("class","text-link");
-        label.setAttribute("onclick","window.openDialog('chrome://mrc_compose/content/options.xul',' My Option Dialog','chrome,toolbar');");
-        label.setAttribute("value",text2);
-        groupbox.appendChild(label);
+        label.setAttribute("class", "text-link");
+        label.setAttribute("onclick", "if (event.button == 0) { window.openDialog('chrome://mrc_compose/content/options.xul',' My Option Dialog','chrome,toolbar'); }");
+        label.setAttribute("value", text2);
+        hbox.appendChild(label);
         
+        var spacer = document.createElement("spacer");
+        spacer.setAttribute("flex", "1");
+        hbox.appendChild(spacer);
+
+        groupbox.appendChild(hbox);
+
         /*
-        var button = document.createElement("button");
-        button.setAttribute("label","Open MRC Compose Options");
-        groupbox.appendChild(button);
-        
-
-      <label id="downloadDictionaries" class="text-link"
-             onclick="if (event.button == 0) { openDictionaryList('tab'); }"
-             value="&downloadDictionaries.label;"/>
-      <spacer flex="1"/>
-
-
+            <label id="downloadDictionaries" class="text-link"
+                 onclick="if (event.button == 0) { openDictionaryList('tab'); }"
+                 value="&downloadDictionaries.label;"/>
+            <spacer flex="1"/>
          */
         
     }, false);
 
-// Application.console.log("window.addEventListener() YEEEEEEEEEEEES !!!!!!!!!");
+// Application.console.log("window.addEventListener()");
