@@ -616,6 +616,8 @@ var mrcAComplete = {
     datas : {},  // it's a dict : every key/value is a part of the result (defined by 'param_mode')
     // the total number of results
     nbDatas : 0,
+    // the errors reported when searching
+    errors : [],
     
 
     // define the values of all elements for each field
@@ -687,6 +689,16 @@ var mrcAComplete = {
 
         // update specials values
         this._prefLoaded();
+        
+        
+        // TEST : try to get TB version
+        var info = Components.classes["@mozilla.org/xre/app-info;1"]
+           .getService(Components.interfaces.nsIXULAppInfo);
+        // Get the name of the application running us
+        // info.name; // Returns "Firefox" for Firefox or "Thunderbird" for TB
+        // info.version; // Returns "2.0.0.1" for Firefox version 2.0.0.1, "24.5.0"
+        Application.console.log("APP NAME="+info.name+" ; APP VERSION="+info.version);
+        // APP NAME=Thunderbird ; APP VERSION=24.5.0
     },
 
     shutdown: function() {
@@ -1703,6 +1715,65 @@ var mrcAComplete = {
                     if (doSearch) {
                         try {
                             Application.console.log("AB LDAP = " + ab.dirName);
+                            /* CODE FOR TB 24-29
+                                    
+                            let query =
+                                Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
+                                        .createInstance(Components.interfaces.nsIAbDirectoryQuery);
+
+                            let attributes =
+                                Components.classes["@mozilla.org/addressbook/ldap-attribute-map;1"]
+                                        .createInstance(Components.interfaces.nsIAbLDAPAttributeMap);
+                            attributes.setAttributeList("DisplayName",
+                                ab.attributeMap.getAttributeList("DisplayName", {}), true);
+                            attributes.setAttributeList("PrimaryEmail",
+                                ab.attributeMap.getAttributeList("PrimaryEmail", {}), true);
+
+                            let args =
+                                Components.classes["@mozilla.org/addressbook/directory/query-arguments;1"]
+                                        .createInstance(Components.interfaces.nsIAbDirectoryQueryArguments);
+
+                            // Create filter from filter template and search string
+                            let ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
+                                                    .getService(Components.interfaces.nsILDAPService);
+                            let filterPrefix = "";
+                            let filterSuffix = "";
+                            let filterAttr = "";
+                            let filter = ldapSvc.createFilter(1024, filterTemplate, filterPrefix, filterSuffix, filterAttr, aString);
+                            if (!filter)
+                                throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
+
+                            args.typeSpecificArg = attributes;
+                            args.querySubDirectories = true;
+                            args.filter = filter;
+
+                            // add an async search listener
+                            let that = this;
+                            let abDirSearchListener = {
+                                addressBook : ab,
+                                isRemote : true,
+                                cbObject : that,
+                                localRes : null,
+                                
+                                onSearchFinished : function(aResult, aErrorMesg) {
+                                    if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
+                                        this.cbObject._completeSearchListener(this);
+                                    }
+                                },
+
+                                onSearchFoundCard : function(aCard) {
+                                    this.cbObject.search_res1.push(this.cbObject._createMyCard(aCard));
+                                }
+                            };
+
+                            this._addSearchListener(abDirSearchListener);
+                            query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
+                                     
+                                    
+                            */
+                            
+                            
+                            /* CODE FOR TB >= 29 */
                             let that = this;
                            
                             function acObserver() {}
@@ -2090,7 +2161,65 @@ var mrcAComplete = {
                     let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                     if (doSearch) {
                         try {
+                            /* CODE FOR TB 24-29
 
+                            let query =
+                                Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
+                                    .createInstance(Components.interfaces.nsIAbDirectoryQuery);
+
+                            let attributes =
+                                Components.classes["@mozilla.org/addressbook/ldap-attribute-map;1"]
+                                    .createInstance(Components.interfaces.nsIAbLDAPAttributeMap);
+                            attributes.setAttributeList("DisplayName",
+                                ab.attributeMap.getAttributeList("DisplayName", {}), true);
+                            attributes.setAttributeList("PrimaryEmail",
+                                ab.attributeMap.getAttributeList("PrimaryEmail", {}), true);
+
+                            let args =
+                                Components.classes["@mozilla.org/addressbook/directory/query-arguments;1"]
+                                    .createInstance(Components.interfaces.nsIAbDirectoryQueryArguments);
+
+                            // Create filter from filter template and search string
+                            let ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
+                                                    .getService(Components.interfaces.nsILDAPService);
+                            let filterPrefix = "";
+                            let filterSuffix = "";
+                            let filterAttr = "";
+                            let filter = ldapSvc.createFilter(1024, filterTemplate, filterPrefix, filterSuffix, filterAttr, aString);
+                            if (!filter)
+                                throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
+
+                            args.typeSpecificArg = attributes;
+                            args.querySubDirectories = true;
+                            args.filter = filter;
+
+                            // add an async search listener
+                            let that = this;
+                            let abDirSearchListener = {
+                                addressBook : ab,
+                                isRemote : true,
+                                cbObject : that,
+                                localRes : [],
+                                
+                                onSearchFinished : function(aResult, aErrorMesg) {
+                                    if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
+                                        this.cbObject._completeSearchListener(this);
+                                    }
+                                },
+
+                                onSearchFoundCard : function(aCard) {
+                                    this.localRes.push(this.cbObject._createMyCard(aCard));
+                                }
+                            };
+
+                            this._addSearchListener(abDirSearchListener);
+                            query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
+
+
+
+                            */
+
+                            /* CODE FOR TB >= 29 */
                             let that = this;
 
                             function acObserver() {}
