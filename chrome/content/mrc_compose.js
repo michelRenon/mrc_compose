@@ -1857,7 +1857,7 @@ var mrcAComplete = {
                     let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                     if (doSearch) {
                         try {
-
+                            /*
                             let acDirURI = null;
                             if (gCurrentIdentity.overrideGlobalPref) {
                                 acDirURI = gCurrentIdentity.directoryServer;
@@ -1870,7 +1870,7 @@ var mrcAComplete = {
                             if (!acDirURI) {
                                 continue;
                             }
-
+                            */
                             let that = this;
 
                             let ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
