@@ -52,7 +52,8 @@
     /* TEST TB23 * /
     background-color: #f80;
     border: 3px solid #fcc;
-   /* box-shadow: 6px 6px 12px #888; */
+    box-shadow: 6px 6px 12px #888;
+    */
 }
 
 #msgAutocompletePanelDiv {
@@ -61,8 +62,10 @@
     display:block; 
     min-width:100px;
 
-    /* TEST TB23 * /
-    border: 3px solid #fcc; */
+    /* necessary for TB > 24 because there is no more shadow for panels :
+     * we need to give a visual clue where are the panel's limits.
+     */
+    border: 1px solid #bbb;
 }
 
 
