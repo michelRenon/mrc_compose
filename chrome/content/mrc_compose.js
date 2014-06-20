@@ -1715,7 +1715,7 @@ var mrcAComplete = {
                     if (doSearch) {
                         try {
                             Application.console.log("AB LDAP = " + ab.dirName);
-                            /* CODE FOR TB 24-29
+                            /* CODE FOR TB 24 to 31?
                                     
                             let query =
                                 Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
@@ -1929,6 +1929,7 @@ var mrcAComplete = {
                     if (doSearch) {
                         try {
                             /*
+                             * CODE UNNECESSARY BECAUSE MRC COMPOSE DISABLES THOSE OPTIONS
                             let acDirURI = null;
                             if (gCurrentIdentity.overrideGlobalPref) {
                                 acDirURI = gCurrentIdentity.directoryServer;
@@ -1942,6 +1943,8 @@ var mrcAComplete = {
                                 continue;
                             }
                             */
+                            
+                            /* CODE FOR TB 24-31 */
                             let that = this;
 
                             let ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
@@ -2161,7 +2164,7 @@ var mrcAComplete = {
                     let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                     if (doSearch) {
                         try {
-                            /* CODE FOR TB 24-29
+                            /* CODE FOR TB 24-31?
 
                             let query =
                                 Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
@@ -2214,8 +2217,6 @@ var mrcAComplete = {
 
                             this._addSearchListener(abDirSearchListener);
                             query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
-
-
 
                             */
 
