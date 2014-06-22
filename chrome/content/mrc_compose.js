@@ -1756,7 +1756,7 @@ var mrcAComplete = {
                     if (doSearch) {
                         try {
                             // Application.console.log("AB LDAP = " + ab.dirName);
-                            /* CODE FOR TB 24 to 31?
+                            /* CODE FOR TB 24 to 31? */
                                     
                             let query =
                                 Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
@@ -1811,10 +1811,11 @@ var mrcAComplete = {
                             query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
                                      
                                     
-                            */
+                            /* */
                             
                             
                             /* CODE FOR TB >= 29 */
+                            /*
                             let that = this;
                            
                             function acObserver() {}
@@ -1850,6 +1851,7 @@ var mrcAComplete = {
                             acs.startSearch(aString, params, null, obs);
 
                             this._addSearchListener(obs);
+                            */
                         } catch (e) {
                             this._addErrorAddressBook(ab.dirName);
                             this._logError(e, "_search_mode_1()");
@@ -2217,7 +2219,7 @@ var mrcAComplete = {
                     let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                     if (doSearch) {
                         try {
-                            /* CODE FOR TB 24-31?
+                            /* CODE FOR TB 24-31? */
 
                             let query =
                                 Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
@@ -2271,9 +2273,10 @@ var mrcAComplete = {
                             this._addSearchListener(abDirSearchListener);
                             query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
 
-                            */
+                            /* */
 
                             /* CODE FOR TB >= 29 */
+                            /*
                             let that = this;
 
                             function acObserver() {}
@@ -2309,6 +2312,7 @@ var mrcAComplete = {
                             acs.startSearch(aString, params, null, obs);
 
                             this._addSearchListener(obs);
+                            */
                         } catch (e) {
                             this._addErrorAddressBook(ab.dirName);
                             this._logError(e, "_search_mode_3()");
