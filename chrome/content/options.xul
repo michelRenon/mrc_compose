@@ -82,8 +82,8 @@
         <preference id="pref_first_focus_reply" name="extensions.mrccompose.first_focus_reply" type="string"/>
         <preference id="pref_first_focus_reply_html" name="extensions.mrccompose.first_focus_reply_html" type="string"/>
 
+        <preference id="pref_ldap_search_version" name="extensions.mrccompose.ldap_search_version" type="string"/>
       </preferences>
-
 
 
     <tooltip id="mrctip" orient="vertical" onpopupshowing="mrcTooltip();">
@@ -344,7 +344,17 @@
                                 <label control="add_comma" value="&options.add_comma.label;" tooltip="mrctip"/>
                                 <checkbox id="add_comma" preference="pref_add_comma" tooltip="mrctip" />
                             </row>
+                            <row>
+                                <label control="ldap_search_version" value="&options.ldap_search_version.label;" tooltip="mrctip"/>
+                                <menulist id="ldap_search_version" preference="pref_ldap_search_version" tooltip="mrctip" >
+                                    <menupopup>
+                                        <menuitem label="Thunderbird 24" value="TB24"/>
+                                        <menuitem label="Thunderbird 31" value="TB31"/>
+                                    </menupopup>
+                                </menulist>
+                            </row>
                         </rows>
+                        
                     </grid>
                     <label value="&options.special_values.label;" style="&options.special_values.style;"/>
                 </vbox>

@@ -26,3 +26,5 @@ pref("extensions.mrccompose.force_bcc", true);
 pref("extensions.mrccompose.first_focus", 'msgTO');
 pref("extensions.mrccompose.first_focus_reply", 'content-frame');
 pref("extensions.mrccompose.first_focus_reply_html", 'default');
+
+pref("extensions.mrccompose.ldap_search_version", 'TB24');

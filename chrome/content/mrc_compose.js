@@ -573,6 +573,9 @@ var mrcAComplete = {
     // help define initial values of some preferences
     param_first_load_done : false,
     
+    // (temporary) : allow user to select code for LDAP Searches
+    param_ldap_search_version : "TB24",
+    
     // store above constants as options (modifiable by user)
     prefs : null,
     
@@ -686,6 +689,8 @@ var mrcAComplete = {
         this.param_show_popularity = this.prefs.getBoolPref("show_popularity");
         this.param_search_ab_URI = this.prefs.getCharPref("search_ab_URI");
         this.param_first_load_done = this.prefs.getBoolPref("first_load_done");
+        this.param_ldap_search_version = this.prefs.getCharPref("ldap_search_version");
+        
         this.field_states['fieldCC'].force = this.prefs.getBoolPref("force_cc");
         this.field_states['fieldBCC'].force = this.prefs.getBoolPref("force_bcc");
 
@@ -783,7 +788,10 @@ var mrcAComplete = {
             case "force_cc":
                 this.field_states['fieldCC'].force = this.prefs.getBoolPref("force_cc");
                 this.updateFieldVisibilityOnLoad('fieldCC');
-                break;  
+                break;
+            case "ldap_search_version":
+                this.param_ldap_search_version = this.prefs.getCharPref("ldap_search_version");
+                break;
 
         }
     },
@@ -1757,101 +1765,98 @@ var mrcAComplete = {
                         try {
                             // Application.console.log("AB LDAP = " + ab.dirName);
                             /* CODE FOR TB 24 to 31? */
+                            if (this.param_ldap_search_version == 'TB24') {
+                                Application.console.log(ab.dirName+" : LDAP search TB24");
+                                let query =
+                                    Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
+                                            .createInstance(Components.interfaces.nsIAbDirectoryQuery);
+
+                                let attributes =
+                                    Components.classes["@mozilla.org/addressbook/ldap-attribute-map;1"]
+                                            .createInstance(Components.interfaces.nsIAbLDAPAttributeMap);
+                                attributes.setAttributeList("DisplayName",
+                                    ab.attributeMap.getAttributeList("DisplayName", {}), true);
+                                attributes.setAttributeList("PrimaryEmail",
+                                    ab.attributeMap.getAttributeList("PrimaryEmail", {}), true);
+
+                                let args =
+                                    Components.classes["@mozilla.org/addressbook/directory/query-arguments;1"]
+                                            .createInstance(Components.interfaces.nsIAbDirectoryQueryArguments);
+
+                                // Create filter from filter template and search string
+                                let ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
+                                                        .getService(Components.interfaces.nsILDAPService);
+                                let filterPrefix = "";
+                                let filterSuffix = "";
+                                let filterAttr = "";
+                                let filter = ldapSvc.createFilter(1024, filterTemplate, filterPrefix, filterSuffix, filterAttr, aString);
+                                if (!filter)
+                                    throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
+
+                                args.typeSpecificArg = attributes;
+                                args.querySubDirectories = true;
+                                args.filter = filter;
+
+                                // add an async search listener
+                                let that = this;
+                                let abDirSearchListener = {
+                                    addressBook : ab,
+                                    isRemote : true,
+                                    cbObject : that,
+                                    localRes : null,
                                     
-                            let query =
-                                Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
-                                        .createInstance(Components.interfaces.nsIAbDirectoryQuery);
+                                    onSearchFinished : function(aResult, aErrorMesg) {
+                                        if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
+                                            this.cbObject._completeSearchListener(this);
+                                        }
+                                    },
 
-                            let attributes =
-                                Components.classes["@mozilla.org/addressbook/ldap-attribute-map;1"]
-                                        .createInstance(Components.interfaces.nsIAbLDAPAttributeMap);
-                            attributes.setAttributeList("DisplayName",
-                                ab.attributeMap.getAttributeList("DisplayName", {}), true);
-                            attributes.setAttributeList("PrimaryEmail",
-                                ab.attributeMap.getAttributeList("PrimaryEmail", {}), true);
-
-                            let args =
-                                Components.classes["@mozilla.org/addressbook/directory/query-arguments;1"]
-                                        .createInstance(Components.interfaces.nsIAbDirectoryQueryArguments);
-
-                            // Create filter from filter template and search string
-                            let ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
-                                                    .getService(Components.interfaces.nsILDAPService);
-                            let filterPrefix = "";
-                            let filterSuffix = "";
-                            let filterAttr = "";
-                            let filter = ldapSvc.createFilter(1024, filterTemplate, filterPrefix, filterSuffix, filterAttr, aString);
-                            if (!filter)
-                                throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
-
-                            args.typeSpecificArg = attributes;
-                            args.querySubDirectories = true;
-                            args.filter = filter;
-
-                            // add an async search listener
-                            let that = this;
-                            let abDirSearchListener = {
-                                addressBook : ab,
-                                isRemote : true,
-                                cbObject : that,
-                                localRes : null,
-                                
-                                onSearchFinished : function(aResult, aErrorMesg) {
-                                    if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
-                                        this.cbObject._completeSearchListener(this);
-                                    }
-                                },
-
-                                onSearchFoundCard : function(aCard) {
-                                    this.cbObject.search_res1.push(this.cbObject._createMyCard(aCard));
-                                }
-                            };
-
-                            this._addSearchListener(abDirSearchListener);
-                            query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
-                                     
-                                    
-                            /* */
-                            
-                            
-                            /* CODE FOR TB >= 29 */
-                            /*
-                            let that = this;
-                           
-                            function acObserver() {}
-
-                            acObserver.prototype = {
-                                _search: null,
-                                _result: null,
-                                addressBook : ab,
-                                isRemote : true,
-                                cbObject : that,
-                                localRes : null,
-
-                                onSearchResult: function (aSearch, aResult) {
-                                    this._search = aSearch;
-                                    this._result = aResult;
-                                    for (var i = 0; i < aResult.matchCount; i++) {
-                                        aResult.QueryInterface(Components.interfaces.nsIAbAutoCompleteResult);
-                                        var aCard = aResult.getCardAt(i);
+                                    onSearchFoundCard : function(aCard) {
                                         this.cbObject.search_res1.push(this.cbObject._createMyCard(aCard));
                                     }
-                                    this.cbObject._completeSearchListener(this);
-                                },
+                                };
 
-                                onUpdateSearchResult: function(search, result) {}
-                            };
+                                this._addSearchListener(abDirSearchListener);
+                                query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
+                            } else {
+                                Application.console.log(ab.dirName+" : LDAP search TB31");
+                                /* CODE FOR TB >= 29 */
+                                let that = this;
+                               
+                                function acObserver() {}
 
-                            var acs = Components.classes["@mozilla.org/autocomplete/search;1?name=ldap"]
-                                .getService(Components.interfaces.nsIAutoCompleteSearch);
+                                acObserver.prototype = {
+                                    _search: null,
+                                    _result: null,
+                                    addressBook : ab,
+                                    isRemote : true,
+                                    cbObject : that,
+                                    localRes : null,
 
-                            var params = JSON.stringify({ idKey: gCurrentIdentity.key });
+                                    onSearchResult: function (aSearch, aResult) {
+                                        this._search = aSearch;
+                                        this._result = aResult;
+                                        for (var i = 0; i < aResult.matchCount; i++) {
+                                            aResult.QueryInterface(Components.interfaces.nsIAbAutoCompleteResult);
+                                            var aCard = aResult.getCardAt(i);
+                                            this.cbObject.search_res1.push(this.cbObject._createMyCard(aCard));
+                                        }
+                                        this.cbObject._completeSearchListener(this);
+                                    },
 
-                            var obs = new acObserver();
-                            acs.startSearch(aString, params, null, obs);
+                                    onUpdateSearchResult: function(search, result) {}
+                                };
 
-                            this._addSearchListener(obs);
-                            */
+                                var acs = Components.classes["@mozilla.org/autocomplete/search;1?name=ldap"]
+                                    .getService(Components.interfaces.nsIAutoCompleteSearch);
+
+                                var params = JSON.stringify({ idKey: gCurrentIdentity.key });
+
+                                var obs = new acObserver();
+                                acs.startSearch(aString, params, null, obs);
+
+                                this._addSearchListener(obs);
+                            }
                         } catch (e) {
                             this._addErrorAddressBook(ab.dirName);
                             this._logError(e, "_search_mode_1()");
@@ -1992,7 +1997,10 @@ var mrcAComplete = {
                                 continue;
                             }
                             */
-                            
+
+                            // MODE 2 HAS ONLY CODE FOR TB24 : is it ok with TB29+ ?
+                            // if (this.param_ldap_search_version == 'TB24') {
+
                             /* CODE FOR TB 24-31 */
                             let that = this;
 
@@ -2219,100 +2227,101 @@ var mrcAComplete = {
                     let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                     if (doSearch) {
                         try {
-                            /* CODE FOR TB 24-31? */
-
-                            let query =
-                                Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
-                                    .createInstance(Components.interfaces.nsIAbDirectoryQuery);
-
-                            let attributes =
-                                Components.classes["@mozilla.org/addressbook/ldap-attribute-map;1"]
-                                    .createInstance(Components.interfaces.nsIAbLDAPAttributeMap);
-                            attributes.setAttributeList("DisplayName",
-                                ab.attributeMap.getAttributeList("DisplayName", {}), true);
-                            attributes.setAttributeList("PrimaryEmail",
-                                ab.attributeMap.getAttributeList("PrimaryEmail", {}), true);
-
-                            let args =
-                                Components.classes["@mozilla.org/addressbook/directory/query-arguments;1"]
-                                    .createInstance(Components.interfaces.nsIAbDirectoryQueryArguments);
-
-                            // Create filter from filter template and search string
-                            let ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
-                                                    .getService(Components.interfaces.nsILDAPService);
-                            let filterPrefix = "";
-                            let filterSuffix = "";
-                            let filterAttr = "";
-                            let filter = ldapSvc.createFilter(1024, filterTemplate, filterPrefix, filterSuffix, filterAttr, aString);
-                            if (!filter)
-                                throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
-
-                            args.typeSpecificArg = attributes;
-                            args.querySubDirectories = true;
-                            args.filter = filter;
-
-                            // add an async search listener
-                            let that = this;
-                            let abDirSearchListener = {
-                                addressBook : ab,
-                                isRemote : true,
-                                cbObject : that,
-                                localRes : [],
+                            if (this.param_ldap_search_version == 'TB24') {
+                                Application.console.log(ab.dirName+" : LDAP search TB24");
+                                /* CODE FOR TB 24-31? */
                                 
-                                onSearchFinished : function(aResult, aErrorMesg) {
-                                    if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
-                                        this.cbObject._completeSearchListener(this);
-                                    }
-                                },
+                                let query =
+                                    Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
+                                        .createInstance(Components.interfaces.nsIAbDirectoryQuery);
 
-                                onSearchFoundCard : function(aCard) {
-                                    this.localRes.push(this.cbObject._createMyCard(aCard));
-                                }
-                            };
+                                let attributes =
+                                    Components.classes["@mozilla.org/addressbook/ldap-attribute-map;1"]
+                                        .createInstance(Components.interfaces.nsIAbLDAPAttributeMap);
+                                attributes.setAttributeList("DisplayName",
+                                    ab.attributeMap.getAttributeList("DisplayName", {}), true);
+                                attributes.setAttributeList("PrimaryEmail",
+                                    ab.attributeMap.getAttributeList("PrimaryEmail", {}), true);
 
-                            this._addSearchListener(abDirSearchListener);
-                            query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
+                                let args =
+                                    Components.classes["@mozilla.org/addressbook/directory/query-arguments;1"]
+                                        .createInstance(Components.interfaces.nsIAbDirectoryQueryArguments);
 
-                            /* */
+                                // Create filter from filter template and search string
+                                let ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
+                                                        .getService(Components.interfaces.nsILDAPService);
+                                let filterPrefix = "";
+                                let filterSuffix = "";
+                                let filterAttr = "";
+                                let filter = ldapSvc.createFilter(1024, filterTemplate, filterPrefix, filterSuffix, filterAttr, aString);
+                                if (!filter)
+                                    throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
 
-                            /* CODE FOR TB >= 29 */
-                            /*
-                            let that = this;
+                                args.typeSpecificArg = attributes;
+                                args.querySubDirectories = true;
+                                args.filter = filter;
 
-                            function acObserver() {}
+                                // add an async search listener
+                                let that = this;
+                                let abDirSearchListener = {
+                                    addressBook : ab,
+                                    isRemote : true,
+                                    cbObject : that,
+                                    localRes : [],
+                                    
+                                    onSearchFinished : function(aResult, aErrorMesg) {
+                                        if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
+                                            this.cbObject._completeSearchListener(this);
+                                        }
+                                    },
 
-                            acObserver.prototype = {
-                                _search: null,
-                                _result: null,
-                                addressBook : ab,
-                                isRemote : true,
-                                cbObject : that,
-                                localRes : [],
-
-                                onSearchResult: function (aSearch, aResult) {
-                                    this._search = aSearch;
-                                    this._result = aResult;
-                                    for (var i = 0; i < aResult.matchCount; i++) {
-                                        aResult.QueryInterface(Components.interfaces.nsIAbAutoCompleteResult);
-                                        var aCard = aResult.getCardAt(i);
+                                    onSearchFoundCard : function(aCard) {
                                         this.localRes.push(this.cbObject._createMyCard(aCard));
                                     }
-                                    this.cbObject._completeSearchListener(this);
-                                },
+                                };
 
-                                onUpdateSearchResult: function(search, result) {}
-                            };
+                                this._addSearchListener(abDirSearchListener);
+                                query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
+                                
+                            } else {
+                                Application.console.log(ab.dirName+" : LDAP search TB31");
+                                /* CODE FOR TB >= 29 */
+                                let that = this;
 
-                            var acs = Components.classes["@mozilla.org/autocomplete/search;1?name=ldap"]
-                                .getService(Components.interfaces.nsIAutoCompleteSearch);
+                                function acObserver() {}
 
-                            var params = JSON.stringify({ idKey: gCurrentIdentity.key });
+                                acObserver.prototype = {
+                                    _search: null,
+                                    _result: null,
+                                    addressBook : ab,
+                                    isRemote : true,
+                                    cbObject : that,
+                                    localRes : [],
 
-                            var obs = new acObserver();
-                            acs.startSearch(aString, params, null, obs);
+                                    onSearchResult: function (aSearch, aResult) {
+                                        this._search = aSearch;
+                                        this._result = aResult;
+                                        for (var i = 0; i < aResult.matchCount; i++) {
+                                            aResult.QueryInterface(Components.interfaces.nsIAbAutoCompleteResult);
+                                            var aCard = aResult.getCardAt(i);
+                                            this.localRes.push(this.cbObject._createMyCard(aCard));
+                                        }
+                                        this.cbObject._completeSearchListener(this);
+                                    },
 
-                            this._addSearchListener(obs);
-                            */
+                                    onUpdateSearchResult: function(search, result) {}
+                                };
+
+                                var acs = Components.classes["@mozilla.org/autocomplete/search;1?name=ldap"]
+                                    .getService(Components.interfaces.nsIAutoCompleteSearch);
+
+                                var params = JSON.stringify({ idKey: gCurrentIdentity.key });
+
+                                var obs = new acObserver();
+                                acs.startSearch(aString, params, null, obs);
+
+                                this._addSearchListener(obs);
+                            }
                         } catch (e) {
                             this._addErrorAddressBook(ab.dirName);
                             this._logError(e, "_search_mode_3()");
