@@ -144,6 +144,18 @@
     border-radius: 4px;
     padding: 3px 5px 3px 5px;
 }
+
+#msgAutocompletePanelDiv .alert-error p {
+    margin : 0;
+    padding : 0;
+}
+
+#msgAutocompletePanelDiv .info-error {
+    text-align: right;
+    font-style: italic;
+    color: #888;
+}
+
 /*
 .alert {
     background-color: #fcf8e3;

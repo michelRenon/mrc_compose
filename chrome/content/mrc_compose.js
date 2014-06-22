@@ -447,6 +447,7 @@ var mrcAComplete = {
     POPULARITY_CLASSNAME : "popularity",
     HIDDENNAME_CLASSNAME : "hiddenname",
     ERROR_CLASSNAME : "alert-error",
+    ERRORINFO_CLASSNAME : "info-error",
     
     // html namespace in order to integrate html elements into xul
     HTMLNS : "http://www.w3.org/1999/xhtml",
@@ -820,6 +821,26 @@ var mrcAComplete = {
      */
     _pick : function(arg, def) {
         return (typeof arg !== "undefined" ? arg : def);
+    },
+    
+    _logError : function(obj, context) {
+        /*
+         * Send information to the console.
+         * 
+         * params :
+         *   obj : text or exception
+         *   context : text, (optionnal) some informationabout context of log
+         */
+        context = this._pick(context, '');
+
+        let message = "ERREUR MRC-COMPOSE : ";
+        if (context != '')
+            message += " : "+context+" : "
+        
+        if (obj.message)
+            Application.console.log(message+obj.message);
+        else
+            Application.console.log(message+obj);
     },
     
     _prefLoaded : function() {
@@ -1634,6 +1655,20 @@ var mrcAComplete = {
         this._testSearchComplete();
     },
     
+    _addErrorAddressBook : function(ab_name) {
+        /*
+         * Add an error message for an addressBook name
+         * 
+         * params :
+         *   ab_name : the name of address book
+         * return
+         *   none
+         */
+        let message = this.getString("ab_error");
+        message = message.replace(/%s/g, ab_name); 
+        this.errors.push(message);
+    },
+
     /*
      * 
     Infos for LDAP searches :
@@ -1679,7 +1714,7 @@ var mrcAComplete = {
             let ab = allAddressBooks.getNext();
             if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
                 // recherche 1
-                Application.console.log("AB LOCAL = " + ab.dirName);
+                // Application.console.log("AB LOCAL = " + ab.dirName);
                 let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                 if (doSearch) {
                     // add a sync search listener
@@ -1710,12 +1745,12 @@ var mrcAComplete = {
                 }
             } else {
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
-                    Application.console.log("param_search="+this.param_search_ab_URI+" ; ab.URI="+ab.URI)
+                    // Application.console.log("param_search="+this.param_search_ab_URI+" ; ab.URI="+ab.URI)
                     // check if user wants to search in this AB
                     let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                     if (doSearch) {
                         try {
-                            Application.console.log("AB LDAP = " + ab.dirName);
+                            // Application.console.log("AB LDAP = " + ab.dirName);
                             /* CODE FOR TB 24 to 31?
                                     
                             let query =
@@ -1811,7 +1846,8 @@ var mrcAComplete = {
 
                             this._addSearchListener(obs);
                         } catch (e) {
-                            Application.console.log("ERREUR __search_mode_1() : "+e.message);
+                            this._addErrorAddressBook(ab.dirName);
+                            this._logError(e, "_search_mode_1()");
                         }
                     }
                 }
@@ -2093,7 +2129,8 @@ var mrcAComplete = {
                             query.doQuery(ab, args, abDirSearchListener3, ab.maxHits, 0);
                             */
                         } catch (e) {
-                            Application.console.log("ERREUR __search_mode_2() : "+e.message);
+                            this._addErrorAddressBook(ab.dirName);
+                            this._logError(e, "_search_mode_2()");
                         }
                     }
                 }
@@ -2258,7 +2295,8 @@ var mrcAComplete = {
 
                             this._addSearchListener(obs);
                         } catch (e) {
-                            Application.console.log("ERREUR __search_mode_3() : "+e.message);
+                            this._addErrorAddressBook(ab.dirName);
+                            this._logError(e, "_search_mode_3()");
                         }
                     }
                 }
@@ -2512,13 +2550,24 @@ var mrcAComplete = {
          * return :
          *   none
          */
-        if (this.errors.length > 0 || true) {
-            let sep = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
-            sep.className += " "+this.ERROR_CLASSNAME;
-            sep.appendChild(document.createTextNode("Test ERROR"));
-            popupDiv.appendChild(sep);
+        if (this.errors.length > 0) {
+            // only one error div, with several lines (one for each error)
+            let errorDiv = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
+            errorDiv.setAttribute("class", " "+this.ERROR_CLASSNAME);
+            for (let i=0, len=this.errors.length ; i < len ; i++) {
+                let pDiv = document.createElementNS("http://www.w3.org/1999/xhtml", "p");
+                pDiv.appendChild(document.createTextNode(this.errors[i]));
+                errorDiv.appendChild(pDiv);
+            }
+
+            // more info message
+            let div = document.createElementNS(this.HTMLNS, "div");
+            div.setAttribute("class", " "+this.ERRORINFO_CLASSNAME);
+            div.appendChild(document.createTextNode(this.getString('more_info_see_console')));
+            errorDiv.appendChild(div);
+
+            popupDiv.appendChild(errorDiv);
         }
-        
     },
 
     _buildResultList_mode_1 : function(textBold) {
@@ -2610,6 +2659,9 @@ var mrcAComplete = {
             }
         }
 
+        // Add infos about errors if there are some
+        this._buildResultErrors(popupDiv);
+        
         // select first element
         if (this.nbDatas > 0) {
             this._select(1);
@@ -2663,6 +2715,9 @@ var mrcAComplete = {
             }
         }
 
+        // Add infos about errors if there are some
+        this._buildResultErrors(popupDiv);
+        
         // select first element
         if (this.nbDatas > 0) {
             this._select(1);
@@ -2802,11 +2857,17 @@ var mrcAComplete = {
          * return :
          *   the value of property in the current language
          */
-        let bundle = document.getElementById("mrcComposeStringBundle");
-        if (bundle)
-            return bundle.getString(key);
-        else
-            return key;
+        let res = key;
+        try {
+            let bundle = document.getElementById("mrcComposeStringBundle");
+            if (bundle)
+                res = bundle.getString(key);
+            else
+                res = key;
+        } catch(e) {
+            res = key;
+        }
+        return res
         /*
          * Alternate way
          * 
@@ -2925,6 +2986,7 @@ var mrcAComplete = {
          *   none
          */
         this.datas = {}; // TODO : check if it's the right way to empty dictionary
+        this.errors = [];
         this.nbDatas = 0;
         let meth = "_search_mode_"+this.param_mode;
         this.cbSearch = cbSearch
@@ -2942,7 +3004,7 @@ var mrcAComplete = {
          * return:
          *   non
          */
-        Application.console.log("finishSearch() 1");
+        // Application.console.log("finishSearch() 1");
         this.lastQuery = aString;
         this.lastQueryTime = new Date().getTime()
         if (this.nbDatas > 0) {
@@ -3487,7 +3549,7 @@ function mrcRecipientKeyUp(event, element) {
         if (textPart.length >= mrcAComplete.param_search_min_char) {
             if (mrcAComplete.needSearch(textPart)) {
                 // perform search
-                Application.console.log("avant search()");
+                // Application.console.log("avant search()");
                 mrcAComplete.search(textPart, function callback_search() { 
                         mrcAComplete.finishSearch(textPart, event, element) 
                     } );
