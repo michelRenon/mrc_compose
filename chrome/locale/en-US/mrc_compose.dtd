@@ -70,4 +70,4 @@
 <!ENTITY options.special_values.label "These values are special. It's better not to change them.">
 <!ENTITY options.special_values.style "font-size:1.2em; font-style:italic"> 
 
-<!ENTITY options.ldap_search_version.label "Use LDAP API version :"
+<!ENTITY options.ldap_search_version.label "Use LDAP API version :">
