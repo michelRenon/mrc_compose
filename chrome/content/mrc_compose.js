@@ -446,6 +446,7 @@ var mrcAComplete = {
     NBINGROUP_CLASSNAME : "nbingroup",
     POPULARITY_CLASSNAME : "popularity",
     HIDDENNAME_CLASSNAME : "hiddenname",
+    ERROR_CLASSNAME : "alert-error",
     
     // html namespace in order to integrate html elements into xul
     HTMLNS : "http://www.w3.org/1999/xhtml",
@@ -2502,6 +2503,24 @@ var mrcAComplete = {
             return false;
     },
 
+    _buildResultErrors : function(popupDiv) {
+        /*
+         * Add informations about search errors.
+         * 
+         * params :
+         *   popupDiv : the html element in which we have to add informations
+         * return :
+         *   none
+         */
+        if (this.errors.length > 0 || true) {
+            let sep = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
+            sep.className += " "+this.ERROR_CLASSNAME;
+            sep.appendChild(document.createTextNode("Test ERROR"));
+            popupDiv.appendChild(sep);
+        }
+        
+    },
+
     _buildResultList_mode_1 : function(textBold) {
         /*
          * build the html list of results for mode 1, with results of search
@@ -2539,7 +2558,10 @@ var mrcAComplete = {
                 popupDiv.appendChild(sep);
             }
         }
-
+        
+        // Add infos about errors if there are some
+        this._buildResultErrors(popupDiv);
+        
         // select first element
         if (this.nbDatas > 0) {
             this._select(1);
