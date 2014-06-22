@@ -1717,31 +1717,36 @@ var mrcAComplete = {
                 // Application.console.log("AB LOCAL = " + ab.dirName);
                 let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                 if (doSearch) {
-                    // add a sync search listener
-                    let that = this;
-                    let abSearchListener = {
-                        addressBook : ab,
-                        isRemote : false,
-                        cbObject : that,
-                        localRes : null,
-                    }
-                    this._addSearchListener(abSearchListener);
-
-                    let childCards1 = this.abManager.getDirectory(ab.URI + "?" + searchQuery1).childCards;  
-                    while (childCards1.hasMoreElements()) {
-                        let card = childCards1.getNext();
-                        if (card instanceof Components.interfaces.nsIAbCard) {
-                            // a list has no email, but we want to keep it
-                            if (card.isMailList) {
-                                this.search_res1.push(this._createMyCard(card));
-                            } else if (card.primaryEmail != "")
-                                // filter real cards without email
-                                this.search_res1.push(this._createMyCard(card));
+                    try {
+                        // add a sync search listener
+                        let that = this;
+                        let abSearchListener = {
+                            addressBook : ab,
+                            isRemote : false,
+                            cbObject : that,
+                            localRes : null,
                         }
+                        this._addSearchListener(abSearchListener);
+
+                        let childCards1 = this.abManager.getDirectory(ab.URI + "?" + searchQuery1).childCards;  
+                        while (childCards1.hasMoreElements()) {
+                            let card = childCards1.getNext();
+                            if (card instanceof Components.interfaces.nsIAbCard) {
+                                // a list has no email, but we want to keep it
+                                if (card.isMailList) {
+                                    this.search_res1.push(this._createMyCard(card));
+                                } else if (card.primaryEmail != "")
+                                    // filter real cards without email
+                                    this.search_res1.push(this._createMyCard(card));
+                            }
+                        }
+                        
+                        // finish the listener
+                        this._completeSearchListener(abSearchListener);
+                    } catch (e) {
+                        this._addErrorAddressBook(ab.dirName);
+                        this._logError(e, "_search_mode_1()");
                     }
-                    
-                    // finish the listener
-                    this._completeSearchListener(abSearchListener);
                 }
             } else {
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
@@ -1907,55 +1912,60 @@ var mrcAComplete = {
 
                 let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                 if (doSearch) {
-                    // add a sync search listener
-                    let that = this;
-                    let abSearchListener = {
-                        addressBook : ab,
-                        isRemote : false,
-                        cbObject : that,
-                        localRes : null,
-                    }
-                    this._addSearchListener(abSearchListener);
+                    try {
+                        // add a sync search listener
+                        let that = this;
+                        let abSearchListener = {
+                            addressBook : ab,
+                            isRemote : false,
+                            cbObject : that,
+                            localRes : null,
+                        }
+                        this._addSearchListener(abSearchListener);
 
-                    // search 1
-                    let childCards1 = this.abManager.getDirectory(ab.URI + "?" + searchQuery1).childCards;  
-                    while (childCards1.hasMoreElements()) {
-                        card = childCards1.getNext();
-                        if (card instanceof Components.interfaces.nsIAbCard) {
-                            if (card.isMailList) { // necessary
-                                this.search_res3.push(this._createMyCard(card));
-                            } else if (card.primaryEmail != "")
-                                this.search_res1.push(this._createMyCard(card));
+                        // search 1
+                        let childCards1 = this.abManager.getDirectory(ab.URI + "?" + searchQuery1).childCards;  
+                        while (childCards1.hasMoreElements()) {
+                            card = childCards1.getNext();
+                            if (card instanceof Components.interfaces.nsIAbCard) {
+                                if (card.isMailList) { // necessary
+                                    this.search_res3.push(this._createMyCard(card));
+                                } else if (card.primaryEmail != "")
+                                    this.search_res1.push(this._createMyCard(card));
+                            }
                         }
-                    }
 
-                    // search 2
-                    let childCards2 = this.abManager.getDirectory(ab.URI + "?" + searchQuery2).childCards;  
-                    msg = "";
-                    while (childCards2.hasMoreElements()) {
-                        card = childCards2.getNext();
-                        if (card instanceof Components.interfaces.nsIAbCard) {
-                            if (card.isMailList) { // necessary 
-                                this.search_res3.push(this._createMyCard(card));
-                            } else if (card.primaryEmail != "")
-                                this.search_res2.push(this._createMyCard(card));
+                        // search 2
+                        let childCards2 = this.abManager.getDirectory(ab.URI + "?" + searchQuery2).childCards;  
+                        msg = "";
+                        while (childCards2.hasMoreElements()) {
+                            card = childCards2.getNext();
+                            if (card instanceof Components.interfaces.nsIAbCard) {
+                                if (card.isMailList) { // necessary 
+                                    this.search_res3.push(this._createMyCard(card));
+                                } else if (card.primaryEmail != "")
+                                    this.search_res2.push(this._createMyCard(card));
+                            }
                         }
-                    }
-                    // search 3
-                    // unused
-                    /*
-                    let childCards3 = mrcAbManager.getDirectory(ab.URI + "?" + searchQuery3).childCards;  
-                    // Application.console.log(ab.dirName+" : "+searchResult.toString());
-                    msg = "";
-                    while (childCards3.hasMoreElements()) {
-                        card = childCards3.getNext();
-                        if (card instanceof Components.interfaces.nsIAbCard) {
-                            res3.push(this._createMyCard(card));
+                        // search 3
+                        // unused
+                        /*
+                        let childCards3 = mrcAbManager.getDirectory(ab.URI + "?" + searchQuery3).childCards;  
+                        // Application.console.log(ab.dirName+" : "+searchResult.toString());
+                        msg = "";
+                        while (childCards3.hasMoreElements()) {
+                            card = childCards3.getNext();
+                            if (card instanceof Components.interfaces.nsIAbCard) {
+                                res3.push(this._createMyCard(card));
+                            }
                         }
+                        */ 
+                        // finish the listener
+                        this._completeSearchListener(abSearchListener);
+                    } catch (e) {
+                        this._addErrorAddressBook(ab.dirName);
+                        this._logError(e, "_search_mode_1()");
                     }
-                    */ 
-                    // finish the listener
-                    this._completeSearchListener(abSearchListener);
                 }
             } else {
                 // Parts of the code in this block are copied from
@@ -2171,30 +2181,35 @@ var mrcAComplete = {
                 // recherche 1
                 let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                 if (doSearch) {
-                    // add a sync search listener
-                    let that = this;
-                    let abSearchListener = {
-                        addressBook : ab,
-                        isRemote : false,
-                        cbObject : that,
-                        localRes : [],
-                    }
-                    this._addSearchListener(abSearchListener);
-
-                    let childCards1 = this.abManager.getDirectory(ab.URI + "?" + searchQuery1).childCards;  
-                    while (childCards1.hasMoreElements()) {
-                        card = childCards1.getNext();
-                        if (card instanceof Components.interfaces.nsIAbCard) {
-                            // a list has no email, but we want to keep it
-                            if (card.isMailList) {
-                                abSearchListener.localRes.push(this._createMyCard(card));
-                            } else if (card.primaryEmail != "")
-                                // filter real cards without email
-                                abSearchListener.localRes.push(this._createMyCard(card));
+                    try {
+                        // add a sync search listener
+                        let that = this;
+                        let abSearchListener = {
+                            addressBook : ab,
+                            isRemote : false,
+                            cbObject : that,
+                            localRes : [],
                         }
+                        this._addSearchListener(abSearchListener);
+
+                        let childCards1 = this.abManager.getDirectory(ab.URI + "?" + searchQuery1).childCards;  
+                        while (childCards1.hasMoreElements()) {
+                            card = childCards1.getNext();
+                            if (card instanceof Components.interfaces.nsIAbCard) {
+                                // a list has no email, but we want to keep it
+                                if (card.isMailList) {
+                                    abSearchListener.localRes.push(this._createMyCard(card));
+                                } else if (card.primaryEmail != "")
+                                    // filter real cards without email
+                                    abSearchListener.localRes.push(this._createMyCard(card));
+                            }
+                        }
+                        // finish the listener
+                        this._completeSearchListener(abSearchListener);
+                    } catch (e) {
+                        this._addErrorAddressBook(ab.dirName);
+                        this._logError(e, "_search_mode_1()");
                     }
-                    // finish the listener
-                    this._completeSearchListener(abSearchListener);
                 }
             } else {
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
