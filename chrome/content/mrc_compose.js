@@ -2898,6 +2898,8 @@ var mrcAComplete = {
          */
         // check the element : is it one of the N fields ?        
         if (this.FIELDS[field]) {
+            // Ensure height can change.
+            mrcCompose_WORKAROUND_Height();
             try{
                 let element = document.getElementById(this.FIELDS[field].txtId);
                 let nbRecipients = this._getNbRecipients(element.value);
@@ -2964,6 +2966,8 @@ var mrcAComplete = {
          */
 
         if (this.FIELDS[field]) {
+            // Ensure height can change.
+            mrcCompose_WORKAROUND_Height();
             try{
                 let idBox = this.FIELDS[field].boxId;
                 let box = document.getElementById(idBox);
@@ -3118,12 +3122,15 @@ var mrcAComplete = {
     
 }
 
-// Install load and unload handlers
-function mrcComposeLoaded() {
+// Workaround for compatibility with other addons, specially Stationery :
+// they force the height of the recipients panels.
+function mrcCompose_WORKAROUND_Height() {
     let headerToolbar = document.getElementById("MsgHeadersToolbar");
     headerToolbar.setAttribute("minheight", "10");
     // compat TB24
     headerToolbar.removeAttribute("height");
+    // compat Stationery : it forces the 'height' and 'min-height' in "style" attribute
+    headerToolbar.removeAttribute("style");
 }
 
 function mrcComposeFocus() {
@@ -3184,7 +3191,6 @@ function mrcComposeFocus() {
 }
 
 window.addEventListener("load", function(e) { 
-        mrcComposeLoaded();
         mrcAComplete.startup();
     }, false);
 
@@ -3337,6 +3343,9 @@ function mrcRecipientResize(element, maxi) {
         // maxi = mrcAComplete._pick(maxi, mrcAComplete.param_max_height);
         maxi = mrcAComplete.param_max_height;
         
+        // Ensure height can change.
+        mrcCompose_WORKAROUND_Height();
+
         let sh1 = element.inputField.scrollHeight;
         element.height = 'auto'; // ==> forces the textbox to recompute scrollHeight to adapt to current value
         let sh2 = element.inputField.scrollHeight;
