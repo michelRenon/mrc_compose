@@ -352,18 +352,24 @@ function AddRecipient(recipientType, address)
             mrcAComplete._insertRecipient('fieldTO', address);
             mrcAComplete.forceFieldVisibility('fieldTO', true);
             mrcAComplete.updateFieldUI('fieldTO');
+            // special TB 24 ; TB 17 does not need the parameter
+            updateSendCommands(true);
             break;
             
         case "addr_cc" :
             mrcAComplete._insertRecipient('fieldCC', address);
             mrcAComplete.forceFieldVisibility('fieldCC', true);
             mrcAComplete.updateFieldUI('fieldCC');
+            // special TB 24 ; TB 17 does not need the parameter
+            updateSendCommands(true);
             break;
 
         case "addr_bcc" :
             mrcAComplete._insertRecipient('fieldBCC', address);
             mrcAComplete.forceFieldVisibility('fieldBCC', true);
             mrcAComplete.updateFieldUI('fieldBCC');
+            // special TB 24 ; TB 17 does not need the parameter
+            updateSendCommands(true);
             break;
     }
 }
