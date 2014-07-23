@@ -1342,9 +1342,17 @@ var mrcAComplete = {
         elt.className += " "+this.SELECT_CLASSNAME;
     },
 
-
-
-
+    _makeFullAddress : function(a, b) {
+        let res = "";
+        if (typeof mrcAComplete.mhParser.makeFullAddress === "function") {
+            // TB 24
+            res = this.mhParser.makeFullAddress(a, b);
+        } else {
+            // >= TB 29
+            res = this.mhParser.makeMailboxObject(a, b).toString();
+        }
+        return res;
+    },
 
 
 
@@ -2180,7 +2188,8 @@ var mrcAComplete = {
                 if (card[fields['name'][i]] != "")
                     names.push(card[fields['name'][i]]);
             }
-            cardText = mrcAComplete.mhParser.makeFullAddress(names.join(" "), card['primaryEmail']);
+            // cardText = mrcAComplete.mhParser.makeFullAddress(names.join(" "), card['primaryEmail']);
+            cardText = mrcAComplete._makeFullAddress(names.join(" "), card['primaryEmail']);
             
             // ----------------
             // node version
@@ -2211,7 +2220,8 @@ var mrcAComplete = {
                 if (card[fields['name'][i]] != "")
                     names.push(card[fields['name'][i]]);
             }
-            cardText = mrcAComplete.mhParser.makeFullAddress(names.join(" "), card['secondEmail']);
+            // cardText = mrcAComplete.mhParser.makeFullAddress(names.join(" "), card['secondEmail']);
+            cardText = mrcAComplete._makeFullAddress(names.join(" "), card['secondEmail']);
             
             // ----------------
             // node version
@@ -2730,7 +2740,8 @@ var mrcAComplete = {
             if (card[fields['email'][i]] != "")
                 emails.push(card[fields['email'][i]]);
         }
-        let cardText = this.mhParser.makeFullAddress(names.join(" "), emails.join(" "));
+        // let cardText = this.mhParser.makeFullAddress(names.join(" "), emails.join(" "));
+        let cardText = this._makeFullAddress(names.join(" "), emails.join(" "));
         return cardText;
     },
     
