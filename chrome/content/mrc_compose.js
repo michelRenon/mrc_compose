@@ -521,6 +521,9 @@ var mrcAComplete = {
 
     // the delay between 2 identical searches (milliseconds)
     param_min_search_delay : 500, 
+    
+    // the timeout of search (milliseconds)
+    param_search_timeout : 5000,
 
     // start the autocomplete search when a min number of chars is entered
     param_search_min_char : 1,
@@ -1610,13 +1613,32 @@ var mrcAComplete = {
         // Then test if search is complete for all addressbooks.
         this._testSearchComplete();
     },
-        
+    
+    _timeOutSearchListener : function() {
+        /*
+         * Perform actions when search timeout has been trigerred
+         */
+        // SPECIAL : 
+        // As it is a call-back, we can't use 'this'
+        // instead, we must use the let 'mrcAComplete'
+
+        // TODO : store which searchListeners have not completed
+        // to show them as timedOut in the panel
+        mrcAComplete.numRemotes = 0;
+        mrcAComplete._testSearchComplete();
+    },
+
     _testSearchComplete : function() {
         Application.console.log("_testSearchComplete : "+this.numRemotes+", "+this.allListenersStarted);
         if (this.numRemotes == 0 && this.allListenersStarted == true) {
             /*
              * Perform actions when ALL searches are completed.
              */
+            
+            // stop the current timeout
+            clearTimeout(this.searchTimeOut);
+            
+            // then handle results
             switch(this.param_mode) {
                 case 1:
                     // 
@@ -1663,6 +1685,9 @@ var mrcAComplete = {
 
     _startWaitingSearchListeners : function() {
         this.allListenersStarted = true;
+        // start search timeout
+        this.searchTimeOut = setTimeout(this._timeOutSearchListener, this.param_search_timeout);
+        
         Application.console.log("_startWaitingSearchListeners ");
         this._testSearchComplete();
     },
