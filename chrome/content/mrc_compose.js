@@ -2966,7 +2966,7 @@ var mrcAComplete = {
                 // to be coherent : inform TB that content of current Msg has really changed
                 gContentChanged=true;
             } catch (e) {
-                Application.console.log("ERREUR _removeRecipient() : "+e.message);
+                this._logError(e, " _removeRecipient()");
             }
         }
     },
@@ -2985,7 +2985,7 @@ var mrcAComplete = {
                     gContentChanged=true;
                 }
             } catch (e) {
-                Application.console.log("ERREUR _insertRecipient() : "+e.message);
+                this._logError(e, " _insertRecipient()");
             }
         }
     },
@@ -3154,7 +3154,7 @@ var mrcAComplete = {
         try {
             this[meth](aString);
         } catch (e) {
-            Application.console.log("ERROR SEARCH() : "+e);
+            this._logError(e, "SEARCH()");
         }
     },
 
@@ -3280,7 +3280,7 @@ var mrcAComplete = {
                 }
                 this._updateFieldAction(field);
             } catch (e) {
-                Application.console.log("ERREUR updateFieldVisibility() : "+e.message);
+                this._logError(e, "updateFieldVisibility()");
             }
         }
     },
@@ -3347,7 +3347,7 @@ var mrcAComplete = {
                     txt.focus();
                 }
             } catch (e) {
-                Application.console.log("ERREUR changeFieldVisibility("+field+") : "+e.message);
+                this._logError(e, "changeFieldVisibility("+field+")");
             }
         }
     },
@@ -3366,7 +3366,7 @@ var mrcAComplete = {
                 if (newCollapsed != box.collapsed)
                     this.changeFieldVisibility(field);
             } catch (e) {
-                Application.console.log("ERREUR forceFieldVisibility() : "+e.message);
+                this._logError(e, "forceFieldVisibility()");
             }
         }
     },
@@ -3751,7 +3751,7 @@ function mrcRecipientResize(element, maxi) {
         element.height = h;
         let sh3 = element.inputField.scrollHeight;
     } catch (e) {
-        Application.console.log("ERREUR mrcRecipientResize()"+e.message);
+        this._logError(e, "mrcRecipientResize()");
     }      
 }
 
@@ -3824,7 +3824,7 @@ function mrcMinimizeFields(event) {
             }
         }
     } catch (e) {
-        Application.console.log("ERREUR mrcMinimizeFields() : "+e.message);
+        mrcAComplete._logError(e, "mrcMinimizeFields()");
     }
 }
 
@@ -3855,7 +3855,7 @@ function mrcMaximizeFields(event) {
             mrcRecipientResize(element);
         }
     } catch (e) {
-        Application.console.log("ERREUR mrcMaximizeFields() : "+e.message);
+        mrcAComplete._logError(e, "mrcMaximizeFields()");
     }
 }
 
@@ -3866,8 +3866,8 @@ function mrcOpenPreferences(event) {
      * 
      */
     try {
-        window.openDialog('chrome://mrc_compose/content/options.xul',' My Option Dialog','chrome,toolbar');
+        window.openDialog('chrome://mrc_compose/content/options.xul',' My Option Dialog','chrome,toolbar'); 
     } catch (e) {
-        Application.console.log("ERREUR mrcOpenPreferences() : "+e.message);
+        mrcAComplete._logError(e, "mrcOpenPreferences()");
     }
 }
