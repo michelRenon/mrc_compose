@@ -43,6 +43,8 @@
  * 
  * specific for MRC AUTOCOMPLETE
  * 
+ * Some css values are copied from http://getbootstrap.com/examples/theme/
+ * 
  */
  
 #msgAutocompletePanel {
@@ -147,9 +149,9 @@
 #msgAutocompletePanelDiv .alert-error {
     /* from bootstrap theme */
     background-color: #f2dede;
-    border-color: #eed3d7;
-    color: #b94a48;
+    border: 1px solid #eed3d7;
     border-radius: 4px;
+    color: #b94a48;
     padding: 3px 5px 3px 5px;
 }
 
@@ -163,6 +165,22 @@
     font-style: italic;
     color: #888;
 }
+
+#msgAutocompletePanelDiv .alert-warning {
+    /* from bootstrap theme */
+    background-color: #fcf8e3;
+    border: 1px solid #f5e79e;
+    border-radius: 4px;
+    color: #8a6d3b;
+    padding: 3px 5px 3px 5px;
+}
+
+#msgAutocompletePanelDiv .alert-warning p {
+    margin : 0;
+    padding : 0;
+}
+
+
 
 /*
 .alert {

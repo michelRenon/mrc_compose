@@ -448,6 +448,7 @@ var mrcAComplete = {
     HIDDENNAME_CLASSNAME : "hiddenname",
     ERROR_CLASSNAME : "alert-error",
     ERRORINFO_CLASSNAME : "info-error",
+    WARNING_CLASSNAME : "alert-warning",
     
     // html namespace in order to integrate html elements into xul
     HTMLNS : "http://www.w3.org/1999/xhtml",
@@ -626,11 +627,14 @@ var mrcAComplete = {
     nbDatas : 0,
     // the errors reported when searching
     errors : [],
+    // the warnings reported when searching
+    warnings : [],
     // uniq id of each future search :
     // will allow handling of several callback returns of ldap searches
     // and filter obsolete ones
     searchID : 0,
-    
+    // the list of searched address books, at each request
+    searchedAB : [],
 
     // define the values of all elements for each field
     // format :
@@ -1577,7 +1581,8 @@ var mrcAComplete = {
     
     _initSearchListeners : function() {
         this.allListenersStarted = false;
-        this.numRemotes = 0;
+        // this.numRemotes = 0;
+        this.searchedAB = [];
         this.searchID++;
         Application.console.log("_initSearchListeners : "+this.searchID);
         
@@ -1587,10 +1592,11 @@ var mrcAComplete = {
     },
         
     _addSearchListener : function(abSearchListener) {
-        if (abSearchListener.isRemote) {
-            this.numRemotes++;
-        }
-        Application.console.log("_addSearchListener : "+abSearchListener.addressBook.URI+":"+this.numRemotes+", "+this.allListenersStarted);
+        // if (abSearchListener.isRemote) {
+        //    this.numRemotes++;
+        // }
+        this.searchedAB.push(abSearchListener.addressBook.dirName);
+        Application.console.log("_addSearchListener : "+abSearchListener.addressBook.URI+":"+this.searchedAB.length+", "+this.allListenersStarted);
     },
     
     _completeSearchListener : function(abSearchListener) {
@@ -1617,10 +1623,14 @@ var mrcAComplete = {
                     this.nbDatas += abSearchListener.localRes.length;
                     break;
             }
-            if (abSearchListener.isRemote == true) {
-                this.numRemotes--;
-            }
-            Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":"+this.numRemotes+", "+this.allListenersStarted);
+            // if (abSearchListener.isRemote == true) {
+            //    this.numRemotes--;
+            // }
+            // remove
+            let index = this.searchedAB.indexOf(abSearchListener.addressBook.dirName);
+            this.searchedAB.splice(index, 1);
+            
+            Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":"+this.searchedAB.length+", "+this.allListenersStarted);
             // Then test if search is complete for all addressbooks.
             this._testSearchComplete();
         } else {
@@ -1639,15 +1649,24 @@ var mrcAComplete = {
         // instead, we must use the let 'mrcAComplete'
 
         Application.console.log("_timeOutSearchListener() ");
-        // TODO : store which searchListeners have not completed
-        // to show them as timedOut in the panel
-        mrcAComplete.numRemotes = 0;
+        // if (mrcAComplete.numRemotes > 0) {
+        //    mrcAComplete._addErrorTimeout("??");
+        //}
+        // generate warnings for each remaining search
+        if (mrcAComplete.searchedAB.length > 0) {
+            for(let i=0, l=mrcAComplete.searchedAB.length ; i < l; i++) {
+                mrcAComplete._addWarningTimeout(mrcAComplete.searchedAB[i]);
+            }
+        }
+        // force search complete
+        // mrcAComplete.numRemotes = 0;
+        mrcAComplete.searchedAB = [];
         mrcAComplete._testSearchComplete();
     },
 
     _testSearchComplete : function() {
-        Application.console.log("_testSearchComplete : "+this.numRemotes+", "+this.allListenersStarted);
-        if (this.numRemotes == 0 && this.allListenersStarted == true) {
+        Application.console.log("_testSearchComplete : "+this.searchedAB.length+", "+this.allListenersStarted);
+        if (this.searchedAB.length == 0 && this.allListenersStarted == true) {
             /*
              * Perform actions when ALL searches are completed.
              */
@@ -1727,18 +1746,18 @@ var mrcAComplete = {
         this.errors.push(message);
     },
 
-    _addErrorTimeout : function(ab_name) {
+    _addWarningTimeout : function(ab_name) {
         /*
-         * Add a timeout error message for an addressBook name
+         * Add a timeout warning message for an addressBook name
          * 
          * params :
          *   ab_name : the name of address book
          * return
          *   none
          */
-        let message = this.getString("%s : timeout");
+        let message = this.getString("ab_timeout");
         message = message.replace(/%s/g, ab_name); 
-        this.errors.push(message);
+        this.warnings.push(message);
     },
 
     /*
@@ -2643,6 +2662,28 @@ var mrcAComplete = {
             return false;
     },
 
+    _buildResultWarnings : function(popupDiv) {
+        /*
+         * Add informations about search warnings.
+         * 
+         * params :
+         *   popupDiv : the html element in which we have to add informations
+         * return :
+         *   none
+         */
+        if (this.warnings.length > 0) {
+            // only one error div, with several lines (one for each warning)
+            let errorDiv = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
+            errorDiv.setAttribute("class", " "+this.WARNING_CLASSNAME);
+            for (let i=0, len=this.warnings.length ; i < len ; i++) {
+                let pDiv = document.createElementNS("http://www.w3.org/1999/xhtml", "p");
+                pDiv.appendChild(document.createTextNode(this.warnings[i]));
+                errorDiv.appendChild(pDiv);
+            }
+            popupDiv.appendChild(errorDiv);
+        }
+    },
+
     _buildResultErrors : function(popupDiv) {
         /*
          * Add informations about search errors.
@@ -2710,6 +2751,8 @@ var mrcAComplete = {
             }
         }
         
+        // Add infos about warnings if there are some
+        this._buildResultWarnings(popupDiv);
         // Add infos about errors if there are some
         this._buildResultErrors(popupDiv);
         
@@ -2761,6 +2804,8 @@ var mrcAComplete = {
             }
         }
 
+        // Add infos about warnings if there are some
+        this._buildResultWarnings(popupDiv);
         // Add infos about errors if there are some
         this._buildResultErrors(popupDiv);
         
@@ -2817,6 +2862,8 @@ var mrcAComplete = {
             }
         }
 
+        // Add infos about warnings if there are some
+        this._buildResultWarnings(popupDiv);
         // Add infos about errors if there are some
         this._buildResultErrors(popupDiv);
         
@@ -3100,6 +3147,7 @@ var mrcAComplete = {
          */
         this.datas = {}; // TODO : check if it's the right way to empty dictionary
         this.errors = [];
+        this.warnings = [];
         this.nbDatas = 0;
         let meth = "_search_mode_"+this.param_mode;
         this.cbSearch = cbSearch
