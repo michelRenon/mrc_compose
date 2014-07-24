@@ -716,7 +716,7 @@ var mrcAComplete = {
         // Get the name of the application running us
         // info.name; // Returns "Firefox" for Firefox or "Thunderbird" for TB
         // info.version; // Returns "2.0.0.1" for Firefox version 2.0.0.1, "24.5.0"
-        Application.console.log("APP NAME="+info.name+" ; APP VERSION="+info.version);
+        // Application.console.log("APP NAME="+info.name+" ; APP VERSION="+info.version);
         // APP NAME=Thunderbird ; APP VERSION=24.5.0
     },
 
@@ -1583,8 +1583,7 @@ var mrcAComplete = {
         this.allListenersStarted = false;
         this.searchedAB = [];
         this.searchID++;
-        Application.console.log("_initSearchListeners : "+this.searchID);
-        
+        // Application.console.log("_initSearchListeners : "+this.searchID);
         this.search_res1 = [];
         this.search_res2 = [];
         this.search_res3 = [];
@@ -1592,7 +1591,7 @@ var mrcAComplete = {
         
     _addSearchListener : function(abSearchListener) {
         this.searchedAB.push(abSearchListener.addressBook.dirName);
-        Application.console.log("_addSearchListener : "+abSearchListener.addressBook.URI+":"+this.searchedAB.length+", "+this.allListenersStarted);
+        // Application.console.log("_addSearchListener : "+abSearchListener.addressBook.URI+":"+this.searchedAB.length+", "+this.allListenersStarted);
     },
     
     _completeSearchListener : function(abSearchListener) {
@@ -1623,13 +1622,12 @@ var mrcAComplete = {
             let index = this.searchedAB.indexOf(abSearchListener.addressBook.dirName);
             this.searchedAB.splice(index, 1);
             
-            Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":"+this.searchedAB.length+", "+this.allListenersStarted);
+            // Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":"+this.searchedAB.length+", "+this.allListenersStarted);
             // Then test if search is complete for all addressbooks.
             this._testSearchComplete();
         } else {
             // it's an obsolete searchListener : 
-            // nothing to do...
-            Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":obsolete = "+abSearchListener.searchID);
+            // Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":obsolete = "+abSearchListener.searchID);
         }
     },
     
@@ -1644,7 +1642,7 @@ var mrcAComplete = {
         // make any search obsolete
         this.searchID++;
 
-        Application.console.log("_timeOutSearchListener() ");
+        // Application.console.log("_timeOutSearchListener() ");
         // generate warnings for each remaining search
         if (mrcAComplete.searchedAB.length > 0) {
             for(let i=0, l=mrcAComplete.searchedAB.length ; i < l; i++) {
@@ -1657,7 +1655,7 @@ var mrcAComplete = {
     },
 
     _testSearchComplete : function() {
-        Application.console.log("_testSearchComplete : "+this.searchedAB.length+", "+this.allListenersStarted);
+        // Application.console.log("_testSearchComplete : "+this.searchedAB.length+", "+this.allListenersStarted);
         if (this.searchedAB.length == 0 && this.allListenersStarted == true) {
             /*
              * Perform actions when ALL searches are completed.
@@ -1668,7 +1666,7 @@ var mrcAComplete = {
 
             // stop the current timeout
             clearTimeout(this.searchTimeOut);
-            Application.console.log("clearTimeout() ");
+            // Application.console.log("clearTimeout() ");
             
             // then handle results
             switch(this.param_mode) {
@@ -1723,7 +1721,7 @@ var mrcAComplete = {
         // and start new search timeout
         this.searchTimeOut = setTimeout(this._timeOutSearchListener, this.param_search_timeout);
         
-        Application.console.log("_startWaitingSearchListeners ");
+        // Application.console.log("_startWaitingSearchListeners ");
         this._testSearchComplete();
     },
     
@@ -1845,7 +1843,7 @@ var mrcAComplete = {
                             // Application.console.log("AB LDAP = " + ab.dirName);
                             /* CODE FOR TB 24 to 31? */
                             if (this.param_ldap_search_version == 'TB24') {
-                                Application.console.log(ab.dirName+" : LDAP search TB24");
+                                // Application.console.log(ab.dirName+" : LDAP search TB24");
                                 let query =
                                     Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
                                             .createInstance(Components.interfaces.nsIAbDirectoryQuery);
@@ -1899,7 +1897,7 @@ var mrcAComplete = {
                                 this._addSearchListener(abDirSearchListener);
                                 query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
                             } else {
-                                Application.console.log(ab.dirName+" : LDAP search TB31");
+                                // Application.console.log(ab.dirName+" : LDAP search TB31");
                                 /* CODE FOR TB >= 29 */
                                 let that = this;
                                
@@ -2313,7 +2311,7 @@ var mrcAComplete = {
                     if (doSearch) {
                         try {
                             if (this.param_ldap_search_version == 'TB24') {
-                                Application.console.log(ab.dirName+" : LDAP search TB24");
+                                // Application.console.log(ab.dirName+" : LDAP search TB24");
                                 /* CODE FOR TB 24-31? */
                                 
                                 let query =
@@ -2370,7 +2368,7 @@ var mrcAComplete = {
                                 query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
                                 
                             } else {
-                                Application.console.log(ab.dirName+" : LDAP search TB31");
+                                // Application.console.log(ab.dirName+" : LDAP search TB31");
                                 /* CODE FOR TB >= 29 */
                                 let that = this;
 
@@ -2412,7 +2410,7 @@ var mrcAComplete = {
                         } catch (e) {
                             this._addErrorAddressBook(ab.dirName);
                             this._logError(e, "_search_mode_3()");
-                            Application.console.log(ab.dirName+" : LDAP _search_mode_3 ERROR");
+                            // Application.console.log(ab.dirName+" : LDAP _search_mode_3 ERROR");
                         }
                     }
                 }
@@ -2978,7 +2976,7 @@ var mrcAComplete = {
         if (this.FIELDS[field]) {
             try {
                 if (email != null && email != "") {
-                    Application.console.log("DEBUG _insertRecipient() : "+field+", "+email);
+                    // Application.console.log("DEBUG _insertRecipient() : "+field+", "+email);
                     let element = document.getElementById(this.FIELDS[field].txtId);
                     this._elementInsertInPart(element, element.value.length, email);
                     this.updateNbRecipients(element);
@@ -3146,7 +3144,6 @@ var mrcAComplete = {
         this.nbDatas = 0;
         let meth = "_search_mode_"+this.param_mode;
         this.cbSearch = cbSearch
-        Application.console.log("BEGIN SEARCH()");
 
         // show panel with spinning image while searching
         let deck = document.getElementById('deckAutocompletePanel');
@@ -3159,7 +3156,6 @@ var mrcAComplete = {
         } catch (e) {
             Application.console.log("ERROR SEARCH() : "+e);
         }
-        Application.console.log("END SEARCH()");
     },
 
     finishSearch : function(aString, event, element) {
@@ -3173,7 +3169,6 @@ var mrcAComplete = {
          * return:
          *   non
          */
-        Application.console.log("BEGIN FINISHSEARCH()");
         this.lastQuery = aString;
         this.lastQueryTime = new Date().getTime()
         if (this.nbDatas > 0) {
@@ -3182,7 +3177,6 @@ var mrcAComplete = {
         } else {
             this.hidePopup();
         }
-        Application.console.log("END FINISHSEARCH()");
     },
 
     buildResultList : function(textPart) {
@@ -3724,7 +3718,6 @@ function mrcRecipientKeyUp(event, element) {
         if (textPart.length >= mrcAComplete.param_search_min_char) {
             if (mrcAComplete.needSearch(textPart)) {
                 // perform search
-                // Application.console.log("avant search()");
                 mrcAComplete.search(textPart, event, element, function callback_search() { 
                         mrcAComplete.finishSearch(textPart, event, element) 
                     } );
