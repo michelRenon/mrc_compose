@@ -684,6 +684,7 @@ var mrcAComplete = {
         this.param_max_recipients_warning = this.prefs.getIntPref("max_recipients_warning");
         this.param_add_comma = this.prefs.getBoolPref("add_comma");
         this.param_min_search_delay = this.prefs.getIntPref("min_search_delay");
+        this.param_search_timeout = this.prefs.getIntPref("search_timeout");
         this.param_search_min_char = this.prefs.getIntPref("search_min_char");
         this.param_search_collected_ab = this.prefs.getBoolPref("search_collected_ab");
         this.param_max_elements_part_menu = this.prefs.getIntPref("max_elements_part_menu");
@@ -759,6 +760,9 @@ var mrcAComplete = {
                 break;  
             case "min_search_delay":  
                 this.param_min_search_delay = this.prefs.getIntPref("min_search_delay");
+                break;  
+            case "search_timeout":  
+                this.param_search_timeout = this.prefs.getIntPref("search_timeout");
                 break;  
             case "search_min_char":  
                 this.param_search_min_char = this.prefs.getIntPref("search_min_char");

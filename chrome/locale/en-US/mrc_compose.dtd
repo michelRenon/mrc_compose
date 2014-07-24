@@ -65,6 +65,7 @@
 
 <!-- tab 4 -->
 <!ENTITY options.min_search_delay.label "Min search delay (ms) (?): ">
+<!ENTITY options.search_timeout.label "Timeout for LDAP searches (ms) (?)">
 <!ENTITY options.add_comma.label "Automatic add comma (?): ">            
 
 <!ENTITY options.special_values.label "These values are special. It's better not to change them.">

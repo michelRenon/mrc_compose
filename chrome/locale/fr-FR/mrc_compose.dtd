@@ -66,6 +66,7 @@
 
 <!-- tab 4 -->
 <!ENTITY options.min_search_delay.label "Intervalle minimum de recherche (ms) (?): ">
+<!ENTITY options.search_timeout.label "Timeout pour les recherches LDAP (ms) (?)">
 <!ENTITY options.add_comma.label "Ajout virgule automatique (?) : ">
 
 <!ENTITY options.special_values.label "Ces valeurs sont spéciales. Il n'est pas recommandé de les changer.">

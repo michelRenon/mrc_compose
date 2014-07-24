@@ -9,6 +9,7 @@ pref("extensions.mrccompose.min_recipients_show", 2);
 pref("extensions.mrccompose.max_recipients_warning", 10);
 pref("extensions.mrccompose.add_comma", true);
 pref("extensions.mrccompose.min_search_delay", 500);
+pref("extensions.mrccompose.search_timeout", 5000);
 pref("extensions.mrccompose.search_min_char", 1);
 pref("extensions.mrccompose.search_collected_ab", false);
 pref("extensions.mrccompose.max_elements_part_menu", 30);

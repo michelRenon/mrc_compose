@@ -67,6 +67,7 @@
         <preference id="pref_max_recipients_warning" name="extensions.mrccompose.max_recipients_warning" type="int"/>
         <preference id="pref_add_comma" name="extensions.mrccompose.add_comma" type="bool"/>
         <preference id="pref_min_search_delay" name="extensions.mrccompose.min_search_delay" type="int"/>
+        <preference id="pref_search_timeout" name="extensions.mrccompose.search_timeout" type="int"/>
         <preference id="pref_search_min_char" name="extensions.mrccompose.search_min_char" type="int"/>
         <preference id="pref_search_collected_ab" name="extensions.mrccompose.search_collected_ab" type="bool"/>
         <preference id="pref_max_elements_part_menu" name="extensions.mrccompose.max_elements_part_menu" type="int"/>
@@ -83,6 +84,7 @@
         <preference id="pref_first_focus_reply_html" name="extensions.mrccompose.first_focus_reply_html" type="string"/>
 
         <preference id="pref_ldap_search_version" name="extensions.mrccompose.ldap_search_version" type="string"/>
+                
       </preferences>
 
 
@@ -178,7 +180,10 @@
                                 <label control="show_popularity" value="&options.show_popularity.label;" tooltip="mrctip"/>
                                 <checkbox id="show_popularity" preference="pref_show_popularity" tooltip="mrctip"/>
                             </row>
-                            
+                            <row>
+                                <label control="search_timeout" value="&options.search_timeout.label;" tooltip="mrctip"/>
+                                <textbox id="search_timeout" preference="pref_search_timeout" type="number" min="1000" max="30000" size="4" tooltip="mrctip"/>     
+                            </row>
                         </rows>
                     </grid>
                 </vbox>
