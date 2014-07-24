@@ -105,12 +105,13 @@
     <vbox id="addresses-box" >
         <panel id="msgAutocompletePanel" noautofocus="true" level="parent"
             xmlns:html="http://www.w3.org/1999/xhtml" >
-            <vbox >
+            <deck id="deckAutocompletePanel" selectedIndex="0">
+                <hbox flex="1">
+                    <image id="img_wait" collapsed="false"/>
+                </hbox>
                 <html:div id="msgAutocompletePanelDiv" style="display:block; min-width:100px" >
-                    <html:div style="display:block; background-color:red">titi</html:div>
-                    <html:div>toto</html:div>
                 </html:div>
-            </vbox>
+            </deck>
         </panel>
 
         <hbox id="box-to" >

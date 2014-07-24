@@ -1577,6 +1577,7 @@ var mrcAComplete = {
         if (abSearchListener.isRemote) {
             this.numRemotes++;
         }
+        Application.console.log("_addSearchListener : "+abSearchListener.addressBook.URI+":"+this.numRemotes+", "+this.allListenersStarted);
     },
     
     _completeSearchListener : function(abSearchListener) {
@@ -1605,11 +1606,13 @@ var mrcAComplete = {
         if (abSearchListener.isRemote == true) {
             this.numRemotes--;
         }
+        Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":"+this.numRemotes+", "+this.allListenersStarted);
         // Then test if search is complete for all addressbooks.
         this._testSearchComplete();
     },
         
     _testSearchComplete : function() {
+        Application.console.log("_testSearchComplete : "+this.numRemotes+", "+this.allListenersStarted);
         if (this.numRemotes == 0 && this.allListenersStarted == true) {
             /*
              * Perform actions when ALL searches are completed.
@@ -1660,6 +1663,7 @@ var mrcAComplete = {
 
     _startWaitingSearchListeners : function() {
         this.allListenersStarted = true;
+        Application.console.log("_startWaitingSearchListeners ");
         this._testSearchComplete();
     },
     
@@ -2325,6 +2329,7 @@ var mrcAComplete = {
                         } catch (e) {
                             this._addErrorAddressBook(ab.dirName);
                             this._logError(e, "_search_mode_3()");
+                            Application.console.log(ab.dirName+" : LDAP _search_mode_3 ERROR");
                         }
                     }
                 }
@@ -2756,6 +2761,15 @@ var mrcAComplete = {
             this.datas[i].length = 0;
     },
 
+    _doEmptyPanel : function() {
+        
+        let popupDiv = document.getElementById("msgAutocompletePanelDiv");
+        removeChildren(popupDiv);
+        // empty associated internals fields
+        this.panelCards.length = 0;
+        this.indexSelectedCard = -1;
+    },
+    
     _getNbRecipients : function(textAddress) {
         /*
          * from a text separated by commas, compute the number 
@@ -3002,13 +3016,15 @@ var mrcAComplete = {
         return ((this.lastQuery != newQuery) || ((now - this.lastQueryTime) > this.param_min_search_delay));
     },
     
-    search : function(aString, cbSearch) {
+    search : function(aString, event, element, cbSearch) {
         /*
          * official call to perform search on address book.
          * dynamic call of internal search method
          * 
          * params :
          *   aString : the text to search
+         *   event : event that generated the search
+         *   element : the html field element that generated the search
          *   cbSearch : the callback when search is done
          * return :
          *   none
@@ -3018,7 +3034,20 @@ var mrcAComplete = {
         this.nbDatas = 0;
         let meth = "_search_mode_"+this.param_mode;
         this.cbSearch = cbSearch
-        this[meth](aString);
+        Application.console.log("BEGIN SEARCH()");
+
+        // show panel with spinning image while searching
+        let deck = document.getElementById('deckAutocompletePanel');
+        deck.selectedIndex = 0; // wainting
+        this._doEmptyPanel();
+        this.openPopup(event, element);
+        
+        try {
+            this[meth](aString);
+        } catch (e) {
+            Application.console.log("ERROR SEARCH() : "+e);
+        }
+        Application.console.log("END SEARCH()");
     },
 
     finishSearch : function(aString, event, element) {
@@ -3032,7 +3061,7 @@ var mrcAComplete = {
          * return:
          *   non
          */
-        // Application.console.log("finishSearch() 1");
+        Application.console.log("BEGIN FINISHSEARCH()");
         this.lastQuery = aString;
         this.lastQueryTime = new Date().getTime()
         if (this.nbDatas > 0) {
@@ -3041,6 +3070,7 @@ var mrcAComplete = {
         } else {
             this.hidePopup();
         }
+        Application.console.log("END FINISHSEARCH()");
     },
 
     buildResultList : function(textPart) {
@@ -3053,8 +3083,13 @@ var mrcAComplete = {
          * return :
          *   none
          */
+        /*
         let panel = document.getElementById('msgAutocompletePanel');
         panel.height = '10px';
+        */
+        let deck = document.getElementById('deckAutocompletePanel');
+        deck.selectedIndex = 1; // autocomplete
+
         let meth = "_buildResultList_mode_"+this.param_mode;
         this[meth](textPart);
     },
@@ -3578,7 +3613,7 @@ function mrcRecipientKeyUp(event, element) {
             if (mrcAComplete.needSearch(textPart)) {
                 // perform search
                 // Application.console.log("avant search()");
-                mrcAComplete.search(textPart, function callback_search() { 
+                mrcAComplete.search(textPart, event, element, function callback_search() { 
                         mrcAComplete.finishSearch(textPart, event, element) 
                     } );
             }
