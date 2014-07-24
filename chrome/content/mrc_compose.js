@@ -1581,7 +1581,6 @@ var mrcAComplete = {
     
     _initSearchListeners : function() {
         this.allListenersStarted = false;
-        // this.numRemotes = 0;
         this.searchedAB = [];
         this.searchID++;
         Application.console.log("_initSearchListeners : "+this.searchID);
@@ -1592,9 +1591,6 @@ var mrcAComplete = {
     },
         
     _addSearchListener : function(abSearchListener) {
-        // if (abSearchListener.isRemote) {
-        //    this.numRemotes++;
-        // }
         this.searchedAB.push(abSearchListener.addressBook.dirName);
         Application.console.log("_addSearchListener : "+abSearchListener.addressBook.URI+":"+this.searchedAB.length+", "+this.allListenersStarted);
     },
@@ -1623,9 +1619,6 @@ var mrcAComplete = {
                     this.nbDatas += abSearchListener.localRes.length;
                     break;
             }
-            // if (abSearchListener.isRemote == true) {
-            //    this.numRemotes--;
-            // }
             // remove
             let index = this.searchedAB.indexOf(abSearchListener.addressBook.dirName);
             this.searchedAB.splice(index, 1);
@@ -1646,15 +1639,12 @@ var mrcAComplete = {
          */
         // SPECIAL : 
         // As it is a call-back, we can't use 'this'
-        // instead, we must use the let 'mrcAComplete'
+        // instead, we must use 'mrcAComplete'
 
         // make any search obsolete
         this.searchID++;
 
         Application.console.log("_timeOutSearchListener() ");
-        // if (mrcAComplete.numRemotes > 0) {
-        //    mrcAComplete._addErrorTimeout("??");
-        //}
         // generate warnings for each remaining search
         if (mrcAComplete.searchedAB.length > 0) {
             for(let i=0, l=mrcAComplete.searchedAB.length ; i < l; i++) {
@@ -1662,7 +1652,6 @@ var mrcAComplete = {
             }
         }
         // force search complete
-        // mrcAComplete.numRemotes = 0;
         mrcAComplete.searchedAB = [];
         mrcAComplete._testSearchComplete();
     },
