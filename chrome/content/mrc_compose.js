@@ -626,6 +626,10 @@ var mrcAComplete = {
     nbDatas : 0,
     // the errors reported when searching
     errors : [],
+    // uniq id of each future search :
+    // will allow handling of several callback returns of ldap searches
+    // and filter obsolete ones
+    searchID : 0,
     
 
     // define the values of all elements for each field
@@ -1574,6 +1578,8 @@ var mrcAComplete = {
     _initSearchListeners : function() {
         this.allListenersStarted = false;
         this.numRemotes = 0;
+        this.searchID++;
+        Application.console.log("_initSearchListeners : "+this.searchID);
         
         this.search_res1 = [];
         this.search_res2 = [];
@@ -1591,31 +1597,37 @@ var mrcAComplete = {
         /*
          * Perform actions when a search is finished on ONE addressbook.
          */
-         
-        switch(this.param_mode) {
-            case 1:
-                // nothing
-                break;
-                
-            case 2:
-                // nothing
-                break;
-                
-            case 3:
-                // sum localRes in global res
-                abSearchListener.localRes = this._removeDuplicatecards(abSearchListener.localRes);
-                abSearchListener.localRes.sort(this._sort_card);
+        if (abSearchListener.searchID == this.searchID) {
+            // OK, it's a searchListener for current search
+            switch(this.param_mode) {
+                case 1:
+                    // nothing
+                    break;
+                    
+                case 2:
+                    // nothing
+                    break;
+                    
+                case 3:
+                    // sum localRes in global res
+                    abSearchListener.localRes = this._removeDuplicatecards(abSearchListener.localRes);
+                    abSearchListener.localRes.sort(this._sort_card);
 
-                this.datas[abSearchListener.addressBook.dirName] = abSearchListener.localRes;
-                this.nbDatas += abSearchListener.localRes.length;
-                break;
+                    this.datas[abSearchListener.addressBook.dirName] = abSearchListener.localRes;
+                    this.nbDatas += abSearchListener.localRes.length;
+                    break;
+            }
+            if (abSearchListener.isRemote == true) {
+                this.numRemotes--;
+            }
+            Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":"+this.numRemotes+", "+this.allListenersStarted);
+            // Then test if search is complete for all addressbooks.
+            this._testSearchComplete();
+        } else {
+            // it's an obsolete searchListener : 
+            // nothing to do...
+            Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":obsolete = "+abSearchListener.searchID);
         }
-        if (abSearchListener.isRemote == true) {
-            this.numRemotes--;
-        }
-        Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":"+this.numRemotes+", "+this.allListenersStarted);
-        // Then test if search is complete for all addressbooks.
-        this._testSearchComplete();
     },
     
     _timeOutSearchListener : function() {
@@ -1626,6 +1638,7 @@ var mrcAComplete = {
         // As it is a call-back, we can't use 'this'
         // instead, we must use the let 'mrcAComplete'
 
+        Application.console.log("_timeOutSearchListener() ");
         // TODO : store which searchListeners have not completed
         // to show them as timedOut in the panel
         mrcAComplete.numRemotes = 0;
@@ -1641,6 +1654,7 @@ var mrcAComplete = {
             
             // stop the current timeout
             clearTimeout(this.searchTimeOut);
+            Application.console.log("clearTimeout() ");
             
             // then handle results
             switch(this.param_mode) {
@@ -1689,7 +1703,10 @@ var mrcAComplete = {
 
     _startWaitingSearchListeners : function() {
         this.allListenersStarted = true;
-        // start search timeout
+        // clear previous timeout
+        if (this.searchTimeOut)
+            clearTimeout(this.searchTimeOut);
+        // and start new search timeout
         this.searchTimeOut = setTimeout(this._timeOutSearchListener, this.param_search_timeout);
         
         Application.console.log("_startWaitingSearchListeners ");
@@ -1706,6 +1723,20 @@ var mrcAComplete = {
          *   none
          */
         let message = this.getString("ab_error");
+        message = message.replace(/%s/g, ab_name); 
+        this.errors.push(message);
+    },
+
+    _addErrorTimeout : function(ab_name) {
+        /*
+         * Add a timeout error message for an addressBook name
+         * 
+         * params :
+         *   ab_name : the name of address book
+         * return
+         *   none
+         */
+        let message = this.getString("%s : timeout");
         message = message.replace(/%s/g, ab_name); 
         this.errors.push(message);
     },
@@ -1762,6 +1793,7 @@ var mrcAComplete = {
                         // add a sync search listener
                         let that = this;
                         let abSearchListener = {
+                            searchID : this.searchID,
                             addressBook : ab,
                             isRemote : false,
                             cbObject : that,
@@ -1833,6 +1865,7 @@ var mrcAComplete = {
                                 // add an async search listener
                                 let that = this;
                                 let abDirSearchListener = {
+                                    searchID : this.searchID,
                                     addressBook : ab,
                                     isRemote : true,
                                     cbObject : that,
@@ -1861,6 +1894,7 @@ var mrcAComplete = {
                                 acObserver.prototype = {
                                     _search: null,
                                     _result: null,
+                                    searchID : this.searchID,
                                     addressBook : ab,
                                     isRemote : true,
                                     cbObject : that,
@@ -1956,6 +1990,7 @@ var mrcAComplete = {
                         // add a sync search listener
                         let that = this;
                         let abSearchListener = {
+                            searchID : this.searchID,
                             addressBook : ab,
                             isRemote : false,
                             cbObject : that,
@@ -2071,6 +2106,7 @@ var mrcAComplete = {
 
                             // add an async search listener
                             let abDirSearchListener1 = {
+                                searchID : this.searchID,
                                 addressBook : ab,
                                 isRemote : true,
                                 cbObject : that,
@@ -2123,6 +2159,7 @@ var mrcAComplete = {
 
                             // add an async search listener
                             let abDirSearchListener2 = {
+                                searchID : this.searchID,
                                 addressBook : ab,
                                 isRemote : true,
                                 cbObject : that,
@@ -2228,6 +2265,7 @@ var mrcAComplete = {
                         // add a sync search listener
                         let that = this;
                         let abSearchListener = {
+                            searchID : this.searchID,
                             addressBook : ab,
                             isRemote : false,
                             cbObject : that,
@@ -2297,6 +2335,7 @@ var mrcAComplete = {
                                 // add an async search listener
                                 let that = this;
                                 let abDirSearchListener = {
+                                    searchID : this.searchID,
                                     addressBook : ab,
                                     isRemote : true,
                                     cbObject : that,
@@ -2326,6 +2365,7 @@ var mrcAComplete = {
                                 acObserver.prototype = {
                                     _search: null,
                                     _result: null,
+                                    searchID : this.searchID,
                                     addressBook : ab,
                                     isRemote : true,
                                     cbObject : that,
