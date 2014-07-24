@@ -1648,6 +1648,9 @@ var mrcAComplete = {
         // As it is a call-back, we can't use 'this'
         // instead, we must use the let 'mrcAComplete'
 
+        // make any search obsolete
+        this.searchID++;
+
         Application.console.log("_timeOutSearchListener() ");
         // if (mrcAComplete.numRemotes > 0) {
         //    mrcAComplete._addErrorTimeout("??");
@@ -1671,6 +1674,9 @@ var mrcAComplete = {
              * Perform actions when ALL searches are completed.
              */
             
+            // make any search obsolete
+            this.searchID++;
+
             // stop the current timeout
             clearTimeout(this.searchTimeOut);
             Application.console.log("clearTimeout() ");
