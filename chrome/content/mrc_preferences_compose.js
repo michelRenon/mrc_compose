@@ -53,21 +53,28 @@ function getString(key) {
      * return :
      *   the value of property in the current language
      */
+    /* old version
     Application.console.log("getString");
-    let bundle = document.getElementById("mrcComposeStringBundle");
+    let bundle = document.getElementById("mrcComposePrefStringBundle");
     Application.console.log("getString bundle="+bundle);
     if (bundle)
         return bundle.getString(key);
     else
         return key;
+     */
+     
     /*
      * Alternate way
      * 
+     */
+    // Application.console.log("getString");
     let bundleService = Components.classes["@mozilla.org/intl/stringbundle;1"].getService(Components.interfaces.nsIStringBundleService);
     let bundle = bundleService.createBundle("chrome://mrc_compose/locale/mrc_compose.properties");
-    let str = bundle.GetStringFromName(key);
+    // Application.console.log("getString bundle="+bundle);
+    let str = key;
+    if (bundle)
+        str = bundle.GetStringFromName(key);
     return str;
-    */
 }
 
 
@@ -82,7 +89,7 @@ window.addEventListener("load", function(e) {
         */
         let text = getString('autocomplete');
         let text2 = getString('autocomplete2');
-        // Application.console.log("text="+text);
+        // Application.console.log("text="+text+"     text2="+text2);
         
         let src = document.getElementById('emailCollectionOutgoing');
         // Application.console.log("src="+src.nodeName);
