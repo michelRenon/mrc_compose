@@ -1631,27 +1631,31 @@ var mrcAComplete = {
         }
     },
     
-    _timeOutSearchListener : function() {
+    _timeOutSearchListener : function(originalSearchID) {
         /*
          * Perform actions when search timeout has been trigerred
+         * 
+         * params :
+         *   originalSearchID : the searchID at the time the timeout was created
+         * 
          */
-        // SPECIAL : 
-        // As it is a call-back, we can't use 'this'
-        // instead, we must use 'mrcAComplete'
+        if (originalSearchID == this.searchID) {
+            // make any search obsolete
+            this.searchID++;
 
-        // make any search obsolete
-        this.searchID++;
-
-        // Application.console.log("_timeOutSearchListener() ");
-        // generate warnings for each remaining search
-        if (mrcAComplete.searchedAB.length > 0) {
-            for(let i=0, l=mrcAComplete.searchedAB.length ; i < l; i++) {
-                mrcAComplete._addWarningTimeout(mrcAComplete.searchedAB[i]);
+            // Application.console.log("_timeOutSearchListener() ");
+            // generate warnings for each remaining search
+            if (this.searchedAB.length > 0) {
+                for(let i=0, l=this.searchedAB.length ; i < l; i++) {
+                    this._addWarningTimeout(this.searchedAB[i]);
+                }
             }
+            // force search complete
+            this.searchedAB = [];
+            this._testSearchComplete();
+        } else {
+            // This timeout is obsolete : noting to do.
         }
-        // force search complete
-        mrcAComplete.searchedAB = [];
-        mrcAComplete._testSearchComplete();
     },
 
     _testSearchComplete : function() {
@@ -1718,8 +1722,12 @@ var mrcAComplete = {
         // clear previous timeout
         if (this.searchTimeOut)
             clearTimeout(this.searchTimeOut);
-        // and start new search timeout
-        this.searchTimeOut = setTimeout(this._timeOutSearchListener, this.param_search_timeout);
+        // and start new search timeout :
+        // we keep the current searchID in a closure, for the callback to compare.
+        let tempSearchID = this.searchID;
+        this.searchTimeOut = setTimeout(function () {
+                mrcAComplete._timeOutSearchListener(tempSearchID);
+            }, this.param_search_timeout);
         
         // Application.console.log("_startWaitingSearchListeners ");
         this._testSearchComplete();
@@ -3479,6 +3487,9 @@ var mrcAComplete = {
          * return :
          *   none
          */
+        // make any search obsolete
+        this.searchID++;
+
         let popup = document.getElementById("msgAutocompletePanel");
         popup.hidePopup();
         this.currentTextBox = null;
