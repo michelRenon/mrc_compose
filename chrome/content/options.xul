@@ -353,8 +353,8 @@
                                 <label control="ldap_search_version" value="&options.ldap_search_version.label;" tooltip="mrctip"/>
                                 <menulist id="ldap_search_version" preference="pref_ldap_search_version" tooltip="mrctip" >
                                     <menupopup>
-                                        <menuitem label="Thunderbird 24" value="TB24"/>
-                                        <menuitem label="Thunderbird 31" value="TB31"/>
+                                        <menuitem label="Standard (Thunderbird 24+)" value="TB24"/>
+                                        <menuitem label="Test (Thunderbird 31+, weird results)" value="TB31"/>
                                     </menupopup>
                                 </menulist>
                             </row>
