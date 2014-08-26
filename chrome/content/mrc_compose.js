@@ -136,6 +136,19 @@ function Recipients2CompFields(msgCompFields)
         let fieldValue = inputField.value;
         if (fieldValue == null)
             fieldValue = inputField.getAttribute("value");
+
+        // TB31 : need to clean unused comma
+        let nb = fieldValue.length - 1;
+        let found = false;
+        while(found == false) {
+            let c = fieldValue.charAt(nb);
+            if (c == mrcAComplete.SEP || c == mrcAComplete.PART_PREFIX)
+                nb = nb - 1;
+            else
+                found = true;
+        }
+        fieldValue = fieldValue.substring(0, nb+1);
+
         return fieldValue;
     }
     addrTo = getValue("msgTO");
@@ -144,6 +157,7 @@ function Recipients2CompFields(msgCompFields)
     addrReply = getValue("msgREPLY");
     addrNg = getValue("msgNG");
     addrFollow = getValue("msgFOLLOW");
+    Application.console.log("R2C TO:|"+addrTo+"|");
 
     msgCompFields.to = addrTo;
     msgCompFields.cc = addrCc;
@@ -171,7 +185,7 @@ function CompFields2Recipients(msgCompFields)
     let msgNewsgroups = msgCompFields.newsgroups;
     let msgFollowupTo = msgCompFields.followupTo;
     let havePrimaryRecipient = false;
-    
+    Application.console.log("C2R TO:|"+msgTo+"|");
     // cleaning CR and LF :
     // TB inserts some \n to have some default formatting ( < 70 cols ?).
     // we don't need it anymore (and we check also for \r )
@@ -197,8 +211,10 @@ function CompFields2Recipients(msgCompFields)
 
         let inputField = document.getElementById(elt_id);
         inputField.value = recipient;
+        Application.console.log(elt_id+" -> "+inputField.value);
         if (recipient != "" && mrcAComplete.param_add_comma) {
             inputField.value += mrcAComplete.PART_SUFFIX+mrcAComplete.SEP+mrcAComplete.PART_PREFIX;
+            Application.console.log(elt_id+" 2 -> "+inputField.value);
         }
 
         if (field != "") {
