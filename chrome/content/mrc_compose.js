@@ -139,6 +139,19 @@ function Recipients2CompFields(msgCompFields)
         let fieldValue = inputField.value;
         if (fieldValue == null)
             fieldValue = inputField.getAttribute("value");
+
+        // TB31 : need to clean unused comma
+        let nb = fieldValue.length - 1;
+        let found = false;
+        while(found == false) {
+            let c = fieldValue.charAt(nb);
+            if (c == mrcAComplete.SEP || c == mrcAComplete.PART_PREFIX)
+                nb = nb - 1;
+            else
+                found = true;
+        }
+        fieldValue = fieldValue.substring(0, nb+1);
+
         return fieldValue;
     }
     addrTo = getValue("msgTO");
