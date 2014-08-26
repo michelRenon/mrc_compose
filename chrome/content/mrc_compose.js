@@ -954,7 +954,8 @@ var mrcAComplete = {
                 // escaper handling
                 if (curChar === escaper) {
                     // escape next char
-                    doPushChar = false;
+                    // and keep the escaper !
+                    doPushChar = true;
                     doEscapeNextChar = true;
                 }
             } else {
