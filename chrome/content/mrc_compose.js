@@ -1355,7 +1355,24 @@ var mrcAComplete = {
             res = this.mhParser.makeFullAddress(a, b);
         } else {
             // >= TB 29
-            res = this.mhParser.makeMailboxObject(a, b).toString();
+            // res = this.mhParser.makeMailboxObject(a, b).toString();
+            // THIS API DOES NOT PERFORM NECESSARY ENCODINGS...
+            // ie : Doe, John <john.doe@free.fr> ==> "Doe, John" <john.doe@free.fr>
+            // so it is completely useless...
+            
+            // so we have to do them ourselve.
+            // we perform encodings on name only
+            res = a;
+            // first the backslash
+            res = res.replace(/\\/g, "\\\\");
+            // then the quotes
+            res = res.replace(/"/g, '\\"');
+            // finally, add quotes if comma
+            if (res.indexOf(",") >= 0)
+                res = '"' + res + '"';
+            
+            // then we add the email
+            res = res + " <" + b + ">";
         }
         return res;
     },
