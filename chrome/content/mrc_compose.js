@@ -237,7 +237,7 @@ function LoadIdentity(startup)
         
         if (!startup && prevIdentity && idKey != prevIdentity.key) {
             let prefstring = "mail.identity." + prevIdentity.key;
-            ////RemoveDirectoryServerObserver(prefstring);
+
             let prevReplyTo = prevIdentity.replyTo;
             let prevCc = "";
             let prevBcc = "";
@@ -331,10 +331,10 @@ function LoadIdentity(startup)
             document.getElementById("msgcomposeWindow").dispatchEvent(event);
         }
 
-      ////AddDirectoryServerObserver(false);
+
       if (!startup) {
           try {
-              ////setupLdapAutocompleteSession();
+
           } catch (ex) {
               // catch the exception and ignore it, so that if LDAP setup
               // fails, the entire compose window doesn't end up horked
@@ -1416,13 +1416,34 @@ var mrcAComplete = {
 
     _makeFullAddress : function(a, b) {
         let res = "";
+        let temp = typeof mrcAComplete.mhParser.makeFullAddressString;
+        Application.console.log("typeof makeFullAddressString ="+temp);
+        
         if (typeof mrcAComplete.mhParser.makeFullAddress === "function") {
             // TB 24
             res = this.mhParser.makeFullAddress(a, b);
         } else {
             // >= TB 29
-            res = this.mhParser.makeMailboxObject(a, b).toString();
+            // res = this.mhParser.makeMailboxObject(a, b).toString();
+            // THIS API DOES NOT PERFORM NECESSARY ENCODINGS...
+            // ie : Doe, John <john.doe@free.fr> ==> "Doe, John" <john.doe@free.fr>
+            // so it is completely useless...
+            
+            // so we have to do them ourselve.
+            // we perform encodings on name only
+            res = a;
+            // first the backslash
+            res = res.replace(/\\/g, "\\\\");
+            // then the quotes
+            res = res.replace(/"/g, '\\"');
+            // finally, add quotes if comma
+            if (res.indexOf(",") >= 0)
+                res = '"' + res + '"';
+            
+            // then we add the email
+            res = res + " <" + b + ">";
         }
+        Application.console.log("_makeFullAddress="+res);
         return res;
     },
 
@@ -3456,6 +3477,7 @@ var mrcAComplete = {
         } else {
             // --> enter his email in the text
             email = card.text;
+            Application.console.log("EMAIL = "+email);
         }
         this._elementInsertInPart(this.currentTextBox, this.currentTextBox.selectionStart, email);
         this.updateNbRecipients(this.currentTextBox);
