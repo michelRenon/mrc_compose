@@ -250,6 +250,8 @@ function LoadIdentity(startup)
         
         if (!startup && prevIdentity && idKey != prevIdentity.key) {
             let prefstring = "mail.identity." + prevIdentity.key;
+            if (typeof RemoveDirectoryServerObserver === "function")
+                RemoveDirectoryServerObserver(prefstring);
 
             let prevReplyTo = prevIdentity.replyTo;
             let prevCc = "";
@@ -344,9 +346,12 @@ function LoadIdentity(startup)
             document.getElementById("msgcomposeWindow").dispatchEvent(event);
         }
 
-
+      if (typeof AddDirectoryServerObserver === "function")
+        AddDirectoryServerObserver(false);
       if (!startup) {
           try {
+            if (typeof setupLdapAutocompleteSession === "function")
+              setupLdapAutocompleteSession();
 
           } catch (ex) {
               // catch the exception and ignore it, so that if LDAP setup
