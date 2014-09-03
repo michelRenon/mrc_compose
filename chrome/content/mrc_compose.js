@@ -251,6 +251,9 @@ function LoadIdentity(startup)
         if (!startup && prevIdentity && idKey != prevIdentity.key) {
             let prefstring = "mail.identity." + prevIdentity.key;
             // RemoveDirectoryServerObserver(prefstring); TB31
+            if (typeof RemoveDirectoryServerObserver === "function")
+                RemoveDirectoryServerObserver(prefstring);
+
             let prevReplyTo = prevIdentity.replyTo;
             let prevCc = "";
             let prevBcc = "";
@@ -345,9 +348,13 @@ function LoadIdentity(startup)
         }
 
       // AddDirectoryServerObserver(false); TB31
+      if (typeof AddDirectoryServerObserver === "function")
+        AddDirectoryServerObserver(false);
       if (!startup) {
           try {
               // setupLdapAutocompleteSession(); TB31
+              if (typeof setupLdapAutocompleteSession === "function")
+                setupLdapAutocompleteSession();
           } catch (ex) {
               // catch the exception and ignore it, so that if LDAP setup
               // fails, the entire compose window doesn't end up horked
