@@ -671,7 +671,9 @@ var mrcAComplete = {
             'fieldFOLLOW' : {'enabled':false, 'checked':false, 'force':false},
     },
 
-
+    // Cache for _splitEmailList()
+    _splitEmail_cache_data : "",
+    _splitEmail_cache_output : [],
     
 
 
@@ -965,9 +967,17 @@ var mrcAComplete = {
         }
         return output;
         */
-        let output1 = this._splitEmailList_js_version(data);
-        // Application.console.log("1 : "+output1.join("||"));
-        // Application.console.log("2 : "+output.join("||"));
+        let output1 = this._splitEmail_cache_output;
+        if (data != this._splitEmail_cache_data) {
+        // if (true) {
+        
+            output1 = this._splitEmailList_js_version(data);
+            // Application.console.log("1 : "+output1.join("||"));
+            // Application.console.log("2 : "+output.join("||"));
+            
+            this._splitEmail_cache_data = data;
+            this._splitEmail_cache_output = output1;
+        }
         return output1;
     },
 
@@ -999,6 +1009,7 @@ var mrcAComplete = {
          * returns :
          *    array of emails, still quoted and backslashed
          */
+        Application.console.log("_splitEmailList_js_version:'"+data+"'");
         separator = this._pick(separator, ',');
         quote = this._pick(quote, '"');
         escaper = this._pick(escaper, '\\');
@@ -1436,7 +1447,7 @@ var mrcAComplete = {
     _makeFullAddress : function(a, b) {
         let res = "";
         let temp = typeof mrcAComplete.mhParser.makeFullAddressString;
-        Application.console.log("typeof makeFullAddressString ="+temp);
+        // Application.console.log("typeof makeFullAddressString ="+temp);
         
         if (typeof mrcAComplete.mhParser.makeFullAddress === "function") {
             // TB 24
@@ -1462,7 +1473,7 @@ var mrcAComplete = {
             // then we add the email
             res = res + " <" + b + ">";
         }
-        Application.console.log("_makeFullAddress="+res);
+        // Application.console.log("_makeFullAddress="+res);
         return res;
     },
 
