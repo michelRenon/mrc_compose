@@ -500,7 +500,10 @@ var mrcAComplete = {
     COLLECTED_ADDRESS_BOOK_URI : "moz-abmdbdirectory://history.mab",
 
 
-
+    // Values of deck of autocomplete panel
+    DECK_WAITING : 0,
+    DECK_AUTOCOMPLETE : 1,
+    DECK_TYPEMORE : 2,
 
 
 
@@ -3206,7 +3209,7 @@ var mrcAComplete = {
 
         // show panel with spinning image while searching
         let deck = document.getElementById('deckAutocompletePanel');
-        deck.selectedIndex = 0; // wainting
+        deck.selectedIndex = this.DECK_WAITING;
         this._doEmptyPanel();
         this.openPopup(event, element);
         
@@ -3238,6 +3241,23 @@ var mrcAComplete = {
         }
     },
 
+    infoTypeMore : function(aString, event, element) {
+        
+        // show panel with spinning image while searching
+        let deck = document.getElementById('deckAutocompletePanel');
+        deck.selectedIndex = this.DECK_TYPEMORE;
+        // prepare message for user
+        let delta = this.param_search_min_char - aString.length;
+        let message = this.getString("type_more");
+        message = message.replace(/%s/g, delta); 
+        // put message in panel
+        let label = document.getElementById('labelTypeMore');
+        label.value = message;
+        
+        this._doEmptyPanel();
+        this.openPopup(event, element);
+    },
+    
     buildResultList : function(textPart) {
         /*
          * official call to perform search on address book.
@@ -3253,7 +3273,7 @@ var mrcAComplete = {
         panel.height = '10px';
         */
         let deck = document.getElementById('deckAutocompletePanel');
-        deck.selectedIndex = 1; // autocomplete
+        deck.selectedIndex = this.DECK_AUTOCOMPLETE;
 
         let meth = "_buildResultList_mode_"+this.param_mode;
         this[meth](textPart);
@@ -3856,14 +3876,12 @@ function mrcRecipientKeyUp(event, element) {
                         mrcAComplete.finishSearch(textPart, event, element) 
                     } );
             }
-        } else {
-            
-            // TODO
-            // afficher le panel avec un message indiquant de taper x autres caractères pour lancer la recherche
-            // mais quand fermer le panel ???
-            // quand 0 cars dans textPart ?
+        } else if (textPart.length == 0) {
             
             mrcAComplete.hidePopup();
+        } else {
+            // not enough caracters to start searching : tell that to user
+            mrcAComplete.infoTypeMore(textPart, event, element);
         }
     }
 }

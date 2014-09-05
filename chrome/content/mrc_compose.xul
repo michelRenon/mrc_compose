@@ -111,6 +111,9 @@
                 </hbox>
                 <html:div id="msgAutocompletePanelDiv" style="display:block; min-width:100px" >
                 </html:div>
+                <hbox flex="1">
+                    <label id="labelTypeMore" value="" />
+                </hbox>
             </deck>
         </panel>
 
