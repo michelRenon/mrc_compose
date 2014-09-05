@@ -969,7 +969,6 @@ var mrcAComplete = {
         */
         let output1 = this._splitEmail_cache_output;
         if (data != this._splitEmail_cache_data) {
-        // if (true) {
         
             output1 = this._splitEmailList_js_version(data);
             // Application.console.log("1 : "+output1.join("||"));
@@ -1009,7 +1008,6 @@ var mrcAComplete = {
          * returns :
          *    array of emails, still quoted and backslashed
          */
-        Application.console.log("_splitEmailList_js_version:'"+data+"'");
         separator = this._pick(separator, ',');
         quote = this._pick(quote, '"');
         escaper = this._pick(escaper, '\\');
