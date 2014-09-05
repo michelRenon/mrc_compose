@@ -676,7 +676,8 @@ var mrcAComplete = {
     _splitEmail_cache_output : [],
     
 
-
+    // Cache for keyUp
+    _textPart_cache : "",
 
 
 
@@ -967,6 +968,7 @@ var mrcAComplete = {
         }
         return output;
         */
+        // Application.console.log("_splitEmailList:'"+data+"'");
         let output1 = this._splitEmail_cache_output;
         if (data != this._splitEmail_cache_data) {
         
@@ -1838,7 +1840,7 @@ var mrcAComplete = {
          *   none
          */
         // use DisplayName and NickName
-        let baseQuery = "(or(PrimaryEmail,@C,@V)(FirstName,@C,@V)(LastName,@C,@V)(DisplayName,@C,@V)(NickName,@C,@V))";
+        let baseQuery = "(or(PrimaryEmail,@C,@V)(SecondEmail,@C,@V)(FirstName,@C,@V)(LastName,@C,@V)(DisplayName,@C,@V)(NickName,@C,@V))";
         
         // one search : CONTAINS     
         let searchQuery1 = baseQuery.replace(/@C/g, 'c');
@@ -2020,7 +2022,7 @@ var mrcAComplete = {
          *   none
          */
         // use DisplayName or NickName ?
-        let baseQuery = "(or(PrimaryEmail,@C,@V)(FirstName,@C,@V)(LastName,@C,@V)(DisplayName,@C,@V)(NickName,@C,@V))";  
+        let baseQuery = "(or(PrimaryEmail,@C,@V)(SecondEmail,@C,@V)(FirstName,@C,@V)(LastName,@C,@V)(DisplayName,@C,@V)(NickName,@C,@V))";  
         
         // first search : BEGIN WITH     
         let searchQuery1 = baseQuery.replace(/@C/g, 'bw');
@@ -2312,7 +2314,7 @@ var mrcAComplete = {
          *   none
          */
         // use DisplayName and NickName
-        let baseQuery = "(or(PrimaryEmail,@C,@V)(FirstName,@C,@V)(LastName,@C,@V)(DisplayName,@C,@V)(NickName,@C,@V))";  
+        let baseQuery = "(or(PrimaryEmail,@C,@V)(SecondEmail,@C,@V)(FirstName,@C,@V)(LastName,@C,@V)(DisplayName,@C,@V)(NickName,@C,@V))";  
         
         // one search : CONTAINS     
         let searchQuery1 = baseQuery.replace(/@C/g, 'c');
@@ -3731,10 +3733,13 @@ function mrcRecipientKeyUp(event, element) {
      */
     // www.the-art-of-web.com/javascript/escape
     gContentChanged=true;
-    
+    Application.console.log("keyCode="+event.keyCode);
     let sel = element.selectionStart;
     let textPart = mrcAComplete.getCurrentPart(element.value, sel).trim();    
     let canUpdatePanel = true;
+    let canUpdateUI = true;
+
+    // TODO : ajouter un cache sur textPart pour optimiser
     
     let popup = document.getElementById("msgAutocompletePanel");
     if (popup.state == "open" || popup.state == "showing") { // TODO : check if 'showing' is ok
@@ -3760,30 +3765,104 @@ function mrcRecipientKeyUp(event, element) {
         switch(event.keyCode) {
             case KeyEvent.DOM_VK_ESCAPE:
                 canUpdatePanel = false;
+                canUpdateUI = false;
                 // simply close the popup
                 mrcAComplete.hidePopup();
                 break;
         }
     }
-
-    // update the UI that handle fields
-    mrcAComplete.updateFieldUIAfterKeyUp(element);
     
-    // update the # of recipients of the current textbox
-    mrcAComplete.updateNbRecipients(element);
+    
+    // TODO
+    // revoir la gestion des flèches dans les différents cas
+    
+    switch(event.keyCode) {
+        case KeyEvent.DOM_VK_PAGE_UP:
+        case KeyEvent.DOM_VK_PAGE_DOWN:
+        case KeyEvent.DOM_VK_END:
+        case KeyEvent.DOM_VK_HOME:
+        case KeyEvent.DOM_VK_LEFT:
+        case KeyEvent.DOM_VK_UP:
+        case KeyEvent.DOM_VK_RIGHT:
+        case KeyEvent.DOM_VK_DOWN:
+        
+            // optimize with cache
+            if (textPart == mrcAComplete._textPart_cache) {
+                // no need to update UI
+                canUpdateUI = false;
+                // no need to search
+                canUpdatePanel = false;
+            } else {
+                Application.console.log("texPart changed:"+textPart);
+                // no need to update UI
+                canUpdateUI = false;
+                // need to search
+                canUpdatePanel = true;
+            }
+            break;
+    }
 
-    // special TB 24 ; TB 17 does not need the parameter
-    updateSendCommands(true);
+    // fill cache for next keyups
+    mrcAComplete._textPart_cache = textPart;
+    
+    if (canUpdateUI) {
+        // update the UI that handle fields
+        mrcAComplete.updateFieldUIAfterKeyUp(element);
+        
+        // update the # of recipients of the current textbox
+        mrcAComplete.updateNbRecipients(element);
+
+        // special TB 24 ; TB 17 does not need the parameter
+        updateSendCommands(true);
+        }
 
     if (canUpdatePanel) {
         if (textPart.length >= mrcAComplete.param_search_min_char) {
+            
+            /*
+            TODO :
+            test si le textPart est déjà un email complet "xxxxx <yyy@isp.com>"
+            ou non.
+            * si oui, faire la recherche sur l'email ! pour etre sur de retrouver le contact
+      
+            regex simple pour chercher un email
+                /\S+@\S+\.\S+/
+
+                Example JavaScript function:
+
+                function validateEmail(email) 
+                {
+                    var re = /\S+@\S+\.\S+/;
+                    return re.test(email);
+                    
+            */
+            
+            let re = / <\S+@\S+\.\S+>/;
+            let res = re.exec(textPart);
+            if (res && res.length > 0) {
+                // we extract the pure email
+                let raw = res[0];
+                Application.console.log("raw:'"+raw+"'");
+                textPart = raw.slice(2,-1);
+                Application.console.log("new textPart:'"+textPart+"'");
+                
+            }
+                    
+                    
             if (mrcAComplete.needSearch(textPart)) {
                 // perform search
+                Application.console.log("searching:'"+textPart+"'");
                 mrcAComplete.search(textPart, event, element, function callback_search() { 
                         mrcAComplete.finishSearch(textPart, event, element) 
                     } );
             }
         } else {
+            
+            // TODO
+            // afficher le panel avec un message indiquant de taper x autres caractères pour lancer la recherche
+            // mais quand fermer le panel ???
+            // quand 0 cars dans textPart ?
+            
             mrcAComplete.hidePopup();
         }
     }
