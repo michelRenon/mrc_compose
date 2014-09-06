@@ -1890,7 +1890,8 @@ var mrcAComplete = {
                         try {
                             // Application.console.log("AB LDAP = " + ab.dirName);
                             /* CODE FOR TB 24 to 31? */
-                            if (this.param_ldap_search_version == 'TB24') {
+                            // if (this.param_ldap_search_version == 'TB24') {
+                            if (true) {
                                 // Application.console.log(ab.dirName+" : LDAP search TB24");
                                 let query =
                                     Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
@@ -1947,6 +1948,7 @@ var mrcAComplete = {
                             } else {
                                 // Application.console.log(ab.dirName+" : LDAP search TB31");
                                 /* CODE FOR TB >= 29 */
+                                /*
                                 let that = this;
                                
                                 function acObserver() {}
@@ -1983,6 +1985,7 @@ var mrcAComplete = {
                                 acs.startSearch(aString, params, null, obs);
 
                                 this._addSearchListener(obs);
+                                */
                             }
                         } catch (e) {
                             this._addErrorAddressBook(ab.dirName);
@@ -2358,7 +2361,8 @@ var mrcAComplete = {
                     let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                     if (doSearch) {
                         try {
-                            if (this.param_ldap_search_version == 'TB24') {
+                            // if (this.param_ldap_search_version == 'TB24') {
+                            if (true) {
                                 // Application.console.log(ab.dirName+" : LDAP search TB24");
                                 /* CODE FOR TB 24-31? */
                                 
@@ -2418,6 +2422,7 @@ var mrcAComplete = {
                             } else {
                                 // Application.console.log(ab.dirName+" : LDAP search TB31");
                                 /* CODE FOR TB >= 29 */
+                                /*
                                 let that = this;
 
                                 function acObserver() {}
@@ -2454,6 +2459,7 @@ var mrcAComplete = {
                                 acs.startSearch(aString, params, null, obs);
 
                                 this._addSearchListener(obs);
+                                */
                             }
                         } catch (e) {
                             this._addErrorAddressBook(ab.dirName);
