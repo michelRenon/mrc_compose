@@ -46,81 +46,17 @@
  */
 
 
+
+
+
+
 function mrcOnPrefLoaded() {
 
     // Application.console.log("mrcOnPrefLoaded()");
-    let prefs = Components.classes["@mozilla.org/preferences-service;1"]  
-                         .getService(Components.interfaces.nsIPrefService)  
-                         .getBranch("extensions.mrccompose.");  
-
-    let first_load_done = prefs.getBoolPref("first_load_done");
-    
-    let currentArray = [];
-    currentArray = document.getElementById("search_ab_URI").value.split(";;;");
-
-    // set up the whitelist UI
-    let wList = document.getElementById("search_ab_URI_list");
-
-    // Ensure the whitelist is empty
-    while (wList.lastChild)
-        wList.removeChild(wList.lastChild);
-
-    // Populate the listbox with address books
-    let abItems = [];
-    // for (let ab in fixIterator(MailServices.ab.directories,
-    //                          Components.interfaces.nsIAbDirectory)) {
-
-    let abManager = Components.classes["@mozilla.org/abmanager;1"].getService(Components.interfaces.nsIAbManager);
-    let allAddressBooks = abManager.directories;
-    while (allAddressBooks.hasMoreElements()) {
-        let ab = allAddressBooks.getNext();
-        // if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
-        if ( !(ab instanceof Components.interfaces.nsIAbDirectory))
-            continue;
-            
-        // We skip mailing lists and remote address books.
-        // if (ab.isMailList || ab.isRemote)
-        // if (ab.isRemote)
-        //    continue;
-
-        let abItem = document.createElement("listitem");
-        abItem.setAttribute("type", "checkbox");
-        abItem.setAttribute("class", "listitem-iconic");
-        abItem.setAttribute("label", ab.dirName);
-        abItem.setAttribute("value", ab.URI);
-
-        // abItem.setAttribute("onclick", "mrcToggleCheckAB(this)" );
-        abItem.addEventListener("click", mrcToggleCheckAB, false); 
-     
-        // Due to bug 448582, we have to use setAttribute to set the
-        // checked value of the listitem.
-        if (!first_load_done)
-            // we force all ab
-            abItem.setAttribute("checked", true);
-        else
-            abItem.setAttribute("checked", (currentArray.indexOf(ab.URI) != -1));
-
-        abItems.push(abItem);
-    }
-
-    // Sort the list
-    function sortFunc(a, b) {
-        return a.getAttribute("label").toLowerCase()
-           > b.getAttribute("label").toLowerCase();
-    }
-
-    abItems.sort(sortFunc);
-
-    // And then append each item to the listbox
-    for (let i = 0; i < abItems.length; i++)
-        wList.appendChild(abItems[i]);
-
-    if (!first_load_done) {
-        prefs.setBoolPref("first_load_done", true);
-        onSaveWhiteList();
-    }
-
+    buildABList();
     // mrcLoadHelp(); no need anymore with with help through tooltips.
+
+    window.addEventListener("activate", mrcOnPrefActivate); 
 }
 
 
@@ -226,8 +162,20 @@ function mrcDefaultLineHeight(event) {
     
 }
 
+function mrcEditDirectories() {
+    
+    window.openDialog("chrome://messenger/content/addressbook/pref-editdirectories.xul",
+                  "editDirectories", "chrome,modal=yes,resizable=no", null);
+}
 
 
+
+function mrcOnPrefActivate() {
+    
+    Application.console.log("mrcOnPrefActivate()");
+    // force rebuild of addressbooks list
+    buildABList();
+}
 
 /*
  * 
@@ -235,7 +183,82 @@ function mrcDefaultLineHeight(event) {
  * 
  */
 
+function buildABList() {
 
+    Application.console.log("buildABList()");
+
+    let prefs = Components.classes["@mozilla.org/preferences-service;1"]  
+                         .getService(Components.interfaces.nsIPrefService)  
+                         .getBranch("extensions.mrccompose.");  
+
+    let first_load_done = prefs.getBoolPref("first_load_done");
+    
+    let currentArray = [];
+    currentArray = document.getElementById("search_ab_URI").value.split(";;;");
+
+    // set up the whitelist UI
+    let wList = document.getElementById("search_ab_URI_list");
+
+    // Ensure the whitelist is empty
+    while (wList.lastChild)
+        wList.removeChild(wList.lastChild);
+
+    // Populate the listbox with address books
+    let abItems = [];
+    // for (let ab in fixIterator(MailServices.ab.directories,
+    //                          Components.interfaces.nsIAbDirectory)) {
+
+    let abManager = Components.classes["@mozilla.org/abmanager;1"].getService(Components.interfaces.nsIAbManager);
+    let allAddressBooks = abManager.directories;
+    while (allAddressBooks.hasMoreElements()) {
+        let ab = allAddressBooks.getNext();
+        // if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
+        if ( !(ab instanceof Components.interfaces.nsIAbDirectory))
+            continue;
+            
+        // We skip mailing lists and remote address books.
+        // if (ab.isMailList || ab.isRemote)
+        // if (ab.isRemote)
+        //    continue;
+
+        let abItem = document.createElement("listitem");
+        abItem.setAttribute("type", "checkbox");
+        abItem.setAttribute("class", "listitem-iconic");
+        abItem.setAttribute("label", ab.dirName);
+        abItem.setAttribute("value", ab.URI);
+
+        // abItem.setAttribute("onclick", "mrcToggleCheckAB(this)" );
+        abItem.addEventListener("click", mrcToggleCheckAB, false); 
+     
+        // Due to bug 448582, we have to use setAttribute to set the
+        // checked value of the listitem.
+        if (!first_load_done)
+            // we force all ab
+            abItem.setAttribute("checked", true);
+        else
+            abItem.setAttribute("checked", (currentArray.indexOf(ab.URI) != -1));
+
+        abItems.push(abItem);
+    }
+
+    // Sort the list
+    function sortFunc(a, b) {
+        return a.getAttribute("label").toLowerCase()
+           > b.getAttribute("label").toLowerCase();
+    }
+
+    abItems.sort(sortFunc);
+
+    // And then append each item to the listbox
+    for (let i = 0; i < abItems.length; i++)
+        wList.appendChild(abItems[i]);
+
+    if (!first_load_done) {
+        prefs.setBoolPref("first_load_done", true);
+        onSaveWhiteList();
+    }
+    
+}
 
 function getLineHeight() {
     

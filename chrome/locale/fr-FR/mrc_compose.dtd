@@ -26,6 +26,7 @@
 
 <!-- tab 1 -->
 <!ENTITY options.search_ab_URI_list.label "Recherche dans les carnets : ">
+<!ENTITY options.edit_directories.label     "&editDirectories.label;">
 <!ENTITY options.mode.label "Mode (?) : ">
 <!ENTITY options.mode_value1.label "1 : Tous les contacts contenant">
 <!ENTITY options.mode_value2.label "2 : Tous les contacts commençant par / Tous les contacts contenant">

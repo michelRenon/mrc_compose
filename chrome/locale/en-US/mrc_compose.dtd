@@ -26,6 +26,7 @@
 
 <!-- tab 1 -->
 <!ENTITY options.search_ab_URI_list.label "Search in addressbook: ">
+<!ENTITY options.edit_directories.label     "&editDirectories.label;">
 <!ENTITY options.mode.label "Mode (?): ">
 <!ENTITY options.mode_value1.label "1 : All contacts contain">
 <!ENTITY options.mode_value2.label "2 : All contacts begin with / All contacts contain">

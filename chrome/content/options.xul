@@ -36,8 +36,10 @@
 <!DOCTYPE overlay [
     <!ENTITY % dtd2 SYSTEM "chrome://mrc_compose/locale/mrc_compose.dtd" > 
     <!ENTITY % dtd1 SYSTEM "chrome://messenger/locale/messengercompose/messengercompose.dtd" > 
+    <!ENTITY % dtd3 SYSTEM "chrome://messenger/locale/preferences/compose.dtd" > 
     %dtd2;
     %dtd1;
+    %dtd3;
 ]>
 
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
@@ -132,6 +134,21 @@
                                 <label control="search_ab_URI_list" value="&options.search_ab_URI_list.label;"/>
                                 <listbox id="search_ab_URI_list" rows="5"/>
                             </row>
+
+                            <row>
+
+                                <label control="" value=""/>
+                                <!--
+                                <button id="editButton" label="&editDirectories.label;" 
+                                        oncommand="gComposePane.editDirectories();"
+                                        preference="pref.ldap.disable_button.edit_directories"
+                                        accesskey="&editDirectories.accesskey;"/>
+                                -->
+                                <button id="editButton" label="&options.edit_directories.label;" 
+                                        oncommand="mrcEditDirectories();"/>
+                            </row>
+
+
                             <row>
                                 <label control="mode" value="&options.mode.label;" tooltip="mrctip"/>
                                 <menulist id="mode" preference="pref_mode" tooltip="mrctip">
