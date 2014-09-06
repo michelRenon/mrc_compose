@@ -143,9 +143,18 @@
                                         oncommand="gComposePane.editDirectories();"
                                         preference="pref.ldap.disable_button.edit_directories"
                                         accesskey="&editDirectories.accesskey;"/>
+
+                                <toolbarbutton id="button-address"
+                                   class="toolbarbutton-1"
+                                   label="&addressBookButton.label;"
+                                   oncommand="toAddressBook();"
+                                   tooltiptext="&addressBookButton.tooltip;"/>
                                 -->
-                                <button id="editButton" label="&options.edit_directories.label;" 
+                                <hbox>
+                                    <button id="editButton" label="&options.edit_directories.label;" 
                                         oncommand="mrcEditDirectories();"/>
+
+                                </hbox>
                             </row>
 
 
