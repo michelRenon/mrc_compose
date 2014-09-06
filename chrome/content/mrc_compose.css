@@ -78,6 +78,10 @@
     /* border: 0px solid #f00; */
 }
 
+#labelTypeMore {
+    color: #888;
+    font-style: italic;
+}
  
 #msgAutocompletePanelDiv .container {
     display: block;
