@@ -439,6 +439,29 @@ function debug_obj(obj){
 }
 
 
+function now() {
+    let currentdate = new Date(); 
+    let text = "";
+    // day/month/year
+    // text +=  currentdate.getDate() + "/"
+    //        + (currentdate.getMonth()+1)  + "/" 
+    //        + currentdate.getFullYear() + " @ ";
+    // H:M:S
+    text += currentdate.getHours() + ":"  
+            + currentdate.getMinutes() + ":" 
+            + currentdate.getSeconds();
+    // milliseconds
+    text += ":" + currentdate.getMilliseconds();
+    return text;
+}
+
+// from http://stackoverflow.com/questions/1374126/how-to-extend-an-array-with-an-existing-javascript-array
+Array.prototype.extend = function (other_array) {
+    /* you should include a test to check whether other_array really is an array */
+    other_array.forEach(function(v) {this.push(v)}, this);    
+}
+
+
 /*
  * the manager of autocomplete
  */
@@ -1436,7 +1459,7 @@ var mrcAComplete = {
     _makeFullAddress : function(a, b) {
         let res = "";
         let temp = typeof mrcAComplete.mhParser.makeFullAddressString;
-        Application.console.log("typeof makeFullAddressString ="+temp);
+        // Application.console.log("typeof makeFullAddressString ="+temp);
         
         if (typeof mrcAComplete.mhParser.makeFullAddress === "function") {
             // TB 24
@@ -1462,7 +1485,7 @@ var mrcAComplete = {
             // then we add the email
             res = res + " <" + b + ">";
         }
-        Application.console.log("_makeFullAddress="+res);
+        // Application.console.log("_makeFullAddress="+res);
         return res;
     },
 
@@ -1618,15 +1641,29 @@ var mrcAComplete = {
         return temp;
     },
     
-    
-    _initSearchListeners : function() {
-        this.allListenersStarted = false;
-        this.searchedAB = [];
+    _initSearchID : function() {
+        /*
+         * Reinit internals fields for a future search
+         */
         this.searchID++;
-        // Application.console.log("_initSearchListeners : "+this.searchID);
+        Application.console.log(now()+" _initSearchID : "+this.searchID);
+        this.searchedAB = [];
         this.search_res1 = [];
         this.search_res2 = [];
         this.search_res3 = [];
+    },
+    
+    _obsoleteSearchID : function() {
+        /*
+         * Mark current search as obsolete
+         */
+        this.searchID++;
+    },
+    
+    _initSearchListeners : function() {
+        this.allListenersStarted = false;
+        this._initSearchID();
+        Application.console.log(now()+" _initSearchListeners : "+this.searchID);
     },
         
     _addSearchListener : function(abSearchListener) {
@@ -1638,15 +1675,20 @@ var mrcAComplete = {
         /*
          * Perform actions when a search is finished on ONE addressbook.
          */
+        Application.console.log(now()+" _completeSearchListener : "+abSearchListener.searchID+"/"+this.searchID+":"+abSearchListener.addressBook.dirName);
         if (abSearchListener.searchID == this.searchID) {
             // OK, it's a searchListener for current search
             switch(this.param_mode) {
                 case 1:
-                    // nothing
+                    // Add results for current searchListenet in global results
+                    this.search_res1.extend(abSearchListener.localRes);
                     break;
                     
                 case 2:
-                    // nothing
+                    // Add results for current searchListenet in global results
+                    this.search_res1.extend(abSearchListener.localRes1);
+                    this.search_res2.extend(abSearchListener.localRes2);
+                    this.search_res3.extend(abSearchListener.localRes3);
                     break;
                     
                 case 3:
@@ -1681,7 +1723,8 @@ var mrcAComplete = {
          */
         if (originalSearchID == this.searchID) {
             // make any search obsolete
-            this.searchID++;
+            this._obsoleteSearchID();
+            Application.console.log(now()+" _timeOutSearchListener : "+this.searchID);
 
             // Application.console.log("_timeOutSearchListener() ");
             // generate warnings for each remaining search
@@ -1700,13 +1743,14 @@ var mrcAComplete = {
 
     _testSearchComplete : function() {
         // Application.console.log("_testSearchComplete : "+this.searchedAB.length+", "+this.allListenersStarted);
+        Application.console.log(now()+" _testSearchComplete : "+this.searchID);
         if (this.searchedAB.length == 0 && this.allListenersStarted == true) {
             /*
              * Perform actions when ALL searches are completed.
              */
             
             // make any search obsolete
-            this.searchID++;
+            this._obsoleteSearchID();
 
             // stop the current timeout
             clearTimeout(this.searchTimeOut);
@@ -1857,7 +1901,7 @@ var mrcAComplete = {
                             addressBook : ab,
                             isRemote : false,
                             cbObject : that,
-                            localRes : null,
+                            localRes : [],
                         }
                         this._addSearchListener(abSearchListener);
 
@@ -1867,10 +1911,10 @@ var mrcAComplete = {
                             if (card instanceof Components.interfaces.nsIAbCard) {
                                 // a list has no email, but we want to keep it
                                 if (card.isMailList) {
-                                    this.search_res1.push(this._createMyCard(card));
+                                    abSearchListener.localRes.push(this._createMyCard(card));
                                 } else if (card.primaryEmail != "")
                                     // filter real cards without email
-                                    this.search_res1.push(this._createMyCard(card));
+                                    abSearchListener.localRes.push(this._createMyCard(card));
                             }
                         }
                         
@@ -1930,7 +1974,7 @@ var mrcAComplete = {
                                     addressBook : ab,
                                     isRemote : true,
                                     cbObject : that,
-                                    localRes : null,
+                                    localRes : [],
                                     
                                     onSearchFinished : function(aResult, aErrorMesg) {
                                         if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
@@ -1939,7 +1983,7 @@ var mrcAComplete = {
                                     },
 
                                     onSearchFoundCard : function(aCard) {
-                                        this.cbObject.search_res1.push(this.cbObject._createMyCard(aCard));
+                                        this.localRes.push(this.cbObject._createMyCard(aCard));
                                     }
                                 };
 
@@ -2057,7 +2101,9 @@ var mrcAComplete = {
                             addressBook : ab,
                             isRemote : false,
                             cbObject : that,
-                            localRes : null,
+                            localRes1 : [],
+                            localRes2 : [],
+                            localRes3 : [],
                         }
                         this._addSearchListener(abSearchListener);
 
@@ -2067,9 +2113,9 @@ var mrcAComplete = {
                             card = childCards1.getNext();
                             if (card instanceof Components.interfaces.nsIAbCard) {
                                 if (card.isMailList) { // necessary
-                                    this.search_res3.push(this._createMyCard(card));
+                                    abSearchListener.localRes3.push(this._createMyCard(card));
                                 } else if (card.primaryEmail != "")
-                                    this.search_res1.push(this._createMyCard(card));
+                                    abSearchListener.localRes1.push(this._createMyCard(card));
                             }
                         }
 
@@ -2080,9 +2126,9 @@ var mrcAComplete = {
                             card = childCards2.getNext();
                             if (card instanceof Components.interfaces.nsIAbCard) {
                                 if (card.isMailList) { // necessary 
-                                    this.search_res3.push(this._createMyCard(card));
+                                    abSearchListener.localRes3.push(this._createMyCard(card));
                                 } else if (card.primaryEmail != "")
-                                    this.search_res2.push(this._createMyCard(card));
+                                    abSearchListener.localRes2.push(this._createMyCard(card));
                             }
                         }
                         // search 3
@@ -2173,7 +2219,9 @@ var mrcAComplete = {
                                 addressBook : ab,
                                 isRemote : true,
                                 cbObject : that,
-                                localRes : null,
+                                localRes1 : [],
+                                localRes2 : [],
+                                localRes3 : [],
 
                                 onSearchFinished : function(aResult, aErrorMesg) {
                                     if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
@@ -2184,9 +2232,9 @@ var mrcAComplete = {
                                 onSearchFoundCard : function(aCard) {
                                     // TODO : check if "card.isMailList" is OK
                                     if (card.isMailList) { 
-                                        this.cbObject.search_res3.push(this.cbObject._createMyCard(aCard));
+                                        this.localRes3.push(this.cbObject._createMyCard(aCard));
                                     } else {
-                                        this.cbObject.search_res1.push(this.cbObject._createMyCard(aCard));
+                                        this.localRes1.push(this.cbObject._createMyCard(aCard));
                                     }
                                 }
                             };
@@ -2226,7 +2274,9 @@ var mrcAComplete = {
                                 addressBook : ab,
                                 isRemote : true,
                                 cbObject : that,
-                                localRes : null,
+                                localRes1 : [],
+                                localRes2 : [],
+                                localRes3 : [],
 
                                 onSearchFinished : function(aResult, aErrorMesg) {
                                     if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
@@ -2237,9 +2287,9 @@ var mrcAComplete = {
                                 onSearchFoundCard : function(aCard) {
                                     // TODO : check if "card.isMailList" is OK
                                     if (card.isMailList) { 
-                                        this.cbObject.search_res3.push(this.cbObject._createMyCard(aCard));
+                                        this.localRes3.push(this.cbObject._createMyCard(aCard));
                                     } else {
-                                        this.cbObject.search_res2.push(this.cbObject._createMyCard(aCard));
+                                        this.localRes2.push(this.cbObject._createMyCard(aCard));
                                     }
                                 }
                             };
@@ -2274,7 +2324,7 @@ var mrcAComplete = {
                                 },
 
                                 onSearchFoundCard : function(aCard) {
-                                    this.cbObject.search_res3.push(this.cbObject._createMyCard(aCard));
+                                    this.localRes3.push(this.cbObject._createMyCard(aCard));
                                 }
                             };
 
@@ -2718,6 +2768,7 @@ var mrcAComplete = {
          * return :
          *   none
          */
+        this.warnings = this._removeDuplicatecards(this.warnings);
         if (this.warnings.length > 0) {
             // only one error div, with several lines (one for each warning)
             let errorDiv = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
@@ -3192,6 +3243,7 @@ var mrcAComplete = {
          * return :
          *   none
          */
+        Application.console.log(now()+" search() "+this.searchID);
         this.datas = {}; // TODO : check if it's the right way to empty dictionary
         this.errors = [];
         this.warnings = [];
@@ -3535,7 +3587,7 @@ var mrcAComplete = {
          *   none
          */
         // make any search obsolete
-        this.searchID++;
+        this._obsoleteSearchID();
 
         let popup = document.getElementById("msgAutocompletePanel");
         popup.hidePopup();
