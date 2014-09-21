@@ -233,7 +233,7 @@ function CompFields2Recipients(msgCompFields)
     
     // CompFields2Recipients is called whenever a user replies or edits an existing message. We want to
     // add all of the recipients for this message to the ignore list for spell check
-    addRecipientsToIgnoreList((gCurrentIdentity ? gCurrentIdentity.identityName + ', ' : '') + msgTo + ', ' + msgCC + ', ' + msgBCC);
+    // addRecipientsToIgnoreList((gCurrentIdentity ? gCurrentIdentity.identityName + ', ' : '') + msgTo + ', ' + msgCC + ', ' + msgBCC);
 
     mrcComposeFocus(); 
   }
