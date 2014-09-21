@@ -1716,9 +1716,7 @@ var mrcAComplete = {
          * 
          */
         let temp = searchListener.addressBook.dirName + searchListener.searchID;
-        // searchListener.hash = this._hashCode(temp);
-        // searchListener.hash = temp;
-        // let hash = this._hashCode(temp);
+        // let hash = this._hashCode(temp); // no need to create a real hash
         let hash = temp;
         Application.console.log("_createHashSearchListener : "+hash);
         return hash;
@@ -1726,14 +1724,13 @@ var mrcAComplete = {
     
     _initSearchListeners : function() {
         this.allListenersStarted = false;
-        this._archiveSearchListeners(); // this.searchedAB = {}; // TODO : move content to an archive
+        this._archiveSearchListeners();
         this._initSearchID();
         Application.console.log(now()+" _initSearchListeners : "+this.searchID);
     },
     
             
     _addSearchListener : function(abSearchListener) {
-        // this.searchedAB.push(abSearchListener.addressBook.dirName);
         abSearchListener.hash = this._createHashSearchListener(abSearchListener);
         let key = abSearchListener.hash;
         this.searchedAB[key] = abSearchListener;
@@ -1769,9 +1766,7 @@ var mrcAComplete = {
                     this.nbDatas += abSearchListener.localRes.length;
                     break;
             }
-            // remove
-            // let index = this.searchedAB.indexOf(abSearchListener.addressBook.dirName);
-            // this.searchedAB.splice(index, 1);
+            // remove listener from searched list
             let key = abSearchListener.hash;
             if (key in this.searchedAB) {
                 delete this.searchedAB[key];
@@ -1800,16 +1795,8 @@ var mrcAComplete = {
             this._obsoleteSearchID();
             Application.console.log(now()+" _timeOutSearchListener : "+this.searchID);
 
-            // Application.console.log("_timeOutSearchListener() ");
-            // generate warnings for each remaining search
-            // if (this.searchedAB.length > 0) {
-                // for(let i=0, l=this.searchedAB.length ; i < l; i++) {
-                    // this._addWarningTimeout(this.searchedAB[i]);
-                // }
-            // }
             let keys = Object.keys(this.searchedAB);
             Application.console.log("_timeOutSearchListener() keys="+keys+":"+(typeof keys));
-            // for (let k in keys) {
             for (let i=0, l=keys.length ; i<l; i++) {
                 let k = keys[i];
                 Application.console.log("k="+k);
@@ -1817,7 +1804,7 @@ var mrcAComplete = {
             }
             
             // force search complete
-            this._archiveSearchListeners(); // this.searchedAB = [];
+            this._archiveSearchListeners();
             this._testSearchComplete();
         } else {
             // This timeout is obsolete : noting to do.
@@ -1825,7 +1812,6 @@ var mrcAComplete = {
     },
 
     _testSearchComplete : function() {
-        // Application.console.log("_testSearchComplete : "+this.searchedAB.length+", "+this.allListenersStarted);
         Application.console.log(now()+" _testSearchComplete : "+this.searchID);
         let keys = Object.keys(this.searchedAB);
         if (keys.length == 0 && this.allListenersStarted == true) {
@@ -2643,8 +2629,6 @@ var mrcAComplete = {
                 if (card[fields['name'][i]] != "")
                     names.push(card[fields['name'][i]]);
             }
-            // cardText = mrcAComplete.mhParser.makeMailboxObject(names.join(" "), card['primaryEmail']).toString();
-            // cardText = mrcAComplete.mhParser.makeFullAddress(names.join(" "), card['primaryEmail']);
             cardText = mrcAComplete._makeFullAddress(names.join(" "), card['primaryEmail']);
             
             // ----------------
@@ -2676,8 +2660,6 @@ var mrcAComplete = {
                 if (card[fields['name'][i]] != "")
                     names.push(card[fields['name'][i]]);
             }
-            // cardText = mrcAComplete.mhParser.makeMailboxObject(names.join(" "), card['secondEmail']).toString();
-            // cardText = mrcAComplete.mhParser.makeFullAddress(names.join(" "), card['secondEmail']);
             cardText = mrcAComplete._makeFullAddress(names.join(" "), card['secondEmail']);
             
             // ----------------
