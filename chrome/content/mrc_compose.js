@@ -3974,13 +3974,14 @@ function mrcRecipientKeyUp(event, element) {
                     
             */
             
-            let re = / <\S+@\S+\.\S+>/;
+            // Application.console.log("textPart:'"+textPart+"'");
+            let re = /<\S+@\S+\.\S+>$/;
             let res = re.exec(textPart);
             if (res && res.length > 0) {
                 // we extract the pure email
                 let raw = res[0];
                 // Application.console.log("raw:'"+raw+"'");
-                textPart = raw.slice(2,-1);
+                textPart = raw.slice(1,-1);
                 // Application.console.log("new textPart:'"+textPart+"'");
                 
             }
