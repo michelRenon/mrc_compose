@@ -522,11 +522,14 @@ var mrcAComplete = {
 
     COLLECTED_ADDRESS_BOOK_URI : "moz-abmdbdirectory://history.mab",
 
-
     // Values of deck of autocomplete panel
     DECK_WAITING : 0,
     DECK_AUTOCOMPLETE : 1,
     DECK_TYPEMORE : 2,
+
+    // the delay with no search before purging archive of searchListeners
+    DELAY_PURGE_ARCHIV : 60 * 1000, // 1 minute
+    // DELAY_PURGE_ARCHIV : 10 * 1000, // 10 s for DEBUG
 
 
 
@@ -677,8 +680,14 @@ var mrcAComplete = {
     // will allow handling of several callback returns of ldap searches
     // and filter obsolete ones
     searchID : 0,
-    // the list of searched address books, at each request
-    searchedAB : [],
+    // the list of searched address books, at each request, stored as a dict
+    searchedAB : {},
+    // the list of old searchlisteners (mostly LDAP) that have not been completed before timeout.
+    // Kept to avoid crashes if callback occurs after a long time.
+    // In std TB code, there is a timeout of 60s before deleting them.
+    searchedAB_archiv : [],
+    // The timeout of archiv. It allows purging the archiv after a long time.
+    timeout_archiv : null,
 
     // define the values of all elements for each field
     // format :
@@ -1655,34 +1664,80 @@ var mrcAComplete = {
         return temp;
     },
     
+    
     _initSearchID : function() {
         /*
-         * Reinit internals fields for a future search
+         * Reinit internal fields for a future search
          */
         this.searchID++;
-        Application.console.log(now()+" _initSearchID : "+this.searchID);
-        this.searchedAB = [];
+        // Application.console.log(now()+" _initSearchID : "+this.searchID);
         this.search_res1 = [];
         this.search_res2 = [];
         this.search_res3 = [];
     },
-    
+
     _obsoleteSearchID : function() {
         /*
          * Mark current search as obsolete
          */
         this.searchID++;
     },
+
+    _archiveSearchListeners : function() {
+        /*
+         * Move search listeners from 'searchedAB' to archive.
+         */
+        let keys = Object.keys(this.searchedAB);
+        for (let i=0, l=keys.length ; i<l; i++) {
+            let k = keys[i];
+            this.searchedAB_archiv.push(this.searchedAB[k]);
+            delete this.searchedAB[k];
+        }
+        // this.searchedAB = {}; // implicitely done
+    },
+    
+    _purgeArchiv : function() {
+        /*
+         * Simply empty list of archived search listeners,
+         * the GC will make the real job later.
+         */
+        // SPECIAL : 
+        // As it is a call-back, we can't use 'this'
+        // instead, we must use the let 'mrcAComplete'
+        Application.console.log("AVANT purge:"+mrcAComplete.searchedAB_archiv.join("||"));
+        let l = mrcAComplete.searchedAB_archiv.length;
+        mrcAComplete.searchedAB_archiv.splice(0, l);
+        Application.console.log("APRES purge:"+mrcAComplete.searchedAB_archiv.join("||"));
+    },
+    
+    _createHashSearchListener : function(searchListener) {
+        /*
+         * 
+         * 
+         */
+        let temp = searchListener.addressBook.dirName + searchListener.searchID;
+        // searchListener.hash = this._hashCode(temp);
+        // searchListener.hash = temp;
+        // let hash = this._hashCode(temp);
+        let hash = temp;
+        Application.console.log("_createHashSearchListener : "+hash);
+        return hash;
+    },
     
     _initSearchListeners : function() {
         this.allListenersStarted = false;
+        this._archiveSearchListeners(); // this.searchedAB = {}; // TODO : move content to an archive
         this._initSearchID();
         Application.console.log(now()+" _initSearchListeners : "+this.searchID);
     },
-        
+    
+            
     _addSearchListener : function(abSearchListener) {
-        this.searchedAB.push(abSearchListener.addressBook.dirName);
-        // Application.console.log("_addSearchListener : "+abSearchListener.addressBook.URI+":"+this.searchedAB.length+", "+this.allListenersStarted);
+        // this.searchedAB.push(abSearchListener.addressBook.dirName);
+        abSearchListener.hash = this._createHashSearchListener(abSearchListener);
+        let key = abSearchListener.hash;
+        this.searchedAB[key] = abSearchListener;
+        Application.console.log("_addSearchListener : "+abSearchListener.addressBook.URI+":"+abSearchListener.hash+", "+this.allListenersStarted);
     },
     
     _completeSearchListener : function(abSearchListener) {
@@ -1715,15 +1770,20 @@ var mrcAComplete = {
                     break;
             }
             // remove
-            let index = this.searchedAB.indexOf(abSearchListener.addressBook.dirName);
-            this.searchedAB.splice(index, 1);
+            // let index = this.searchedAB.indexOf(abSearchListener.addressBook.dirName);
+            // this.searchedAB.splice(index, 1);
+            let key = abSearchListener.hash;
+            if (key in this.searchedAB) {
+                delete this.searchedAB[key];
+            }
             
-            // Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":"+this.searchedAB.length+", "+this.allListenersStarted);
+            
+            Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":"+this.searchedAB+", "+this.allListenersStarted);
             // Then test if search is complete for all addressbooks.
             this._testSearchComplete();
         } else {
             // it's an obsolete searchListener : 
-            // Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":obsolete = "+abSearchListener.searchID);
+            Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":obsolete = "+abSearchListener.searchID);
         }
     },
     
@@ -1742,13 +1802,22 @@ var mrcAComplete = {
 
             // Application.console.log("_timeOutSearchListener() ");
             // generate warnings for each remaining search
-            if (this.searchedAB.length > 0) {
-                for(let i=0, l=this.searchedAB.length ; i < l; i++) {
-                    this._addWarningTimeout(this.searchedAB[i]);
-                }
+            // if (this.searchedAB.length > 0) {
+                // for(let i=0, l=this.searchedAB.length ; i < l; i++) {
+                    // this._addWarningTimeout(this.searchedAB[i]);
+                // }
+            // }
+            let keys = Object.keys(this.searchedAB);
+            Application.console.log("_timeOutSearchListener() keys="+keys+":"+(typeof keys));
+            // for (let k in keys) {
+            for (let i=0, l=keys.length ; i<l; i++) {
+                let k = keys[i];
+                Application.console.log("k="+k);
+                this._addWarningTimeout(this.searchedAB[k].addressBook.dirName);
             }
+            
             // force search complete
-            this.searchedAB = [];
+            this._archiveSearchListeners(); // this.searchedAB = [];
             this._testSearchComplete();
         } else {
             // This timeout is obsolete : noting to do.
@@ -1758,7 +1827,8 @@ var mrcAComplete = {
     _testSearchComplete : function() {
         // Application.console.log("_testSearchComplete : "+this.searchedAB.length+", "+this.allListenersStarted);
         Application.console.log(now()+" _testSearchComplete : "+this.searchID);
-        if (this.searchedAB.length == 0 && this.allListenersStarted == true) {
+        let keys = Object.keys(this.searchedAB);
+        if (keys.length == 0 && this.allListenersStarted == true) {
             /*
              * Perform actions when ALL searches are completed.
              */
@@ -1812,6 +1882,7 @@ var mrcAComplete = {
             }
             if (this.cbSearch)
                 this.cbSearch();
+            Application.console.log("archiv="+this.searchedAB_archiv.length);
         }
     },
 
@@ -3265,6 +3336,9 @@ var mrcAComplete = {
         let meth = "_search_mode_"+this.param_mode;
         this.cbSearch = cbSearch
 
+        // stop the purge timeout 
+        clearTimeout(this.timeout_archiv);
+        
         // show panel with spinning image while searching
         let deck = document.getElementById('deckAutocompletePanel');
         deck.selectedIndex = this.DECK_WAITING;
@@ -3297,6 +3371,9 @@ var mrcAComplete = {
         } else {
             this.hidePopup();
         }
+        
+        // start the purge timeout 
+        this.timeout_archiv = setTimeout(this._purgeArchiv, this.DELAY_PURGE_ARCHIV);
     },
 
     infoTypeMore : function(aString, event, element) {
