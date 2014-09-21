@@ -1704,10 +1704,10 @@ var mrcAComplete = {
         // SPECIAL : 
         // As it is a call-back, we can't use 'this'
         // instead, we must use the let 'mrcAComplete'
-        Application.console.log("AVANT purge:"+mrcAComplete.searchedAB_archiv.join("||"));
+        // Application.console.log("AVANT purge:"+mrcAComplete.searchedAB_archiv.join("||"));
         let l = mrcAComplete.searchedAB_archiv.length;
         mrcAComplete.searchedAB_archiv.splice(0, l);
-        Application.console.log("APRES purge:"+mrcAComplete.searchedAB_archiv.join("||"));
+        // Application.console.log("APRES purge:"+mrcAComplete.searchedAB_archiv.join("||"));
     },
     
     _createHashSearchListener : function(searchListener) {
@@ -1718,7 +1718,7 @@ var mrcAComplete = {
         let temp = searchListener.addressBook.dirName + searchListener.searchID;
         // let hash = this._hashCode(temp); // no need to create a real hash
         let hash = temp;
-        Application.console.log("_createHashSearchListener : "+hash);
+        // Application.console.log("_createHashSearchListener : "+hash);
         return hash;
     },
     
@@ -1726,7 +1726,7 @@ var mrcAComplete = {
         this.allListenersStarted = false;
         this._archiveSearchListeners();
         this._initSearchID();
-        Application.console.log(now()+" _initSearchListeners : "+this.searchID);
+        // Application.console.log(now()+" _initSearchListeners : "+this.searchID);
     },
     
             
@@ -1734,14 +1734,14 @@ var mrcAComplete = {
         abSearchListener.hash = this._createHashSearchListener(abSearchListener);
         let key = abSearchListener.hash;
         this.searchedAB[key] = abSearchListener;
-        Application.console.log("_addSearchListener : "+abSearchListener.addressBook.URI+":"+abSearchListener.hash+", "+this.allListenersStarted);
+        // Application.console.log("_addSearchListener : "+abSearchListener.addressBook.URI+":"+abSearchListener.hash+", "+this.allListenersStarted);
     },
     
     _completeSearchListener : function(abSearchListener) {
         /*
          * Perform actions when a search is finished on ONE addressbook.
          */
-        Application.console.log(now()+" _completeSearchListener : "+abSearchListener.searchID+"/"+this.searchID+":"+abSearchListener.addressBook.dirName);
+        // Application.console.log(now()+" _completeSearchListener : "+abSearchListener.searchID+"/"+this.searchID+":"+abSearchListener.addressBook.dirName);
         if (abSearchListener.searchID == this.searchID) {
             // OK, it's a searchListener for current search
             switch(this.param_mode) {
@@ -1773,12 +1773,12 @@ var mrcAComplete = {
             }
             
             
-            Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":"+this.searchedAB+", "+this.allListenersStarted);
+            // Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":"+this.searchedAB+", "+this.allListenersStarted);
             // Then test if search is complete for all addressbooks.
             this._testSearchComplete();
         } else {
             // it's an obsolete searchListener : 
-            Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":obsolete = "+abSearchListener.searchID);
+            // Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":obsolete = "+abSearchListener.searchID);
         }
     },
     
@@ -1793,13 +1793,13 @@ var mrcAComplete = {
         if (originalSearchID == this.searchID) {
             // make any search obsolete
             this._obsoleteSearchID();
-            Application.console.log(now()+" _timeOutSearchListener : "+this.searchID);
+            // Application.console.log(now()+" _timeOutSearchListener : "+this.searchID);
 
             let keys = Object.keys(this.searchedAB);
-            Application.console.log("_timeOutSearchListener() keys="+keys+":"+(typeof keys));
+            // Application.console.log("_timeOutSearchListener() keys="+keys+":"+(typeof keys));
             for (let i=0, l=keys.length ; i<l; i++) {
                 let k = keys[i];
-                Application.console.log("k="+k);
+                // Application.console.log("k="+k);
                 this._addWarningTimeout(this.searchedAB[k].addressBook.dirName);
             }
             
@@ -1812,7 +1812,7 @@ var mrcAComplete = {
     },
 
     _testSearchComplete : function() {
-        Application.console.log(now()+" _testSearchComplete : "+this.searchID);
+        // Application.console.log(now()+" _testSearchComplete : "+this.searchID);
         let keys = Object.keys(this.searchedAB);
         if (keys.length == 0 && this.allListenersStarted == true) {
             /*
@@ -1868,7 +1868,7 @@ var mrcAComplete = {
             }
             if (this.cbSearch)
                 this.cbSearch();
-            Application.console.log("archiv="+this.searchedAB_archiv.length);
+            // Application.console.log("archiv="+this.searchedAB_archiv.length);
         }
     },
 
@@ -3310,7 +3310,7 @@ var mrcAComplete = {
          * return :
          *   none
          */
-        Application.console.log(now()+" search() "+this.searchID);
+        // Application.console.log(now()+" search() "+this.searchID);
         this.datas = {}; // TODO : check if it's the right way to empty dictionary
         this.errors = [];
         this.warnings = [];
@@ -3644,7 +3644,7 @@ var mrcAComplete = {
         } else {
             // --> enter his email in the text
             email = card.text;
-            Application.console.log("EMAIL = "+email);
+            // Application.console.log("EMAIL = "+email);
         }
         this._elementInsertInPart(this.currentTextBox, this.currentTextBox.selectionStart, email);
         this.updateNbRecipients(this.currentTextBox);
@@ -3870,7 +3870,7 @@ function mrcRecipientKeyUp(event, element) {
      */
     // www.the-art-of-web.com/javascript/escape
     gContentChanged=true;
-    Application.console.log("keyCode="+event.keyCode);
+    // Application.console.log("keyCode="+event.keyCode);
     let sel = element.selectionStart;
     let textPart = mrcAComplete.getCurrentPart(element.value, sel).trim();    
     let canUpdatePanel = true;
@@ -3930,7 +3930,7 @@ function mrcRecipientKeyUp(event, element) {
                 // no need to search
                 canUpdatePanel = false;
             } else {
-                Application.console.log("texPart changed:"+textPart);
+                // Application.console.log("texPart changed:"+textPart);
                 // no need to update UI
                 canUpdateUI = false;
                 // need to search
@@ -3979,16 +3979,16 @@ function mrcRecipientKeyUp(event, element) {
             if (res && res.length > 0) {
                 // we extract the pure email
                 let raw = res[0];
-                Application.console.log("raw:'"+raw+"'");
+                // Application.console.log("raw:'"+raw+"'");
                 textPart = raw.slice(2,-1);
-                Application.console.log("new textPart:'"+textPart+"'");
+                // Application.console.log("new textPart:'"+textPart+"'");
                 
             }
                     
                     
             if (mrcAComplete.needSearch(textPart)) {
                 // perform search
-                Application.console.log("searching:'"+textPart+"'");
+                // Application.console.log("searching:'"+textPart+"'");
                 mrcAComplete.search(textPart, event, element, function callback_search() { 
                         mrcAComplete.finishSearch(textPart, event, element) 
                     } );
