@@ -2059,6 +2059,11 @@ var mrcAComplete = {
                                     cbObject : that,
                                     localRes : [],
                                     
+                                    // special LDAP : keep refs of local var to prevent any GC (--> crashes)
+                                    _query : query,
+                                    _attrs : attributes,
+                                    _args : args,
+                                    
                                     onSearchFinished : function(aResult, aErrorMesg) {
                                         if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
                                             this.cbObject._completeSearchListener(this);
@@ -2306,6 +2311,11 @@ var mrcAComplete = {
                                 localRes2 : [],
                                 localRes3 : [],
 
+                                // special LDAP : keep refs of local var to prevent any GC (--> crashes)
+                                _query : query1,
+                                _attrs : attributes1,
+                                _args : args1,
+
                                 onSearchFinished : function(aResult, aErrorMesg) {
                                     if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
                                         this.cbObject._completeSearchListener(this);
@@ -2361,6 +2371,11 @@ var mrcAComplete = {
                                 localRes2 : [],
                                 localRes3 : [],
 
+                                // special LDAP : keep refs of local var to prevent any GC (--> crashes)
+                                _query : query2,
+                                _attrs : attributes2,
+                                _args : args2,
+
                                 onSearchFinished : function(aResult, aErrorMesg) {
                                     if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
                                         this.cbObject._completeSearchListener(this);
@@ -2399,6 +2414,11 @@ var mrcAComplete = {
                                 isRemote : true,
                                 cbObject : that,
                                 localRes : null,
+
+                                // special LDAP : keep refs of local var to prevent any GC (--> crashes)
+                                _query : queryXX,
+                                _attrs : attributesXX,
+                                _args : argsXX,
 
                                 onSearchFinished : function(aResult, aErrorMesg) {
                                     if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
@@ -2538,6 +2558,11 @@ var mrcAComplete = {
                                     cbObject : that,
                                     localRes : [],
                                     
+                                    // special LDAP : keep refs of local var to prevent any GC (--> crashes)
+                                    _query : query,
+                                    _attrs : attributes,
+                                    _args : args,
+
                                     onSearchFinished : function(aResult, aErrorMesg) {
                                         if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
                                             this.cbObject._completeSearchListener(this);
