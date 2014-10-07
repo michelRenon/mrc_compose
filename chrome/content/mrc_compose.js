@@ -456,9 +456,17 @@ function now() {
 }
 
 // from http://stackoverflow.com/questions/1374126/how-to-extend-an-array-with-an-existing-javascript-array
-Array.prototype.extend = function (other_array) {
-    /* you should include a test to check whether other_array really is an array */
+/*
+ * incompatible with TB
+ * 
+Array.prototype.mrc_extend = function (other_array) {
+    // you should include a test to check whether other_array really is an array 
     other_array.forEach(function(v) {this.push(v)}, this);    
+}
+*/
+function array_extend(src_array, other_array) {
+    // you should include a test to check whether other_array really is an array 
+    other_array.forEach(function(v) {this.push(v)}, src_array);    
 }
 
 
@@ -1747,14 +1755,18 @@ var mrcAComplete = {
             switch(this.param_mode) {
                 case 1:
                     // Add results for current searchListenet in global results
-                    this.search_res1.extend(abSearchListener.localRes);
+                    // this.search_res1.mrc_extend(abSearchListener.localRes);
+                    array_extend(this.search_res1, abSearchListener.localRes);
                     break;
                     
                 case 2:
                     // Add results for current searchListenet in global results
-                    this.search_res1.extend(abSearchListener.localRes1);
-                    this.search_res2.extend(abSearchListener.localRes2);
-                    this.search_res3.extend(abSearchListener.localRes3);
+                    // this.search_res1.mrc_extend(abSearchListener.localRes1);
+                    // this.search_res2.mrc_extend(abSearchListener.localRes2);
+                    // this.search_res3.mrc_extend(abSearchListener.localRes3);
+                    array_extend(this.search_res1, abSearchListener.localRes1);
+                    array_extend(this.search_res2, abSearchListener.localRes2);
+                    array_extend(this.search_res3, abSearchListener.localRes3);
                     break;
                     
                 case 3:
