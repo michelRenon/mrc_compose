@@ -3366,6 +3366,10 @@ var mrcAComplete = {
         
         try {
             this[meth](aString);
+            // DEBUG : 
+            // Force some GC to simulate some low-memory context found by some users.
+            // For LDAP searches, it brings some crashes until all variables where referenced.
+            // Components.utils.forceGC();
         } catch (e) {
             this._logError(e, "SEARCH()");
         }
