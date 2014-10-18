@@ -3388,7 +3388,9 @@ var mrcAComplete = {
          */
         this.lastQuery = aString;
         this.lastQueryTime = new Date().getTime()
-        if (this.nbDatas > 0) {
+        // Is there something to show ? results, warnings or errors ?
+        let nb = this.nbDatas + this.warnings+length + this.errors.length;
+        if (nb > 0) {
             this.buildResultList(aString);
             this.openPopup(event, element);
         } else {
