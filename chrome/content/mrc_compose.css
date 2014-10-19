@@ -164,12 +164,6 @@
     padding : 0;
 }
 
-#msgAutocompletePanelDiv .info-error {
-    text-align: right;
-    font-style: italic;
-    color: #888;
-}
-
 #msgAutocompletePanelDiv .alert-warning {
     /* from bootstrap theme */
     background-color: #fcf8e3;
@@ -184,6 +178,19 @@
     padding : 0;
 }
 
+#msgAutocompletePanelDiv .alert-info {
+    /* from bootstrap theme */
+    background-color: #d9edf7;
+    border: 1px solid #d1cfea; /* #9acfe */
+    border-radius: 4px;
+    color: #31708f;
+    padding: 3px 5px 3px 5px;
+}
+
+#msgAutocompletePanelDiv .alert-info p {
+    margin : 0;
+    padding : 0;
+}
 
 
 /*

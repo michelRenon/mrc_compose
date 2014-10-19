@@ -495,9 +495,9 @@ var mrcAComplete = {
     NBINGROUP_CLASSNAME : "nbingroup",
     POPULARITY_CLASSNAME : "popularity",
     HIDDENNAME_CLASSNAME : "hiddenname",
-    ERROR_CLASSNAME : "alert-error",
-    ERRORINFO_CLASSNAME : "info-error",
-    WARNING_CLASSNAME : "alert-warning",
+    ALERT_INFO_CLASSNAME : "alert-info",
+    ALERT_ERROR_CLASSNAME : "alert-error",
+    ALERT_WARNING_CLASSNAME : "alert-warning",
     
     // html namespace in order to integrate html elements into xul
     HTMLNS : "http://www.w3.org/1999/xhtml",
@@ -684,6 +684,8 @@ var mrcAComplete = {
     errors : [],
     // the warnings reported when searching
     warnings : [],
+    // the infos repoerted when searching
+    infos : [],
     // uniq id of each future search :
     // will allow handling of several callback returns of ldap searches
     // and filter obsolete ones
@@ -2863,6 +2865,28 @@ var mrcAComplete = {
             return false;
     },
 
+    _buildResultInfos : function(popupDiv) {
+        /*
+         * Add informations about search informations.
+         * 
+         * params :
+         *   popupDiv : the html element in which we have to add informations
+         * return :
+         *   none
+         */
+        if (this.infos.length > 0) {
+            // only one error div, with several lines (one for each warning)
+            let infoDiv = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
+            infoDiv.setAttribute("class", " "+this.INFO_CLASSNAME);
+            for (let i=0, len=this.infos.length ; i < len ; i++) {
+                let pDiv = document.createElementNS("http://www.w3.org/1999/xhtml", "p");
+                pDiv.appendChild(document.createTextNode(this.infos[i]));
+                infoDiv.appendChild(pDiv);
+            }
+            popupDiv.appendChild(infoDiv);
+        }
+    },
+
     _buildResultWarnings : function(popupDiv) {
         /*
          * Add informations about search warnings.
@@ -2876,7 +2900,7 @@ var mrcAComplete = {
         if (this.warnings.length > 0) {
             // only one error div, with several lines (one for each warning)
             let errorDiv = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
-            errorDiv.setAttribute("class", " "+this.WARNING_CLASSNAME);
+            errorDiv.setAttribute("class", " "+this.ALERT_WARNING_CLASSNAME);
             for (let i=0, len=this.warnings.length ; i < len ; i++) {
                 let pDiv = document.createElementNS("http://www.w3.org/1999/xhtml", "p");
                 pDiv.appendChild(document.createTextNode(this.warnings[i]));
@@ -2898,7 +2922,7 @@ var mrcAComplete = {
         if (this.errors.length > 0) {
             // only one error div, with several lines (one for each error)
             let errorDiv = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
-            errorDiv.setAttribute("class", " "+this.ERROR_CLASSNAME);
+            errorDiv.setAttribute("class", " "+this.ALERT_ERROR_CLASSNAME);
             for (let i=0, len=this.errors.length ; i < len ; i++) {
                 let pDiv = document.createElementNS("http://www.w3.org/1999/xhtml", "p");
                 pDiv.appendChild(document.createTextNode(this.errors[i]));
@@ -2907,7 +2931,7 @@ var mrcAComplete = {
 
             // more info message
             let div = document.createElementNS(this.HTMLNS, "div");
-            div.setAttribute("class", " "+this.ERRORINFO_CLASSNAME);
+            div.setAttribute("class", " "+this.INFO_CLASSNAME);
             div.appendChild(document.createTextNode(this.getString('more_info_see_console')));
             errorDiv.appendChild(div);
 
@@ -3351,6 +3375,7 @@ var mrcAComplete = {
         this.datas = {}; // TODO : check if it's the right way to empty dictionary
         this.errors = [];
         this.warnings = [];
+        this.infos = [];
         this.nbDatas = 0;
         let meth = "_search_mode_"+this.param_mode;
         this.cbSearch = cbSearch
@@ -3388,8 +3413,9 @@ var mrcAComplete = {
          */
         this.lastQuery = aString;
         this.lastQueryTime = new Date().getTime()
-        // Is there something to show ? results, warnings or errors ?
-        let nb = this.nbDatas + this.warnings+length + this.errors.length;
+        // Is there something to show ? results, infos, warnings or errors ?
+        let nb = this.nbDatas + this.infos.length + this.warnings.length + this.errors.length;
+        // Application.console.log("finishSearch, nb="+nb);
         if (nb > 0) {
             this.buildResultList(aString);
             this.openPopup(event, element);
