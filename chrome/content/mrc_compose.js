@@ -1880,6 +1880,11 @@ var mrcAComplete = {
                     // Nothing, already done.
                     break;
             }
+            
+            if (this.nbDatas == 0) {
+                this._addInfoNoResult();
+            }
+            
             if (this.cbSearch)
                 this.cbSearch();
             // Application.console.log("archiv="+this.searchedAB_archiv.length);
@@ -1902,6 +1907,19 @@ var mrcAComplete = {
         this._testSearchComplete();
     },
     
+    _addInfoNoResult : function() {
+        /*
+         * Add an info message saying that no results have been found.
+         * 
+         * params :
+         *   None
+         * return
+         *   none
+         */
+        let message = this.getString("no_result");
+        this.infos.push(message);
+    },
+
     _addErrorAddressBook : function(ab_name) {
         /*
          * Add an error message for an addressBook name
@@ -2877,7 +2895,7 @@ var mrcAComplete = {
         if (this.infos.length > 0) {
             // only one error div, with several lines (one for each warning)
             let infoDiv = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
-            infoDiv.setAttribute("class", " "+this.INFO_CLASSNAME);
+            infoDiv.setAttribute("class", " "+this.ALERT_INFO_CLASSNAME);
             for (let i=0, len=this.infos.length ; i < len ; i++) {
                 let pDiv = document.createElementNS("http://www.w3.org/1999/xhtml", "p");
                 pDiv.appendChild(document.createTextNode(this.infos[i]));
@@ -2977,6 +2995,8 @@ var mrcAComplete = {
             }
         }
         
+        // Add infos if there are some
+        this._buildResultInfos(popupDiv);
         // Add infos about warnings if there are some
         this._buildResultWarnings(popupDiv);
         // Add infos about errors if there are some
@@ -3030,6 +3050,8 @@ var mrcAComplete = {
             }
         }
 
+        // Add infos if there are some
+        this._buildResultInfos(popupDiv);
         // Add infos about warnings if there are some
         this._buildResultWarnings(popupDiv);
         // Add infos about errors if there are some
@@ -3088,6 +3110,8 @@ var mrcAComplete = {
             }
         }
 
+        // Add infos if there are some
+        this._buildResultInfos(popupDiv);
         // Add infos about warnings if there are some
         this._buildResultWarnings(popupDiv);
         // Add infos about errors if there are some
