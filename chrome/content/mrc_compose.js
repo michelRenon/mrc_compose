@@ -635,6 +635,9 @@ var mrcAComplete = {
     // (temporary) : allow user to select code for LDAP Searches
     param_ldap_search_version : "TB24",
     
+    // show panel with info "no result" if no result found
+    param_show_no_result : false,
+    
     // store above constants as options (modifiable by user)
     prefs : null,
     
@@ -768,6 +771,7 @@ var mrcAComplete = {
         this.param_search_ab_URI = this.prefs.getCharPref("search_ab_URI");
         this.param_first_load_done = this.prefs.getBoolPref("first_load_done");
         this.param_ldap_search_version = this.prefs.getCharPref("ldap_search_version");
+        this.param_show_no_result = this.prefs.getBoolPref('show_no_result');
         
         this.field_states['fieldCC'].force = this.prefs.getBoolPref("force_cc");
         this.field_states['fieldBCC'].force = this.prefs.getBoolPref("force_bcc");
@@ -873,7 +877,9 @@ var mrcAComplete = {
             case "ldap_search_version":
                 this.param_ldap_search_version = this.prefs.getCharPref("ldap_search_version");
                 break;
-
+            case "show_no_result":
+                this.param_show_no_result = this.prefs.getBoolPref("show_no_result");
+                break;
         }
     },
 
@@ -1881,7 +1887,7 @@ var mrcAComplete = {
                     break;
             }
             
-            if (this.nbDatas == 0) {
+            if (this.nbDatas == 0 && this.param_show_no_result) {
                 this._addInfoNoResult();
             }
             

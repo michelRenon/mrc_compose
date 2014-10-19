@@ -39,6 +39,7 @@
 <!ENTITY options.sort_field_2.label "Nom">
 <!ENTITY options.sort_field_3.label "Prénom">
 <!ENTITY options.show_popularity.label "Affiche Popularité (?) : ">
+<!ENTITY options.show_no_result.label "Affiche 'Aucun résultat' (?) : ">
 
 <!-- tab 2 -->
 <!ENTITY options.min_recipients_show.label "Afficher nb destinataires à partir de (?) : ">     <!-- min_recipients_show -->

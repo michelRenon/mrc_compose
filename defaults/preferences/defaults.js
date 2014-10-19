@@ -29,3 +29,5 @@ pref("extensions.mrccompose.first_focus_reply", 'content-frame');
 pref("extensions.mrccompose.first_focus_reply_html", 'default');
 
 pref("extensions.mrccompose.ldap_search_version", 'TB24');
+
+pref("extensions.mrccompose.show_no_result", false);
