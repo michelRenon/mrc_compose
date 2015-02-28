@@ -167,7 +167,7 @@ function Recipients2CompFields(msgCompFields)
     msgCompFields.replyTo = addrReply;
     msgCompFields.newsgroups = addrNg;
     msgCompFields.followupTo = addrFollow;
-    msgCompFields.otherRandomHeaders = addrOther;
+    // msgCompFields.otherRandomHeaders = addrOther; // TB38
   }
   else
     dump("Message Compose Error: msgCompFields is null (ExtractRecipients)");
@@ -3540,10 +3540,10 @@ var mrcAComplete = {
          * return :
          *   none
          */
-        let newIndex = Math.min(newIndex, this.panelCards.length);
-        newIndex = Math.max(newIndex, 1);
+        let tempIndex = Math.min(newIndex, this.panelCards.length);
+        tempIndex = Math.max(tempIndex, 1);
         this._unSelectCurrent();
-        this._select(newIndex);    
+        this._select(tempIndex);
     },
 
     updateFieldVisibilityOnLoad : function(field) {
@@ -3560,8 +3560,8 @@ var mrcAComplete = {
             // Ensure height can change.
             mrcCompose_WORKAROUND_Height();
             try{
-                let element = document.getElementById(this.FIELDS[field].txtId);
-                let nbRecipients = this._getNbRecipients(element.value);
+                let fieldElement = document.getElementById(this.FIELDS[field].txtId);
+                let nbRecipients = this._getNbRecipients(fieldElement.value);
                 let idBox = this.FIELDS[field].boxId;
                 let box = document.getElementById(idBox);
                 if (nbRecipients==0 && !this.field_states[field].force) {
