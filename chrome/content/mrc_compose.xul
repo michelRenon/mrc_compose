@@ -70,7 +70,7 @@
     -->
     
     <!-- hide the button "contacts" in the toolbar -->
-    <toolbarbutton id="button-contacts" collapsed="true" />
+    <!-- <toolbarbutton id="button-contacts" collapsed="true" /> -->
 
     <!-- remove handler of splitter
     <splitter id="compose-toolbar-sizer" onmousedown="" />
