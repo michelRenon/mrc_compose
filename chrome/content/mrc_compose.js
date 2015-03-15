@@ -438,6 +438,12 @@ function debug_obj(obj){
     Application.console.log(txt);
 }
 
+function _get(obj, field_name, default_value) {
+    if (obj.hasOwnProperty(field_name))
+        return obj[field_name]
+    else
+        return default_value;    
+}
 
 function now() {
     let currentdate = new Date(); 
@@ -1620,9 +1626,19 @@ var mrcAComplete = {
         // store cards as properties of an object, the name of property being the unique field !!
         let obj = {};
         for (let i=0, l=arr.length ; i<l; i++) {
-            // we store only the first occurence of duplicates
-            if (!obj[arr[i].primaryEmail])
-                obj[arr[i].primaryEmail] = arr[i];
+            try {
+                // we store only the first occurence of duplicates
+                // if (!obj[arr[i].primaryEmail])
+                //    obj[arr[i].primaryEmail] = arr[i];
+                let prop = _get(arr[i], "primaryEmail", "");
+                let prop2 = _get(obj, prop, "");
+                if (prop2 == "")
+                    obj[prop] = arr[i];
+
+            } catch (e) {
+                this._logError(e, "_removeDuplicatecards()");
+                debugLDAP(now()+" EXCEPTION _removeDuplicatecards() : "+e);
+            }
         }
         // obj nows contains unique properties
         // build a std array cards
