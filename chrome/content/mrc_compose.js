@@ -1722,6 +1722,9 @@ var mrcAComplete = {
         let keys = Object.keys(this.searchedAB);
         for (let i=0, l=keys.length ; i<l; i++) {
             let k = keys[i];
+            // Stop LDAP query
+            this.searchedAB[k]._query.stopQuery(0);
+
             this.searchedAB_archiv.push(this.searchedAB[k]);
             delete this.searchedAB[k];
         }
@@ -1805,6 +1808,10 @@ var mrcAComplete = {
             // remove listener from searched list
             let key = abSearchListener.hash;
             if (key in this.searchedAB) {
+                // Stop if LDAP query
+                if (this.searchedAB[key].hasOwnProperty("_query")) {
+                    this.searchedAB[key]._query.stopQuery(0);
+                }
                 delete this.searchedAB[key];
             }
             
