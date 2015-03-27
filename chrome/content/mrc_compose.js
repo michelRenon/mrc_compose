@@ -1637,7 +1637,6 @@ var mrcAComplete = {
 
             } catch (e) {
                 this._logError(e, "_removeDuplicatecards()");
-                debugLDAP(now()+" EXCEPTION _removeDuplicatecards() : "+e);
             }
         }
         // obj nows contains unique properties
