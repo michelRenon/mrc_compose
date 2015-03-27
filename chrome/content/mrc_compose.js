@@ -624,6 +624,13 @@ var mrcAComplete = {
     //     * : fields are 'PrimaryEmail', 'FirstName', 'LastName', 'NickName' for contacts
     //         fields is 'LastName' for list
     //
+    // - 4
+    //    the list contains 1 part :
+    //       - 'begin' : contacts & lists whose fields(*) begin with X
+    //
+    //     * : fields are 'PrimaryEmail', 'FirstName', 'LastName', 'NickName' for contacts
+    //         fields is 'LastName' for list
+    //
     param_mode : 1, 
     
     // the list of ab where search is performed
@@ -1803,6 +1810,12 @@ var mrcAComplete = {
                     this.datas[abSearchListener.addressBook.dirName] = abSearchListener.localRes;
                     this.nbDatas += abSearchListener.localRes.length;
                     break;
+
+                case 4:
+                    // Add results for current searchListenet in global results
+                    // this.search_res1.mrc_extend(abSearchListener.localRes);
+                    array_extend(this.search_res1, abSearchListener.localRes);
+                    break;
             }
             // remove listener from searched list
             let key = abSearchListener.hash;
@@ -1907,6 +1920,16 @@ var mrcAComplete = {
                 case 3:
                     // Nothing, already done.
                     break;
+
+                case 4:
+                    // 
+                    this.search_res1 = this._removeDuplicatecards(this.search_res1);
+                    this.search_res1.sort(this._sort_card);
+
+                    this.datas = {'begin' : this.search_res1};
+                    this.nbDatas = this.search_res1.length;
+                    break;
+                    
             }
             
             if (this.nbDatas == 0 && this.param_show_no_result) {
@@ -2680,6 +2703,195 @@ var mrcAComplete = {
         this._startWaitingSearchListeners();
     },
 
+    _search_mode_4 : function(aString) {
+        /*
+         * search for mode 4, put results in internal fields
+         * 
+         * the list contains 1 part :
+         *   'begin' : contacts & lists whose fields begins with X
+         * 
+         * params :
+         *   aString : the text to search in fields of address book
+         *   cbSearch : the callback when search is done
+         * return:
+         *   none
+         */
+        // use DisplayName and NickName
+        let baseQuery = "(or(PrimaryEmail,@C,@V)(SecondEmail,@C,@V)(FirstName,@C,@V)(LastName,@C,@V)(DisplayName,@C,@V)(NickName,@C,@V))";
+        
+        // one search : CONTAINS     
+        let searchQuery1 = baseQuery.replace(/@C/g, 'bw');
+        searchQuery1 = searchQuery1.replace(/@V/g, encodeURIComponent(aString));
+        // ldap query template
+        let filterTemplate = "(|(mail=%v*)(givenName=%v*)(sn=%v*)(displayName=%v*)(cn=%v*))";
+        
+        let allAddressBooks = this.abManager.directories;
+        
+        // init listeners
+        this._initSearchListeners();
+        
+        while (allAddressBooks.hasMoreElements()) {
+            let ab = allAddressBooks.getNext();
+            if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
+                // recherche 1
+                // Application.console.log("AB LOCAL = " + ab.dirName);
+                let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
+                if (doSearch) {
+                    try {
+                        // add a sync search listener
+                        let that = this;
+                        let abSearchListener = {
+                            searchID : this.searchID,
+                            addressBook : ab,
+                            isRemote : false,
+                            cbObject : that,
+                            localRes : [],
+                        }
+                        this._addSearchListener(abSearchListener);
+
+                        let childCards1 = this.abManager.getDirectory(ab.URI + "?" + searchQuery1).childCards;  
+                        while (childCards1.hasMoreElements()) {
+                            let card = childCards1.getNext();
+                            if (card instanceof Components.interfaces.nsIAbCard) {
+                                // a list has no email, but we want to keep it
+                                if (card.isMailList) {
+                                    abSearchListener.localRes.push(this._createMyCard(card));
+                                } else if (card.primaryEmail != "")
+                                    // filter real cards without email
+                                    abSearchListener.localRes.push(this._createMyCard(card));
+                            }
+                        }
+                        
+                        // finish the listener
+                        this._completeSearchListener(abSearchListener);
+                    } catch (e) {
+                        this._addErrorAddressBook(ab.dirName);
+                        this._logError(e, "_search_mode_4()");
+                    }
+                }
+            } else {
+                if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
+                    // Application.console.log("param_search="+this.param_search_ab_URI+" ; ab.URI="+ab.URI)
+                    // check if user wants to search in this AB
+                    let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
+                    if (doSearch) {
+                        try {
+                            // Application.console.log("AB LDAP = " + ab.dirName);
+                            /* CODE FOR TB 24 to 31? */
+                            // if (this.param_ldap_search_version == 'TB24') {
+                            if (true) {
+                                // Application.console.log(ab.dirName+" : LDAP search TB24");
+                                let query =
+                                    Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
+                                            .createInstance(Components.interfaces.nsIAbDirectoryQuery);
+
+                                let attributes =
+                                    Components.classes["@mozilla.org/addressbook/ldap-attribute-map;1"]
+                                            .createInstance(Components.interfaces.nsIAbLDAPAttributeMap);
+                                attributes.setAttributeList("DisplayName",
+                                    ab.attributeMap.getAttributeList("DisplayName", {}), true);
+                                attributes.setAttributeList("PrimaryEmail",
+                                    ab.attributeMap.getAttributeList("PrimaryEmail", {}), true);
+
+                                let args =
+                                    Components.classes["@mozilla.org/addressbook/directory/query-arguments;1"]
+                                            .createInstance(Components.interfaces.nsIAbDirectoryQueryArguments);
+
+                                // Create filter from filter template and search string
+                                let ldapSvc = Components.classes["@mozilla.org/network/ldap-service;1"]
+                                                        .getService(Components.interfaces.nsILDAPService);
+                                let filterPrefix = "";
+                                let filterSuffix = "";
+                                let filterAttr = "";
+                                let filter = ldapSvc.createFilter(1024, filterTemplate, filterPrefix, filterSuffix, filterAttr, aString);
+                                if (!filter)
+                                    throw new Error("Filter string is empty, check if filterTemplate variable is valid in prefs.js.");
+
+                                args.typeSpecificArg = attributes;
+                                args.querySubDirectories = true;
+                                args.filter = filter;
+
+                                // add an async search listener
+                                let that = this;
+                                let abDirSearchListener = {
+                                    searchID : this.searchID,
+                                    addressBook : ab,
+                                    isRemote : true,
+                                    cbObject : that,
+                                    localRes : [],
+                                    
+                                    // special LDAP : keep refs of local var to prevent any GC (--> crashes)
+                                    _query : query,
+                                    _attrs : attributes,
+                                    _args : args,
+                                    
+                                    onSearchFinished : function(aResult, aErrorMesg) {
+                                        if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
+                                            this.cbObject._completeSearchListener(this);
+                                        }
+                                    },
+
+                                    onSearchFoundCard : function(aCard) {
+                                        this.localRes.push(this.cbObject._createMyCard(aCard));
+                                    }
+                                };
+
+                                this._addSearchListener(abDirSearchListener);
+                                query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
+                            } else {
+                                // Application.console.log(ab.dirName+" : LDAP search TB31");
+                                /* CODE FOR TB >= 29 */
+                                /*
+                                let that = this;
+                               
+                                function acObserver() {}
+
+                                acObserver.prototype = {
+                                    _search: null,
+                                    _result: null,
+                                    searchID : this.searchID,
+                                    addressBook : ab,
+                                    isRemote : true,
+                                    cbObject : that,
+                                    localRes : null,
+
+                                    onSearchResult: function (aSearch, aResult) {
+                                        this._search = aSearch;
+                                        this._result = aResult;
+                                        for (var i = 0; i < aResult.matchCount; i++) {
+                                            aResult.QueryInterface(Components.interfaces.nsIAbAutoCompleteResult);
+                                            var aCard = aResult.getCardAt(i);
+                                            this.cbObject.search_res1.push(this.cbObject._createMyCard(aCard));
+                                        }
+                                        this.cbObject._completeSearchListener(this);
+                                    },
+
+                                    onUpdateSearchResult: function(search, result) {}
+                                };
+
+                                var acs = Components.classes["@mozilla.org/autocomplete/search;1?name=ldap"]
+                                    .getService(Components.interfaces.nsIAutoCompleteSearch);
+
+                                var params = JSON.stringify({ idKey: gCurrentIdentity.key });
+
+                                var obs = new acObserver();
+                                acs.startSearch(aString, params, null, obs);
+
+                                this._addSearchListener(obs);
+                                */
+                            }
+                        } catch (e) {
+                            this._addErrorAddressBook(ab.dirName);
+                            this._logError(e, "_search_mode_4()");
+                        }
+                    }
+                }
+            }
+        }
+        
+        this._startWaitingSearchListeners();
+    },
+
     _buildOneResult_Card : function(card, textBold, typeSearch, primaryEmail) {
         /*
          * call-back to build text for one card.
@@ -3153,6 +3365,60 @@ var mrcAComplete = {
         // we take care of memory : emptying unused arrays: 
         for (let i in this.datas)
             this.datas[i].length = 0;
+    },
+
+    _buildResultList_mode_4 : function(textBold) {
+        /*
+         * build the html list of results for mode 4, with results of search
+         * 
+         * params :
+         *   textBold : the searched text, that will be written in bold
+         * return :
+         *   none
+         */
+        // remove old elements
+        let popupDiv = document.getElementById("msgAutocompletePanelDiv");
+        removeChildren(popupDiv);
+        // empty associated internals fields
+        this.panelCards.length = 0;
+        this.indexSelectedCard = -1;
+        
+        // we build div for every part
+        let divs = [];
+        let params = [ {'data' : 'begin', 'cb' : this._buildOneResult_CardList, 'search' : 'begin', 'text_part' : textBold}, 
+                     ];
+        for (let i=0, len=params.length ; i < len ; i++) {
+            let res = this._buildOnePart(params[i]);
+            if (res) {
+                divs.push(res);
+            }
+        }
+
+        // we assemble divs with separators
+        for (let i=0, len=divs.length ; i < len ; i++) {
+            popupDiv.appendChild(divs[i]);
+            if (i < len-1) {
+                // if it's not last, add a separator
+                let sep = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
+                sep.className += " "+this.SEP_CLASSNAME;
+                popupDiv.appendChild(sep);
+            }
+        }
+        
+        // Add infos if there are some
+        this._buildResultInfos(popupDiv);
+        // Add infos about warnings if there are some
+        this._buildResultWarnings(popupDiv);
+        // Add infos about errors if there are some
+        this._buildResultErrors(popupDiv);
+        
+        // select first element
+        if (this.nbDatas > 0) {
+            this._select(1);
+        }
+
+        // we take care of memory : emptying unused arrays: 
+        this.datas['begin'].length = 0;
     },
 
     _doEmptyPanel : function() {

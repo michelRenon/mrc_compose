@@ -164,6 +164,7 @@
                                 <label control="mode" value="&options.mode.label;" tooltip="mrctip"/>
                                 <menulist id="mode" preference="pref_mode" tooltip="mrctip">
                                     <menupopup>
+                                        <menuitem label="&options.mode_value4.label;" value="4"/>
                                         <menuitem label="&options.mode_value1.label;" value="1"/>
                                         <menuitem label="&options.mode_value2.label;" value="2"/>
                                         <menuitem label="&options.mode_value3.label;" value="3"/>

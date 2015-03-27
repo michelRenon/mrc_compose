@@ -31,6 +31,7 @@
 <!ENTITY options.mode_value1.label "1 : All contacts contain">
 <!ENTITY options.mode_value2.label "2 : All contacts begin with / All contacts contain">
 <!ENTITY options.mode_value3.label "3 : Each AddressBook">
+<!ENTITY options.mode_value4.label "0 : All contacts begin with">
 <!ENTITY options.max_elements_part_menu.label "Max nb line in each part (?): ">
 <!ENTITY options.sort_field_level_1.label "Sort 1: ">
 <!ENTITY options.sort_field_level_2.label "Sort 2: ">

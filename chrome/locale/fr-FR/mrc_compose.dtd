@@ -31,6 +31,7 @@
 <!ENTITY options.mode_value1.label "1 : Tous les contacts contenant">
 <!ENTITY options.mode_value2.label "2 : Tous les contacts commençant par / Tous les contacts contenant">
 <!ENTITY options.mode_value3.label "3 : Chaque Carnet d'Adresses">
+<!ENTITY options.mode_value4.label "0 : Tous les contacts commençant par">
 <!ENTITY options.max_elements_part_menu.label "Nb ligne max dans chaque partie (?) : ">
 <!ENTITY options.sort_field_level_1.label "Tri 1 : ">
 <!ENTITY options.sort_field_level_2.label "Tri 2 : ">
