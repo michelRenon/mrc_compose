@@ -241,73 +241,116 @@ function CompFields2Recipients(msgCompFields)
 
 function LoadIdentity(startup)
 {
-    let identityElement = GetMsgIdentityElement();
-    let prevIdentity = gCurrentIdentity;
+    var identityElement = document.getElementById("msgIdentity");
+    var prevIdentity = gCurrentIdentity;
 
     if (identityElement) {
-        let idKey = identityElement.value;
-        gCurrentIdentity = Components.classes["@mozilla.org/messenger/account-manager;1"].getService(Components.interfaces.nsIMsgAccountManager).getIdentity(idKey);
-        
-        if (!startup && prevIdentity && idKey != prevIdentity.key) {
-            let prefstring = "mail.identity." + prevIdentity.key;
-            if (typeof RemoveDirectoryServerObserver === "function")
-                RemoveDirectoryServerObserver(prefstring);
+        var idKey = identityElement.value; // TB24, TB31
+        var idKey = identityElement.selectedItem.getAttribute("identitykey"); // TB38
+        gCurrentIdentity = MailServices.accounts.getIdentity(idKey);
+        /*
+        let accountKey = null;
+        // Set the account key value on the menu list.
+        if (identityElement.selectedItem) {
+          accountKey = identityElement.selectedItem.getAttribute("accountkey");
+          identityElement.setAttribute("accountkey", accountKey);
+          hideIrrelevantAddressingOptions(accountKey);
+        }
 
-            let prevReplyTo = prevIdentity.replyTo;
-            let prevCc = "";
-            let prevBcc = "";
-            let prevReceipt = prevIdentity.requestReturnReceipt;
-            let prevDSN = prevIdentity.requestDSN;
-            let prevAttachVCard = prevIdentity.attachVCard;
+        let maxRecipients = awGetMaxRecipients();
+        for (let i = 1; i <= maxRecipients; i++)
+        {
+          let params = JSON.parse(awGetInputElement(i).searchParam);
+          params.idKey = idKey;
+          params.accountKey = accountKey;
+          awGetInputElement(i).searchParam = JSON.stringify(params);
+        }
+        */
+        if (!startup && prevIdentity && idKey != prevIdentity.key)
+        {
+          var prevReplyTo = prevIdentity.replyTo;
+          var prevCc = "";
+          var prevBcc = "";
+          var prevReceipt = prevIdentity.requestReturnReceipt;
+          var prevDSN = prevIdentity.DSN;
+          var prevAttachVCard = prevIdentity.attachVCard;
 
-            if (prevIdentity.doCc)
-                prevCc += prevIdentity.doCcList;
+          if (prevIdentity.doCc)
+            prevCc += prevIdentity.doCcList;
 
-            if (prevIdentity.doBcc)
-                prevBcc += prevIdentity.doBccList;
+          if (prevIdentity.doBcc)
+            prevBcc += prevIdentity.doBccList;
 
-            let newReplyTo = gCurrentIdentity.replyTo;
-            let newCc = "";
-            let newBcc = "";
-            let newReceipt = gCurrentIdentity.requestReturnReceipt;
-            let newDSN = gCurrentIdentity.requestDSN;
-            let newAttachVCard = gCurrentIdentity.attachVCard;
+          var newReplyTo = gCurrentIdentity.replyTo;
+          var newCc = "";
+          var newBcc = "";
+          var newReceipt = gCurrentIdentity.requestReturnReceipt;
+          var newDSN = gCurrentIdentity.DSN;
+          var newAttachVCard = gCurrentIdentity.attachVCard;
 
-            if (gCurrentIdentity.doCc)
-                newCc += gCurrentIdentity.doCcList;
+          if (gCurrentIdentity.doCc)
+            newCc += gCurrentIdentity.doCcList;
 
-            if (gCurrentIdentity.doBcc)
-                newBcc += gCurrentIdentity.doBccList;
+          if (gCurrentIdentity.doBcc)
+            newBcc += gCurrentIdentity.doBccList;
 
+          var needToCleanUp = false;
+          var msgCompFields = gMsgCompose.compFields;
 
+          if (!gReceiptOptionChanged &&
+              prevReceipt == msgCompFields.returnReceipt &&
+              prevReceipt != newReceipt)
+          {
+            msgCompFields.returnReceipt = newReceipt;
+            document.getElementById("returnReceiptMenu").setAttribute('checked',msgCompFields.returnReceipt);
+          }
 
-            let needToCleanUp = false;
-            let msgCompFields = gMsgCompose.compFields;
+          if (!gDSNOptionChanged &&
+              prevDSN == msgCompFields.DSN &&
+              prevDSN != newDSN)
+          {
+            msgCompFields.DSN = newDSN;
+            document.getElementById("dsnMenu").setAttribute('checked',msgCompFields.DSN);
+          }
 
-            if (!gReceiptOptionChanged &&
-                prevReceipt == msgCompFields.returnReceipt &&
-                prevReceipt != newReceipt)
-            {
-                msgCompFields.returnReceipt = newReceipt;
-                document.getElementById("returnReceiptMenu").setAttribute('checked',msgCompFields.returnReceipt);
-            }
+          if (!gAttachVCardOptionChanged &&
+              prevAttachVCard == msgCompFields.attachVCard &&
+              prevAttachVCard != newAttachVCard)
+          {
+            msgCompFields.attachVCard = newAttachVCard;
+            document.getElementById("cmd_attachVCard").setAttribute('checked',msgCompFields.attachVCard);
+          }
+        /*
+          if (newReplyTo != prevReplyTo)
+          {
+            needToCleanUp = true;
+            if (prevReplyTo != "")
+              awRemoveRecipients(msgCompFields, "addr_reply", prevReplyTo);
+            if (newReplyTo != "")
+              awAddRecipients(msgCompFields, "addr_reply", newReplyTo);
+          }
 
-            if (!gDSNOptionChanged &&
-                prevDSN == msgCompFields.DSN &&
-                prevDSN != newDSN)
-            {
-                msgCompFields.DSN = newDSN;
-                document.getElementById("dsnMenu").setAttribute('checked',msgCompFields.DSN);
-            }
+          if (newCc != prevCc)
+          {
+            needToCleanUp = true;
+            if (prevCc != "")
+              awRemoveRecipients(msgCompFields, "addr_cc", prevCc);
+            if (newCc != "")
+              awAddRecipients(msgCompFields, "addr_cc", newCc);
+          }
 
-            if (!gAttachVCardOptionChanged &&
-                prevAttachVCard == msgCompFields.attachVCard &&
-                prevAttachVCard != newAttachVCard)
-            {
-                msgCompFields.attachVCard = newAttachVCard;
-                document.getElementById("cmd_attachVCard").setAttribute('checked',msgCompFields.attachVCard);
-            }
+          if (newBcc != prevBcc)
+          {
+            needToCleanUp = true;
+            if (prevBcc != "")
+              awRemoveRecipients(msgCompFields, "addr_bcc", prevBcc);
+            if (newBcc != "")
+              awAddRecipients(msgCompFields, "addr_bcc", newBcc);
+          }
 
+          if (needToCleanUp)
+            awCleanupRows();
+        */
             // start of specific code
             if (newReplyTo != prevReplyTo)
             {
@@ -336,30 +379,20 @@ function LoadIdentity(startup)
                 mrcAComplete.updateFieldVisibilityOnLoad('fieldBCC');
             }
             // end of specific code
+          try {
+            gMsgCompose.identity = gCurrentIdentity;
+          } catch (ex) { dump("### Cannot change the identity: " + ex + "\n");}
 
-            try {
-                gMsgCompose.identity = gCurrentIdentity;
-            } catch (ex) { dump("### Cannot change the identity: " + ex + "\n");}
-
-            let event = document.createEvent('Events');
-            event.initEvent('compose-from-changed', false, true);
-            document.getElementById("msgcomposeWindow").dispatchEvent(event);
+          var event = document.createEvent('Events');
+          event.initEvent('compose-from-changed', false, true);
+          document.getElementById("msgcomposeWindow").dispatchEvent(event);
         }
 
-      if (typeof AddDirectoryServerObserver === "function")
-        AddDirectoryServerObserver(false);
       if (!startup) {
-          try {
-            if (typeof setupLdapAutocompleteSession === "function")
-              setupLdapAutocompleteSession();
+          if (getPref("mail.autoComplete.highlightNonMatches"))
+            document.getElementById('addressCol2#1').highlightNonMatches = true;
 
-          } catch (ex) {
-              // catch the exception and ignore it, so that if LDAP setup
-              // fails, the entire compose window doesn't end up horked
-          }
-
-          // only do this if we aren't starting up....it gets done as part of startup already
-          addRecipientsToIgnoreList(gCurrentIdentity.identityName);
+          addRecipientsToIgnoreList(gCurrentIdentity.identityName);  // only do this if we aren't starting up....it gets done as part of startup already
       }
     }
 }
