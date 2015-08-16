@@ -60,6 +60,9 @@
 
 <!ENTITY options.showcc.label "Toujours afficher le champ '&ccAddr.label;' " >
 <!ENTITY options.showbcc.label "Toujours afficher le champ '&bccAddr.label;' " >
+<!ENTITY options.show_placeholder.label "Afficher le texte par défaut :" >
+<!ENTITY options.show_placeholder.label2 "'entrez un ou plusieurs emails...' " >
+<!ENTITY options.show_placeholder.label3 "(nécessite le redémarrage)" >
 <!ENTITY options.max_nb_line.label "Nb ligne max (?) : ">
 <!ENTITY options.first_line_height.label "Hauteur première ligne (?) : ">
 <!ENTITY options.line_height.label "Hauteur ligne (?) : ">

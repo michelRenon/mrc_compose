@@ -88,7 +88,8 @@
         <preference id="pref_ldap_search_version" name="extensions.mrccompose.ldap_search_version" type="string"/>
         
         <preference id="pref_show_no_result" name="extensions.mrccompose.show_no_result" type="bool"/>
-                
+        <preference id="pref_show_placeholder" name="extensions.mrccompose.show_placeholder" type="bool"/>
+
       </preferences>
 
 
@@ -334,6 +335,22 @@
                                 <label control="force_bcc" value="&options.showbcc.label;"/>
                                 <checkbox id="force_bcc" preference="pref_force_bcc"  />
                             </row>
+
+                            <row>
+                                <label control="show_placeholder" value="&options.show_placeholder.label;"/>
+                                <checkbox id="show_placeholder" preference="pref_show_placeholder"  />
+                            </row>
+                            <row>
+                                <label value="&options.show_placeholder.label2;"/>
+                            </row>
+                            <row>
+                                <label value="&options.show_placeholder.label3;"/>
+                            </row>
+
+                            <row>
+                                <label value=""/>
+                            </row>
+
                             <row>
                                 <label control="max_nb_line" value="&options.max_nb_line.label;" tooltip="mrctip"/>
                                 <textbox id="max_nb_line" preference="pref_max_nb_line" type="number" min="1" max="10" size="3" tooltip="mrctip"/>

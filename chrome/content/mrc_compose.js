@@ -684,6 +684,9 @@ var mrcAComplete = {
     // show panel with info "no result" if no result found
     param_show_no_result : false,
     
+    // show placeholder for each textfield
+    param_show_placeholder : false,
+
     // store above constants as options (modifiable by user)
     prefs : null,
     
@@ -818,6 +821,8 @@ var mrcAComplete = {
         this.param_first_load_done = this.prefs.getBoolPref("first_load_done");
         this.param_ldap_search_version = this.prefs.getCharPref("ldap_search_version");
         this.param_show_no_result = this.prefs.getBoolPref('show_no_result');
+        this.param_show_placeholder = this.prefs.getBoolPref('show_placeholder');
+
         
         this.field_states['fieldCC'].force = this.prefs.getBoolPref("force_cc");
         this.field_states['fieldBCC'].force = this.prefs.getBoolPref("force_bcc");
@@ -834,6 +839,16 @@ var mrcAComplete = {
         // info.version; // Returns "2.0.0.1" for Firefox version 2.0.0.1, "24.5.0"
         // Application.console.log("APP NAME="+info.name+" ; APP VERSION="+info.version);
         // APP NAME=Thunderbird ; APP VERSION=24.5.0
+
+
+        // Adapt visibility of placeholders, based on prefs.
+        if (this.param_show_placeholder == false) {
+            let fields = ["msgTO", "msgCC", "msgBCC", "msgREPLY", "msgNG", "msgFOLLOW"];
+            for (let index in fields) {
+                let test = document.getElementById(fields[index]);
+                test.setAttribute("placeholder", "");
+            }
+        }
     },
 
     shutdown: function() {

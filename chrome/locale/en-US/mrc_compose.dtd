@@ -59,6 +59,9 @@
 
 <!ENTITY options.showcc.label "Always show field '&ccAddr.label;' " >
 <!ENTITY options.showbcc.label "Always show field '&bccAddr.label;' " >
+<!ENTITY options.show_placeholder.label "Show default text" >
+<!ENTITY options.show_placeholder.label2 "'enter one or multiple emails...' " >
+<!ENTITY options.show_placeholder.label3 "(need restart)" >
 <!ENTITY options.max_nb_line.label "Nb line max (?): ">
 <!ENTITY options.first_line_height.label "First line height (?): ">
 <!ENTITY options.line_height.label "Line height (?): ">
