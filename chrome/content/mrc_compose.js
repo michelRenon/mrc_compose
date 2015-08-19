@@ -766,7 +766,7 @@ var mrcAComplete = {
     },
 
     // Cache for _splitEmailList()
-    _splitEmail_cache_data : "",
+    _splitEmail_cache_data : null,
     _splitEmail_cache_output : [],
     
 
