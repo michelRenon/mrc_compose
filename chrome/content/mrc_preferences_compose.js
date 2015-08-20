@@ -77,6 +77,11 @@ function getString(key) {
     return str;
 }
 
+function mrcLabelClick(event) {
+    if (event.button == 0) {
+        window.openDialog('chrome://mrc_compose/content/options.xul',' My Option Dialog','chrome,toolbar');
+    }
+}
 
 
 window.addEventListener("load", function(e) { 
@@ -105,7 +110,7 @@ window.addEventListener("load", function(e) {
 
         var label = document.createElement("label");
         label.setAttribute("class", "text-link");
-        label.setAttribute("onclick", "if (event.button == 0) { window.openDialog('chrome://mrc_compose/content/options.xul',' My Option Dialog','chrome,toolbar'); }");
+        label.addEventListener("click", mrcLabelClick, false);
         label.setAttribute("value", text2);
         hbox.appendChild(label);
         
