@@ -3790,7 +3790,21 @@ var mrcAComplete = {
         }
         
         // start the purge timeout 
-        this.timeout_archiv = setTimeout(this._purgeArchiv, this.DELAY_PURGE_ARCHIV);
+        // this.timeout_archiv = setTimeout(this._purgeArchiv, this.DELAY_PURGE_ARCHIV);
+        // To avoid AMO warning, we copy code of _purgeArchiv().
+        this.timeout_archiv = setTimeout(function() {
+                /*
+                 * Simply empty list of archived search listeners,
+                 * the GC will make the real job later.
+                 */
+                // SPECIAL : 
+                // As it is a call-back, we can't use 'this'
+                // instead, we must use the let 'mrcAComplete'
+                // Application.console.log("AVANT purge:"+mrcAComplete.searchedAB_archiv.join("||"));
+                let l = mrcAComplete.searchedAB_archiv.length;
+                mrcAComplete.searchedAB_archiv.splice(0, l);
+                // Application.console.log("APRES purge:"+mrcAComplete.searchedAB_archiv.join("||"));
+            }, this.DELAY_PURGE_ARCHIV);
     },
 
     infoTypeMore : function(aString, event, element) {
