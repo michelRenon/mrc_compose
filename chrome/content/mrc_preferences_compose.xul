@@ -40,8 +40,9 @@
     <!ENTITY % dtd2 SYSTEM "chrome://mrc_compose/locale/mrc_compose.dtd" > 
     %dtd2;
 ]>
-
+<!--
 <?xml-stylesheet href="chrome://mrc_compose/content/mrc_compose.css" type="text/css"?>
+-->
 <overlay id="mrc_preferences_compose" 
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
     >
