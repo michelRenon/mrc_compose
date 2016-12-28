@@ -114,6 +114,8 @@
  *      --> cf <src>/mail/components/compose/content/MsgComposeCommand.js
  *   - AddRecipientsArray()
  *      --> cd <src>/mail/components/compose/content/MsgComposeCommand.js
+ *   - updateSendLock()
+ *      --> cd <src>/mail/components/compose/content/MsgComposeCommand.js
  */
 
 function Recipients2CompFields(msgCompFields)
@@ -465,7 +467,20 @@ function AddRecipientsArray(aRecipientType, aAddressArray)
     }
 }
 
+/**
+ * Keep the Send buttons disabled until any recipient is entered.
+ */
+function updateSendLock()
+{
+  gSendLocked = true;
+  if (!gMsgCompose)
+    return;
 
+  // Enable the send buttons if anything useable was entered into at least one
+  // recipient field.
+  var nb_total_recipients = mrcAComplete.getNbTotalRecipients();
+  gSendLocked = nb_total_recipients == 0;
+}
 
 
 // function AdjustFocus() {
@@ -804,6 +819,15 @@ var mrcAComplete = {
             'fieldREPLY' :  {'enabled':false, 'checked':false, 'force':false},
             'fieldNG' :     {'enabled':false, 'checked':false, 'force':false},
             'fieldFOLLOW' : {'enabled':false, 'checked':false, 'force':false},
+    },
+
+    field_nb_recipients : {
+            'fieldTO' :     0,
+            'fieldCC' :     0,
+            'fieldBCC' :    0,
+            'fieldREPLY' :  0,
+            'fieldNG' :     0,
+            'fieldFOLLOW' : 0,
     },
 
     // Cache for _splitEmailList()
@@ -4072,6 +4096,7 @@ var mrcAComplete = {
         if (field != "") {
             let txt = "";
             let nbRecipients = this._getNbRecipients(element.value);
+            this.field_nb_recipients[field] = nbRecipients;
             let idLabel = this.FIELDS[field].nbId;
             let idWarning = this.FIELDS[field].warnId;
 
@@ -4171,6 +4196,23 @@ var mrcAComplete = {
         this.currentTextBox = null;
     },
     
+
+    getNbTotalRecipients : function() {
+        /*
+         * compute the total nb recipients,
+         * from fields TO, CC and BCC.
+         * 
+         * params :
+         *   none
+         * return :
+         *   int
+         */
+        nb = 0;
+        nb += this.field_nb_recipients['fieldTO'];
+        nb += this.field_nb_recipients['fieldCC'];
+        nb += this.field_nb_recipients['fieldBCC'];
+        return nb;
+    },
 }
 
 // Workaround for compatibility with other addons, specially Stationery :
