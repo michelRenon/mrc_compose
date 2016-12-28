@@ -112,7 +112,8 @@
  *      --> cf <src>/mail/components/compose/content/MsgComposeCommand.js
  *   - AddRecipient()
  *      --> cf <src>/mail/components/compose/content/MsgComposeCommand.js
- * 
+ *   - AddRecipientsArray()
+ *      --> cd <src>/mail/components/compose/content/MsgComposeCommand.js
  */
 
 function Recipients2CompFields(msgCompFields)
@@ -427,6 +428,43 @@ function AddRecipient(recipientType, address)
             break;
     }
 }
+
+
+
+
+// TB 51+ SPECIFIC
+
+// Public method called by the contants sidebar.
+function AddRecipientsArray(aRecipientType, aAddressArray)
+{
+    Application.console.log("AddRecipientsArray("+aRecipientType+", "+aAddressArray+")");
+    switch(aRecipientType) {
+        case "addr_to" :
+            mrcAComplete._insertRecipient('fieldTO', aAddressArray);
+            mrcAComplete.forceFieldVisibility('fieldTO', true);
+            mrcAComplete.updateFieldUI('fieldTO');
+            // special TB 24 ; TB 17 does not need the parameter
+            updateSendCommands(true);
+            break;
+
+        case "addr_cc" :
+            mrcAComplete._insertRecipient('fieldCC', aAddressArray);
+            mrcAComplete.forceFieldVisibility('fieldCC', true);
+            mrcAComplete.updateFieldUI('fieldCC');
+            // special TB 24 ; TB 17 does not need the parameter
+            updateSendCommands(true);
+            break;
+
+        case "addr_bcc" :
+            mrcAComplete._insertRecipient('fieldBCC', aAddressArray);
+            mrcAComplete.forceFieldVisibility('fieldBCC', true);
+            mrcAComplete.updateFieldUI('fieldBCC');
+            // special TB 24 ; TB 17 does not need the parameter
+            updateSendCommands(true);
+            break;
+    }
+}
+
 
 
 
