@@ -844,7 +844,7 @@ var mrcAComplete = {
                            .getService(Components.interfaces.nsIXULRuntime);
         var os_name = xulRuntime.OS.toLowerCase();
         // Application.console.log("OS = "+xulRuntime.OS);
-        // 'Linux'
+        // 'Linux', 'WINNT', 'Darwin'
 
         // Adapt visibility of placeholders, based on prefs.
         if (this.param_show_placeholder == false) {
@@ -868,7 +868,7 @@ var mrcAComplete = {
          *
          */
         Components.utils.import("resource://gre/modules/Services.jsm");
-        var styleSheets = ["chrome://mrc_compose/skin/theme/"+os_name+"/mrc_compose.css"];
+        var styleSheets = ["chrome://mrc_compose/skin/theme/mrc_compose_"+os_name+".css"];
 
         // Load stylesheets
         let styleSheetService= Components.classes["@mozilla.org/content/style-sheet-service;1"]
