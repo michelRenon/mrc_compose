@@ -690,10 +690,14 @@ var mrcAComplete = {
     // store above constants as options (modifiable by user)
     prefs : null,
     
+    // Offer to expand a search to all addressbooks with a single click
+    show_more_sources : false,
 
+    // The current addressbooks to search (selected or all)
+    current_ab : "",
 
-
-
+    // Remember the last search so that we can search again
+    lastSearch : "",
 
     /*
      * 
@@ -829,7 +833,28 @@ var mrcAComplete = {
 
         // update specials values
         this._prefLoaded();
-        
+
+        // Determine if "param_search_ab_URI" contains ALL addressbooks.
+        // If not, offer a button to expand the search to all addressbooks. That way
+        // the user can exclude slow sources (e.g. ldap) by default, but expand the
+        // search to that excluded source withe one simple click.
+        this.current_ab = this.param_search_ab_URI;
+        this.show_more_sources = false;
+        let abManager = Components.classes["@mozilla.org/abmanager;1"].getService(Components.interfaces.nsIAbManager);
+        let allAddressBooks = abManager.directories;
+        while (allAddressBooks.hasMoreElements()) {
+            let ab = allAddressBooks.getNext();
+            if ((ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) ||
+                (ab instanceof Components.interfaces.nsIAbLDAPDirectory)) {
+                if (this.param_search_ab_URI.indexOf(ab.URI) < 0) {
+                    this.show_more_sources = true;
+                    break;
+                }
+            }
+        }
+        // Set the hidden state of the "search all" button
+        document.getElementById("msgAutocompleteAddSources").hidden = !this.show_more_sources;
+        document.getElementById("msgAutocompleteAddSources").label = this.getString("more_sources");
         
         // TEST : try to get TB version
         var info = Components.classes["@mozilla.org/xre/app-info;1"]
@@ -923,6 +948,24 @@ var mrcAComplete = {
                 break;  
             case "search_ab_URI":
                 this.param_search_ab_URI = this.prefs.getCharPref("search_ab_URI");
+                this.current_ab = this.param_search_ab_URI;
+
+                // this_param_search_ab_URI has been updated. Determine whether
+                // we need to offer the "search all" button in the popup.
+                this.show_more_sources = false;
+                let abManager = Components.classes["@mozilla.org/abmanager;1"].getService(Components.interfaces.nsIAbManager);
+                let allAddressBooks = abManager.directories;
+                while (allAddressBooks.hasMoreElements()) {
+                    let ab = allAddressBooks.getNext();
+                    if ((ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) ||
+                        (ab instanceof Components.interfaces.nsIAbLDAPDirectory)) {
+                        if (this.param_search_ab_URI.indexOf(ab.URI) < 0) {
+                            this.show_more_sources = true;
+                            break;
+                        }
+                    }
+                }
+                document.getElementById("msgAutocompleteAddSources").hidden = !this.show_more_sources;
                 break;  
             case "first_load_done":
                 this.param_first_load_done = this.prefs.getBoolPref("first_load_done");
@@ -2070,7 +2113,6 @@ var mrcAComplete = {
          * 
          * params :
          *   aString : the text to search in fields of address book
-         *   cbSearch : the callback when search is done
          * return:
          *   none
          */
@@ -2093,7 +2135,7 @@ var mrcAComplete = {
             if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
                 // recherche 1
                 // Application.console.log("AB LOCAL = " + ab.dirName);
-                let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
+                let doSearch = this.current_ab.indexOf(ab.URI) >= 0;
                 if (doSearch) {
                     try {
                         // add a sync search listener
@@ -2129,9 +2171,9 @@ var mrcAComplete = {
                 }
             } else {
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
-                    // Application.console.log("param_search="+this.param_search_ab_URI+" ; ab.URI="+ab.URI)
+                    // Application.console.log("param_search="+this.current_ab+" ; ab.URI="+ab.URI)
                     // check if user wants to search in this AB
-                    let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
+                    let doSearch = this.current_ab.indexOf(ab.URI) >= 0;
                     if (doSearch) {
                         try {
                             // Application.console.log("AB LDAP = " + ab.dirName);
@@ -2298,7 +2340,7 @@ var mrcAComplete = {
             let ab = allAddressBooks.getNext();
             if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
 
-                let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
+                let doSearch = this.current_ab.indexOf(ab.URI) >= 0;
                 if (doSearch) {
                     try {
                         // add a sync search listener
@@ -2363,7 +2405,7 @@ var mrcAComplete = {
                 //http://hg.mozilla.org/comm-central/file/tip/mailnews/addrbook/src/nsAbLDAPAutoCompleteSearch.js
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
                     // check if user wants to search in this AB
-                    let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
+                    let doSearch = this.current_ab.indexOf(ab.URI) >= 0;
                     if (doSearch) {
                         try {
                             /*
@@ -2594,7 +2636,7 @@ var mrcAComplete = {
             let ab = allAddressBooks.getNext();
             if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
                 // recherche 1
-                let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
+                let doSearch = this.current_ab.indexOf(ab.URI) >= 0;
                 if (doSearch) {
                     try {
                         // add a sync search listener
@@ -2630,7 +2672,7 @@ var mrcAComplete = {
             } else {
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
                     // check if user wants to search in this AB
-                    let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
+                    let doSearch = this.current_ab.indexOf(ab.URI) >= 0;
                     if (doSearch) {
                         try {
                             // if (this.param_ldap_search_version == 'TB24') {
@@ -2760,7 +2802,6 @@ var mrcAComplete = {
          * 
          * params :
          *   aString : the text to search in fields of address book
-         *   cbSearch : the callback when search is done
          * return:
          *   none
          */
@@ -2783,7 +2824,7 @@ var mrcAComplete = {
             if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
                 // recherche 1
                 // Application.console.log("AB LOCAL = " + ab.dirName);
-                let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
+                let doSearch = this.current_ab.indexOf(ab.URI) >= 0;
                 if (doSearch) {
                     try {
                         // add a sync search listener
@@ -2819,9 +2860,9 @@ var mrcAComplete = {
                 }
             } else {
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
-                    // Application.console.log("param_search="+this.param_search_ab_URI+" ; ab.URI="+ab.URI)
+                    // Application.console.log("param_search="+this.current_ab+" ; ab.URI="+ab.URI)
                     // check if user wants to search in this AB
-                    let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
+                    let doSearch = this.current_ab.indexOf(ab.URI) >= 0;
                     if (doSearch) {
                         try {
                             // Application.console.log("AB LDAP = " + ab.dirName);
@@ -3724,7 +3765,7 @@ var mrcAComplete = {
         return ((this.lastQuery != newQuery) || ((now - this.lastQueryTime) > this.param_min_search_delay));
     },
     
-    search : function(aString, event, element, cbSearch) {
+    search : function(aString, event, element, allbooks, cbSearch) {
         /*
          * official call to perform search on address book.
          * dynamic call of internal search method
@@ -3733,10 +3774,29 @@ var mrcAComplete = {
          *   aString : the text to search
          *   event : event that generated the search
          *   element : the html field element that generated the search
+         *   allbooks : true = search ALL addressbooks, false = only search selected addressbooks
          *   cbSearch : the callback when search is done
          * return :
          *   none
          */
+        if (allbooks) {
+            // Hide the button (since the search now includes all sources
+            document.getElementById("msgAutocompleteAddSources").hidden = true;
+
+            // Set "current_ab" to all addressbooks, overriding the selected addressbooks
+            let abItems = [];
+            let abManager = Components.classes["@mozilla.org/abmanager;1"].getService(Components.interfaces.nsIAbManager);
+            let allAddressBooks = abManager.directories;
+            while (allAddressBooks.hasMoreElements()) {
+                let ab = allAddressBooks.getNext();
+                if ((ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) ||
+                    (ab instanceof Components.interfaces.nsIAbLDAPDirectory)) {
+                    abItems.push(ab.URI);
+                }
+            }
+            this.current_ab = abItems.join(";;;");
+        }
+
         // Application.console.log(now()+" search() "+this.searchID);
         this.datas = {}; // TODO : check if it's the right way to empty dictionary
         this.errors = [];
@@ -3744,7 +3804,8 @@ var mrcAComplete = {
         this.infos = [];
         this.nbDatas = 0;
         let meth = "_search_mode_"+this.param_mode;
-        this.cbSearch = cbSearch
+        this.cbSearch = cbSearch;
+        this.lastSearch = aString;
 
         // stop the purge timeout 
         clearTimeout(this.timeout_archiv);
@@ -3763,6 +3824,7 @@ var mrcAComplete = {
             // Components.utils.forceGC();
         } catch (e) {
             this._logError(e, "SEARCH()");
+            this.lastSearch = "";
         }
     },
 
@@ -4131,6 +4193,11 @@ var mrcAComplete = {
         let popup = document.getElementById("msgAutocompletePanel");
         popup.hidePopup();
         this.currentTextBox = null;
+
+        // Reset to selected addressbooks for the next search
+        this.lastSearch = "";
+        this.current_ab = this.param_search_ab_URI;
+        document.getElementById("msgAutocompleteAddSources").hidden = !this.show_more_sources;
     },
     
 }
@@ -4439,7 +4506,7 @@ function mrcRecipientKeyUp(event, element) {
             if (mrcAComplete.needSearch(textPart)) {
                 // perform search
                 // Application.console.log("searching:'"+textPart+"'");
-                mrcAComplete.search(textPart, event, element, function callback_search() { 
+                mrcAComplete.search(textPart, event, element, false, function callback_search() { 
                         mrcAComplete.finishSearch(textPart, event, element) 
                     } );
             }
@@ -4452,6 +4519,26 @@ function mrcRecipientKeyUp(event, element) {
         }
     }
 }
+
+function mrcSearchInAll() {
+    let element = mrcAComplete.currentTextBox;
+    let textPart = mrcAComplete.lastSearch;
+
+    // Sanity check: Make sure there is an existing search to expand
+    if ((element == null) || (textPart == null))
+    {
+        return;
+    }
+
+    // Get the focus back to the text entry box (the button click loses it)
+    mrcAComplete.hidePopup();
+    
+    // Re-do the existing search, but for all addressbooks
+    mrcAComplete.search(textPart, null, element, true, function callback_search() { 
+            mrcAComplete.finishSearch(textPart, null, element) 
+            } );
+}
+
 
 function mrcRecipientResize(element, maxi) {
     /*
