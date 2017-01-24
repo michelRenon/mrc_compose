@@ -840,6 +840,11 @@ var mrcAComplete = {
         // Application.console.log("APP NAME="+info.name+" ; APP VERSION="+info.version);
         // APP NAME=Thunderbird ; APP VERSION=24.5.0
 
+        var xulRuntime = Components.classes["@mozilla.org/xre/app-info;1"]
+                           .getService(Components.interfaces.nsIXULRuntime);
+        var os_name = xulRuntime.OS.toLowerCase();
+        // Application.console.log("OS = "+xulRuntime.OS);
+        // 'Linux', 'WINNT', 'Darwin'
 
         // Adapt visibility of placeholders, based on prefs.
         if (this.param_show_placeholder == false) {
@@ -849,6 +854,30 @@ var mrcAComplete = {
                 test.setAttribute("placeholder", "");
             }
         }
+
+
+
+
+ 
+        /*
+         *
+         *
+         *
+         * https://developer.mozilla.org/en-US/Add-ons/How_to_convert_an_overlay_extension_to_restartless#Step_7_Manually_handle_global_CSS_Stylesheets
+         * STEP 7
+         *
+         */
+        Components.utils.import("resource://gre/modules/Services.jsm");
+        var styleSheets = ["chrome://mrc_compose/skin/theme/mrc_compose_"+os_name+".css"];
+
+        // Load stylesheets
+        let styleSheetService= Components.classes["@mozilla.org/content/style-sheet-service;1"]
+                                         .getService(Components.interfaces.nsIStyleSheetService);
+        for (let i=0,len=styleSheets.length ; i<len ; i++) {
+            let styleSheetURI = Services.io.newURI(styleSheets[i], null, null);
+            styleSheetService.loadAndRegisterSheet(styleSheetURI, styleSheetService.AUTHOR_SHEET);
+        }
+
     },
 
     shutdown: function() {
