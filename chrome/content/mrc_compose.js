@@ -1627,7 +1627,9 @@ var mrcAComplete = {
          *   none
          */
         let elt = document.getElementById(this.ID_PREFIX+this.indexSelectedCard);
-        elt.className = elt.className.replace(this.SELECT_CLASSNAME, "");
+        if (typeof elt !== "undefined" && elt !== null) {
+            elt.className = elt.className.replace(this.SELECT_CLASSNAME, "");
+        }
         this.indexSelectedCard = 0;
     },
 
@@ -1643,7 +1645,9 @@ var mrcAComplete = {
          */
         this.indexSelectedCard = newIndex;
         let elt = document.getElementById(this.ID_PREFIX+this.indexSelectedCard);
-        elt.className += " "+this.SELECT_CLASSNAME;
+        if (typeof elt !== "undefined" && elt !== null) {
+            elt.className += " "+this.SELECT_CLASSNAME;
+        }
     },
 
 
@@ -4172,26 +4176,29 @@ var mrcAComplete = {
         let email = "";
         // get current card
         let card = this.panelCards[this.indexSelectedCard-1];
-        if (card.isMailList) {
-            // add emails of every member of the list
-            let childs = MailServices.ab.getDirectory(card.mailListURI).addressLists;
-            let nb = childs.length;
-            let emailList = [];
-            for (let i=0 ; i < nb ; i++) {
-                card = childs.queryElementAt(i, Components.interfaces.nsIAbCard);
-                emailList.push(this.getCardAsText(card));
+        if (typeof card !== "undefined") {
+            console.log(" debug validate:", card);
+            if (card.isMailList) {
+                // add emails of every member of the list
+                let childs = MailServices.ab.getDirectory(card.mailListURI).addressLists;
+                let nb = childs.length;
+                let emailList = [];
+                for (let i=0 ; i < nb ; i++) {
+                    card = childs.queryElementAt(i, Components.interfaces.nsIAbCard);
+                    emailList.push(this.getCardAsText(card));
+                }
+                email = emailList.join(this.PART_SUFFIX+this.SEP+this.PART_PREFIX);
+            } else {
+                // --> enter his email in the text
+                email = card.text;
+                // Application.console.log("EMAIL = "+email);
             }
-            email = emailList.join(this.PART_SUFFIX+this.SEP+this.PART_PREFIX);
-        } else {
-            // --> enter his email in the text
-            email = card.text;
-            // Application.console.log("EMAIL = "+email);
-        }
-        this._elementInsertInPart(this.currentTextBox, this.currentTextBox.selectionStart, email);
-        this.updateNbRecipients(this.currentTextBox);
+            this._elementInsertInPart(this.currentTextBox, this.currentTextBox.selectionStart, email);
+            this.updateNbRecipients(this.currentTextBox);
 
-        // to be coherent : inform TB that content of current Msg has really changed
-        gContentChanged=true;
+            // to be coherent : inform TB that content of current Msg has really changed
+            gContentChanged=true;
+        }
     },
 
     openPopup : function(event, element) {
