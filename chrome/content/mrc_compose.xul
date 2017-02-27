@@ -109,8 +109,11 @@
                 <hbox flex="1">
                     <image id="img_wait" collapsed="false"/>
                 </hbox>
-                <html:div id="msgAutocompletePanelDiv" style="display:block; min-width:100px" >
-                </html:div>
+                <vbox flex="1">
+                  <html:div id="msgAutocompletePanelDiv" style="display:block; min-width:100px" >
+                  </html:div>
+                  <button id="msgAutocompleteAddSources" hidden="true" oncommand="mrcSearchInAll()" />
+                </vbox>
                 <hbox flex="1">
                     <label id="labelTypeMore" value="" />
                 </hbox>
