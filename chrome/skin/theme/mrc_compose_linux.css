@@ -58,6 +58,8 @@
     -moz-margin-start: -2px;
 }
 
+/*
+
 
 #msgTO,
 #msgCC,
@@ -98,3 +100,82 @@
   -moz-border-bottom-colors: ThreeDShadow ThreeDHighlight;
   -moz-border-left-colors: ThreeDShadow ThreeDHighlight;
 }
+*/
+
+
+
+
+
+/*
+
+
+Theme linux pour TB60
+
+#subjectLabel {
+  margin-inline-end: 6px;
+  padding-bottom: 1px;
+}
+
+#subject-box {
+  margin-inline-start: -2px;
+}
+
+#msgSubject {
+  -moz-appearance: none;
+  margin-top: 0;
+  margin-inline-start: 6px;
+  margin-inline-end: 5px;
+  background-color: inherit;
+  border: 1px solid transparent;
+  border-bottom-color: var(--toolbarbutton-hover-bordercolor);
+  padding: 4px 2px;
+  padding-inline-start: 5px !important;
+  transition: border .2s, background-color .2s;
+}
+
+#msgSubject:hover,
+#msgSubject[focused="true"] {
+  background-color: -moz-field;
+  border-color: var(--toolbarbutton-hover-bordercolor);         rgba(0, 0, 0, 0.25);
+}
+
+*/
+
+
+
+
+#msgTO,
+#msgCC,
+#msgBCC,
+#msgREPLY,
+#msgNG,
+#msgFOLLOW {
+  -moz-appearance: none;
+  margin-top: 0;
+  margin-inline-start: 6px;
+  margin-inline-end: 5px;
+  background-color: inherit;
+  border: 1px solid transparent;
+  border-bottom-color: rgba(0, 0, 0, 0.25); /* var(--toolbarbutton-hover-bordercolor); */
+  padding: 4px 2px;
+  padding-inline-start: 5px !important;
+  transition: border .2s, background-color .2s;
+}
+
+#msgTO:hover,
+#msgTO[focused="true"],
+#msgCC:hover,
+#msgCC[focused="true"],
+#msgBCC:hover,
+#msgBCC[focused="true"],
+#msgREPLY:hover,
+#msgREPLY[focused="true"],
+#msgNG:hover,
+#msgNG[focused="true"],
+#msgFOLLOW:hover,
+#msgFOLLOW[focused="true"] {
+  background-color: -moz-field;
+  border-color: rgba(0, 0, 0, 0.25); /* var(--toolbarbutton-hover-bordercolor); */
+}
+
+
