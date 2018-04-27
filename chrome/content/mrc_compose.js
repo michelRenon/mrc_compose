@@ -439,7 +439,7 @@ function AddRecipient(recipientType, address)
 // Public method called by the contants sidebar.
 function AddRecipientsArray(aRecipientType, aAddressArray)
 {
-    Application.console.log("AddRecipientsArray("+aRecipientType+", "+aAddressArray+")");
+    mrcAComplete._log("AddRecipientsArray("+aRecipientType+", "+aAddressArray+")");
     switch(aRecipientType) {
         case "addr_to" :
             mrcAComplete._insertRecipient('fieldTO', aAddressArray);
@@ -521,7 +521,7 @@ function debug_obj(obj){
     for (let i in obj) {
         txt += i+":"+obj[i]+"||";
     }
-    Application.console.log(txt);
+    mrcAComplete._log(txt);
 }
 
 function _get(obj, field_name, default_value) {
@@ -918,7 +918,7 @@ var mrcAComplete = {
         }
 
 
-
+        this._log("TEST TB60 avec log + modif");
 
  
         /*
@@ -954,6 +954,7 @@ var mrcAComplete = {
          *  method to implement nsIPrefBranch interface
          * 
          */
+        this._log("nsIPrefBranch::observe : "+subject+","+topic+","+data);
         if (topic != "nsPref:changed") {  
             return;  
         }  
@@ -1085,11 +1086,34 @@ var mrcAComplete = {
             message += " : "+context+" : "
         
         if (obj.message)
-            Application.console.log(message+obj.message);
+            // Application.console.log(message+obj.message);
+            Components.utils.reportError(message+obj.message);
         else
-            Application.console.log(message+obj);
+            // Application.console.log(message+obj);
+            Components.utils.reportError(message+obj);
     },
     
+    _log : function(obj, context) {
+        /*
+         * Send information to the console.
+         *
+         * params :
+         *   obj : text or exception
+         *   context : text, (optionnal) some informationabout context of log
+         */
+        context = this._pick(context, '');
+
+        let message = "";
+        if (context != '')
+            message += context+" : "
+
+        let consoleService = Components.classes["@mozilla.org/consoleservice;1"].getService(Components.interfaces.nsIConsoleService);
+        if (obj.message)
+            consoleService.logStringMessage(message+obj.message);
+        else
+            consoleService.logStringMessage(message+obj);
+    },
+
     _prefLoaded : function() {
         /*
          * 
@@ -4591,6 +4615,7 @@ function mrcRecipientResize(element, maxi) {
         // dump("h1="+sh1+"  h2="+sh2+"  fnbLines="+fnbLines+"  nbLines="+nbLines+"  nHeight="+nHeight+"  h="+h+"\n");
         element.height = h;
         let sh3 = element.inputField.scrollHeight;
+        mrcAComplete._log("Resize : "+element.id+" : h1="+sh1+"  h2="+sh2+"  fnbLines="+fnbLines+"  nbLines="+nbLines+"  nHeight="+nHeight+"  h="+h+"  h3="+sh3);
     } catch (e) {
         this._logError(e, "mrcRecipientResize()");
     }      
@@ -4680,7 +4705,7 @@ function mrcMinimizeFields_2(element) {
         let t = mrcAComplete.param_first_line_height.toString()+'px';
         element.setAttribute("height", t);
     } catch (e) {
-        Application.console.log("ERREUR mrcMinimizeFields() : "+e.message);
+        mrcAComplete._logError(e, "mrcMinimizeFields_2()");
     }
 }
 
