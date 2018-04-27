@@ -208,6 +208,7 @@
 
 #mrc-compose-options-button {
     list-style-image: url("chrome://mrc_compose/content/icon_options.png");
+    max-height: 28px;
 }
 
 #MsgHeadersToolbar {
