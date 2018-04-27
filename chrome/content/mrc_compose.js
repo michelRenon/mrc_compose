@@ -45,53 +45,53 @@
 
 
 /*
- * 
+ *
  * MRC_COMPOSE
  * ===========
- * 
+ *
  * provides 6 fields (To, CC, Bcc, ReplyTo, NewsGroup, FollowTo).
  * Each field can contains several adresses, separated by commas.
  * Each field has autocomplete, with options.
- * 
- * 
- * 
+ *
+ *
+ *
  * Organization of code 
  * ====================
- * 
+ *
  * the fields defined in xul file, have callbacks :
  *  - mrcRecipientKeyPress
  *  - mrcRecipientKeyUp
- * These callback use a variable 'mrcAComplete' that provide the complete 
+ * These callback use a variable 'mrcAComplete' that provide the complete
  * behaviour of autocomplete.
- * 
+ *
  * mrcAComplete define pseudo private methods by prefixing them with '_'.
- * 
- * 
+ *
+ *
  * The subtle part is :
  * search() and buildResultList() are proxys of internal methods.
  * They choose an internal method depending of the value of the 'param_mode' field.
  * It allows the dev to define several behaviour of search/display.
  * For example, the 2 first modes are :
- *  - 1 : one simple query ("fields contains") 
+ *  - 1 : one simple query ("fields contains")
  *        and one simple display (order by lastName and display)
  *  - 2 : 3 queries ("fields begins with", "fields contains but not begin", "group contains")
  *         [ update : that has been optimized to the 2 first queries]
  *        one display : the panel has 3 part, one for each list of results
- *  - 3 : one simple query ("fields contains") 
+ *  - 3 : one simple query ("fields contains")
  *        one display : 1 part for each AddressBook
- * 
+ *
  */
 
 
 /*
- * 
+ *
  * TODO :
- * 
+ *
  *  - allow another view of fields : verticaly ?
  *    I heard of one user being interested in having the email as a vertical list
- *   
+ *
  *  - les focus à l'ouverture ne semblent plus marcher correctement avec TB24
- * 
+ *
  *   - mdoif fenetre prefs : afficher le texte dans des tooltips
  */
 
@@ -103,7 +103,7 @@
 
 
 /*
- * 
+ *
  * New versions of 4 existing methods (from Mozilla Thunderbird) :
  *   - Recipients2CompFields()
  *   - CompFields2Recipients()
@@ -136,7 +136,7 @@ function Recipients2CompFields(msgCompFields)
     let reply_Sep = "";
     let ng_Sep = "";
     let follow_Sep = "";
-    
+
     let getValue = function(elementId) {
         let inputField = document.getElementById(elementId);
         let fieldValue = inputField.value;
@@ -190,7 +190,7 @@ function CompFields2Recipients(msgCompFields)
     let msgNewsgroups = msgCompFields.newsgroups;
     let msgFollowupTo = msgCompFields.followupTo;
     let havePrimaryRecipient = false;
-    
+
     // cleaning CR and LF :
     // TB inserts some \n to have some default formatting ( < 70 cols ?).
     // we don't need it anymore (and we check also for \r )
@@ -233,7 +233,7 @@ function CompFields2Recipients(msgCompFields)
     f("msgREPLY", msgReplyTo, "fieldREPLY");
     f("msgNG", msgNewsgroups, "fieldNG");
     f("msgFOLLOW", msgFollowupTo, "fieldFOLLOW");
-    
+
     // CompFields2Recipients is called whenever a user replies or edits an existing message. We want to
     // add all of the recipients for this message to the ignore list for spell check
     // addRecipientsToIgnoreList((gCurrentIdentity ? gCurrentIdentity.identityName + ', ' : '') + msgTo + ', ' + msgCC + ', ' + msgBCC);
@@ -412,7 +412,7 @@ function AddRecipient(recipientType, address)
             // special TB 24 ; TB 17 does not need the parameter
             updateSendCommands(true);
             break;
-            
+
         case "addr_cc" :
             mrcAComplete._insertRecipient('fieldCC', address);
             mrcAComplete.forceFieldVisibility('fieldCC', true);
@@ -489,16 +489,16 @@ function updateSendLock()
 
 
 /*
- * 
+ *
  * ==================================================================
  * specific code for MRC AUTOCOMPLETE
  * ==================================================================
- * 
+ *
  */
 
 /*
  * javascript utilities
- */ 
+ */
 
 
 function removeChildren(element) {
@@ -528,7 +528,7 @@ function _get(obj, field_name, default_value) {
     if (obj.hasOwnProperty(field_name))
         return obj[field_name]
     else
-        return default_value;    
+        return default_value;
 }
 
 function now() {
@@ -539,8 +539,8 @@ function now() {
     //        + (currentdate.getMonth()+1)  + "/" 
     //        + currentdate.getFullYear() + " @ ";
     // H:M:S
-    text += currentdate.getHours() + ":"  
-            + currentdate.getMinutes() + ":" 
+    text += currentdate.getHours() + ":"
+            + currentdate.getMinutes() + ":"
             + currentdate.getSeconds();
     // milliseconds
     text += ":" + currentdate.getMilliseconds();
@@ -550,15 +550,15 @@ function now() {
 // from http://stackoverflow.com/questions/1374126/how-to-extend-an-array-with-an-existing-javascript-array
 /*
  * incompatible with TB
- * 
+ *
 Array.prototype.mrc_extend = function (other_array) {
     // you should include a test to check whether other_array really is an array 
-    other_array.forEach(function(v) {this.push(v)}, this);    
+    other_array.forEach(function(v) {this.push(v)}, this);
 }
 */
 function array_extend(src_array, other_array) {
     // you should include a test to check whether other_array really is an array 
-    other_array.forEach(function(v) {this.push(v)}, src_array);    
+    other_array.forEach(function(v) {this.push(v)}, src_array);
 }
 
 
@@ -568,13 +568,13 @@ function array_extend(src_array, other_array) {
 var mrcAComplete = {
 
     /*
-     * 
+     *
      * constants used by manager
-     * 
+     *
      */
 
     NBSP : "\u00a0",
-    
+
     // class names for html elements
     ID_PREFIX : "",
     CONTAINER_CLASSNAME : "container",
@@ -590,7 +590,7 @@ var mrcAComplete = {
     ALERT_INFO_CLASSNAME : "alert-info",
     ALERT_ERROR_CLASSNAME : "alert-error",
     ALERT_WARNING_CLASSNAME : "alert-warning",
-    
+
     // html namespace in order to integrate html elements into xul
     HTMLNS : "http://www.w3.org/1999/xhtml",
 
@@ -638,7 +638,7 @@ var mrcAComplete = {
      * parameters (may be changed by preferences dialog)
      * 
      */
-    
+
     // value to compute automatic height of textboxes
     // std textbox is 
     // ubuntu :  28px for first line, then 17px for others
@@ -646,7 +646,7 @@ var mrcAComplete = {
     // mac :     20px and 14 px
     param_line_height : 17, // pixels
     param_first_line_height : 28, // pixels
-    param_max_nb_line : 5, 
+    param_max_nb_line : 5,
     // param_max_height : this.param_first_line_height + (this.param_max_nb_line-1)*this.param_line_height,
     param_max_height : 96,
 
@@ -655,7 +655,7 @@ var mrcAComplete = {
     param_sort_field_level_1 : 'mrcPopularity',
     param_sort_field_level_2 : 'lastName',
     param_sort_field_level_3 : 'firstName',
-    // others values to test 
+    // others values to test
     // param_sort_field_level_1 : 'firstName',
     // param_sort_field_level_2 : 'lastName',
 
@@ -668,14 +668,14 @@ var mrcAComplete = {
     param_add_comma : false,
 
     // the delay between 2 identical searches (milliseconds)
-    param_min_search_delay : 500, 
-    
+    param_min_search_delay : 500,
+
     // the timeout of search (milliseconds)
     param_search_timeout : 5000,
 
     // start the autocomplete search when a min number of chars is entered
     param_search_min_char : 1,
-    
+
     // search on 'collected' address book
     param_search_collected_ab : false,
 
@@ -687,7 +687,7 @@ var mrcAComplete = {
     // because it's impossible to have 'one fits all'...
     //
     // available param_modes :
-    // - 1 
+    // - 1
     //    the list contains 1 part :
     //       - 'contains' : contacts & lists whose fields(*) contains X with (except those in part 1)
     //
@@ -703,7 +703,7 @@ var mrcAComplete = {
     //     * : fields are 'PrimaryEmail', 'FirstName', 'LastName', 'NickName' for contacts
     //         fields is 'LastName' for list
     //
-    // - 3 
+    // - 3
     //    the list contains 1 part for each AddressBook:
     //       - 'contains' : contacts & lists whose fields(*) contains X
     //
@@ -717,8 +717,8 @@ var mrcAComplete = {
     //     * : fields are 'PrimaryEmail', 'FirstName', 'LastName', 'NickName' for contacts
     //         fields is 'LastName' for list
     //
-    param_mode : 1, 
-    
+    param_mode : 1,
+
     // the list of ab where search is performed
     param_search_ab_URI : "",
 
@@ -730,51 +730,51 @@ var mrcAComplete = {
 
     // help define initial values of some preferences
     param_first_load_done : false,
-    
+
     // (temporary) : allow user to select code for LDAP Searches
     param_ldap_search_version : "TB24",
-    
+
     // show panel with info "no result" if no result found
     param_show_no_result : false,
-    
+
     // show placeholder for each textfield
     param_show_placeholder : false,
 
     // store above constants as options (modifiable by user)
     prefs : null,
-    
+
 
 
 
 
 
     /*
-     * 
+     *
      * utilities fields (defined at init of object, act as cache)
-     * 
+     *
      */
-    
+
     // address book manager
     abManager : Components.classes["@mozilla.org/abmanager;1"].getService(Components.interfaces.nsIAbManager),
     // mime header parser
     mhParser : MailServices.headerParser,
 
 
-    
+
 
     /*
-     * 
+     *
      * the real fields of object
-     * 
+     *
      */
-     
+
     // the array that stores the cards listed by the popup panel
     panelCards : [],
     // the index of selected card : ACHTUNG : 1-based : 1..array.length
     indexSelectedCard : 0,
     // the associated textbox, where the autocomplete is activated
     currentTextBox : null,
-    
+
     // the results of search
     lastQuery : "", // the last searched text (OPTIMIZATION & Xul bug workaround)
     // when the popup is opened, for one real keystroke, we receive two identical 'keyup' events.
@@ -833,7 +833,7 @@ var mrcAComplete = {
     // Cache for _splitEmailList()
     _splitEmail_cache_data : null,
     _splitEmail_cache_output : [],
-    
+
 
     // Cache for keyUp
     _textPart_cache : "",
@@ -842,28 +842,28 @@ var mrcAComplete = {
 
 
     /*
-     * 
-     * 
+     *
+     *
      * specific methods : startup(), shutdown()
      * and an observer for preferences
-     * 
-     * 
-     */    
+     *
+     *
+     */
     startup: function() {
         /*
          * Initialize the extension  
          * Register to receive notifications of preference changes  
-         * 
+         *
          */
-        this.prefs = Components.classes["@mozilla.org/preferences-service;1"]  
-                             .getService(Components.interfaces.nsIPrefService)  
+        this.prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                             .getService(Components.interfaces.nsIPrefService)
                              .getBranch("extensions.mrccompose.");  
         // this.prefs.QueryInterface(Components.interfaces.nsIPrefBranch);
-        this.prefs.addObserver("", this, false);  
+        this.prefs.addObserver("", this, false);
 
         this.param_line_height = this.prefs.getIntPref("line_height");
         this.param_first_line_height = this.prefs.getIntPref("first_line_height");
-        this.param_max_nb_line = this.prefs.getIntPref("max_nb_line"); 
+        this.param_max_nb_line = this.prefs.getIntPref("max_nb_line");
         this.param_max_height = this.param_first_line_height + (this.param_max_nb_line-1)*this.param_line_height;
         this.param_sort_field_level_1 = this.prefs.getCharPref("sort_field_level_1");
         this.param_sort_field_level_2 = this.prefs.getCharPref("sort_field_level_2");
@@ -876,7 +876,7 @@ var mrcAComplete = {
         this.param_search_min_char = this.prefs.getIntPref("search_min_char");
         this.param_search_collected_ab = this.prefs.getBoolPref("search_collected_ab");
         this.param_max_elements_part_menu = this.prefs.getIntPref("max_elements_part_menu");
-        this.param_mode = this.prefs.getIntPref("mode");        
+        this.param_mode = this.prefs.getIntPref("mode");
         this.param_automatic_height = this.prefs.getBoolPref("automatic_height");
         this.param_show_popularity = this.prefs.getBoolPref("show_popularity");
         this.param_search_ab_URI = this.prefs.getCharPref("search_ab_URI");
@@ -885,14 +885,14 @@ var mrcAComplete = {
         this.param_show_no_result = this.prefs.getBoolPref('show_no_result');
         this.param_show_placeholder = this.prefs.getBoolPref('show_placeholder');
 
-        
+
         this.field_states['fieldCC'].force = this.prefs.getBoolPref("force_cc");
         this.field_states['fieldBCC'].force = this.prefs.getBoolPref("force_bcc");
 
         // update specials values
         this._prefLoaded();
-        
-        
+
+
         // TEST : try to get TB version
         var info = Components.classes["@mozilla.org/xre/app-info;1"]
            .getService(Components.interfaces.nsIXULAppInfo);
@@ -920,7 +920,7 @@ var mrcAComplete = {
 
         this._log("TEST TB60 avec log + modif");
 
- 
+
         /*
          *
          *
@@ -944,85 +944,85 @@ var mrcAComplete = {
 
     shutdown: function() {
         /*
-         * 
+         *
          */
-        this.prefs.removeObserver("", this);  
-    }, 
+        this.prefs.removeObserver("", this);
+    },
 
-    observe: function(subject, topic, data) {  
+    observe: function(subject, topic, data) {
         /*
          *  method to implement nsIPrefBranch interface
-         * 
+         *
          */
         this._log("nsIPrefBranch::observe : "+subject+","+topic+","+data);
-        if (topic != "nsPref:changed") {  
-            return;  
-        }  
-        switch(data)  {  
-            case "line_height":  
+        if (topic != "nsPref:changed") {
+            return;
+        }
+        switch(data)  {
+            case "line_height":
                 this.param_line_height = this.prefs.getIntPref("line_height");
                 this.param_max_height = this.param_first_line_height + (this.param_max_nb_line-1)*this.param_line_height;
-                break;  
-            case "first_line_height":  
+                break;
+            case "first_line_height":
                 this.param_first_line_height = this.prefs.getIntPref("first_line_height");
                 this.param_max_height = this.param_first_line_height + (this.param_max_nb_line-1)*this.param_line_height;
-                break;  
-            case "max_nb_line":  
-                this.param_max_nb_line = this.prefs.getIntPref("max_nb_line"); 
+                break;
+            case "max_nb_line":
+                this.param_max_nb_line = this.prefs.getIntPref("max_nb_line");
                 this.param_max_height = this.param_first_line_height + (this.param_max_nb_line-1)*this.param_line_height;
-                break;  
-            case "sort_field_level_1":  
+                break;
+            case "sort_field_level_1":
                 this.param_sort_field_level_1 = this.prefs.getCharPref("sort_field_level_1");
-                break;  
-            case "sort_field_level_2":  
+                break;
+            case "sort_field_level_2":
                 this.param_sort_field_level_2 = this.prefs.getCharPref("sort_field_level_2");
-                break;  
-            case "sort_field_level_3":  
+                break;
+            case "sort_field_level_3":
                 this.param_sort_field_level_3 = this.prefs.getCharPref("sort_field_level_3");
-                break;  
-            case "min_recipients_show":  
+                break;
+            case "min_recipients_show":
                 this.param_min_recipients_show = this.prefs.getIntPref("min_recipients_show");
-                break;  
-            case "max_recipients_warning":  
+                break;
+            case "max_recipients_warning":
                 this.param_max_recipients_warning = this.prefs.getIntPref("max_recipients_warning");
-                break;  
-            case "add_comma":  
+                break;
+            case "add_comma":
                 this.param_add_comma = this.prefs.getBoolPref("add_comma");
-                break;  
-            case "min_search_delay":  
+                break;
+            case "min_search_delay":
                 this.param_min_search_delay = this.prefs.getIntPref("min_search_delay");
-                break;  
-            case "search_timeout":  
+                break;
+            case "search_timeout":
                 this.param_search_timeout = this.prefs.getIntPref("search_timeout");
-                break;  
-            case "search_min_char":  
+                break;
+            case "search_min_char":
                 this.param_search_min_char = this.prefs.getIntPref("search_min_char");
                 break;
-            case "search_collected_ab":  
+            case "search_collected_ab":
                 this.param_search_collected_ab = this.prefs.getBoolPref("search_collected_ab");
-                break;                
-            case "max_elements_part_menu":  
+                break;
+            case "max_elements_part_menu":
                 this.param_max_elements_part_menu = this.prefs.getIntPref("max_elements_part_menu");
-                break;  
-            case "mode":  
+                break;
+            case "mode":
                 this.param_mode = this.prefs.getIntPref("mode");
-                break;  
-            case "automatic_height":  
+                break;
+            case "automatic_height":
                 this.param_automatic_height = this.prefs.getBoolPref("automatic_height");
-                break;  
-            case "show_popularity":  
+                break;
+            case "show_popularity":
                 this.param_show_popularity = this.prefs.getBoolPref("show_popularity");
-                break;  
+                break;
             case "search_ab_URI":
                 this.param_search_ab_URI = this.prefs.getCharPref("search_ab_URI");
-                break;  
+                break;
             case "first_load_done":
                 this.param_first_load_done = this.prefs.getBoolPref("first_load_done");
-                break;  
+                break;
             case "force_bcc":
                 this.field_states['fieldBCC'].force = this.prefs.getBoolPref("force_bcc");
                 this.updateFieldVisibilityOnLoad('fieldBCC');
-                break;  
+                break;
             case "force_cc":
                 this.field_states['fieldCC'].force = this.prefs.getBoolPref("force_cc");
                 this.updateFieldVisibilityOnLoad('fieldCC');
@@ -1040,19 +1040,19 @@ var mrcAComplete = {
 
 
     /*
-     * 
-     * 
+     *
+     *
      * pseudo private methods (just begin with '_')
-     * 
-     * 
+     *
+     *
      */
 
     /*
      * hash method
-     * 
+     *
      * from http://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascrip-jquery
      * answer : http://stackoverflow.com/a/15710692
-     * 
+     *
      */
     _hashCode : function(s) {
         return s.split("").reduce(function(a,b) {
@@ -1070,11 +1070,11 @@ var mrcAComplete = {
     _pick : function(arg, def) {
         return (typeof arg !== "undefined" ? arg : def);
     },
-    
+
     _logError : function(obj, context) {
         /*
          * Send information to the console.
-         * 
+         *
          * params :
          *   obj : text or exception
          *   context : text, (optionnal) some informationabout context of log
@@ -1084,7 +1084,7 @@ var mrcAComplete = {
         let message = "ERREUR MRC-COMPOSE : ";
         if (context != '')
             message += " : "+context+" : "
-        
+
         if (obj.message)
             // Application.console.log(message+obj.message);
             Components.utils.reportError(message+obj.message);
@@ -1092,7 +1092,7 @@ var mrcAComplete = {
             // Application.console.log(message+obj);
             Components.utils.reportError(message+obj);
     },
-    
+
     _log : function(obj, context) {
         /*
          * Send information to the console.
@@ -1116,8 +1116,8 @@ var mrcAComplete = {
 
     _prefLoaded : function() {
         /*
-         * 
-         * 
+         *
+         *
          */
         let first_load_done = this.prefs.getBoolPref("first_load_done");
         if (!first_load_done) {
@@ -1143,44 +1143,44 @@ var mrcAComplete = {
     _splitEmailList : function (data) {
         /*
          * split a list of complete emails, separated by commas
-         * 
+         *
          * each complete email can have two parts :
          * [diplayName] <email>
          * displayName is optionnal
-         * 
+         *
          * displayName can contains specials characters :
          * if it contains ',', displayName is quoted
          * if it contains quote, the quote is backslashed
          * if it contains a backslash, it is backslashed
-         * 
+         *
          * ex :
          *   John DOE <john.doe@isp.com>
          *   "DOE, John" <john.doe@isp.com>
          *   "DOE, John (\"Jojo\")" <john.doe@isp.com>
          *   "DOE, John \\/" <john.doe@isp.com>
-         * 
+         *
          * params :
          *   data : text, the list of emails
          *
          * returns :
          *    array of emails, still quoted and backslashed
-         * 
+         *
          */
-        
-        
+
+
         /*
          *  Version with internal API :
          *  MailServices.headerParser.parseHeadersWithArray()
-         * 
+         *
          * but there is a problem in a special case :
          * when the data contains "xxx, yyyy, zzz,"
          * the internal API returns : [xxx,yyyy,zzz] instead of [xxx,yyyy,zzz,].
          * This prevents the current mrcCompose code to add new recipients.
-         * 
+         *
          * The internal API is useful after editing, but not during editing.
          * Until a workaround is found, I keep my javascript version.
-         * 
-         * 
+         *
+         *
         let addresses = {};         // 'value' : list of emails : veronica@achorn.com
         let names = {};             // 'value' : list of names : Achorn, Veronica
         let fullNames = {};         // 'value' : list of 'name <email>' : "Achorn, Veronica" <veronica@achorn.com>
@@ -1198,11 +1198,11 @@ var mrcAComplete = {
         // Application.console.log("_splitEmailList:'"+data+"'");
         let output1 = this._splitEmail_cache_output;
         if (data != this._splitEmail_cache_data) {
-        
+
             output1 = this._splitEmailList_js_version(data);
             // Application.console.log("1 : "+output1.join("||"));
             // Application.console.log("2 : "+output.join("||"));
-            
+
             this._splitEmail_cache_data = data;
             this._splitEmail_cache_output = output1;
         }
@@ -1212,22 +1212,22 @@ var mrcAComplete = {
     _splitEmailList_js_version : function (data, separator, quote, escaper) {
         /*
          * Split a list of complete emails, separated by commas (default).
-         * 
+         *
          * each complete email can have two parts :
          * [diplayName] <email>
          * displayName is optionnal
-         * 
+         *
          * displayName can contains specials characters :
          * if it contains ',', displayName is quoted
          * if it contains quote, the quote is backslashed
          * if it contains a backslash, it is backslashed
-         * 
+         *
          * ex :
          *   John DOE <john.doe@isp.com>
          *   "DOE, John" <john.doe@isp.com>
          *   "DOE, John (\"Jojo\")" <john.doe@isp.com>
          *   "DOE, John \\/" <john.doe@isp.com>
-         * 
+         *
          * params :
          *   data : text, the list of emails
          *   separator : (optional) default is comma
@@ -1240,7 +1240,7 @@ var mrcAComplete = {
         separator = this._pick(separator, ',');
         quote = this._pick(quote, '"');
         escaper = this._pick(escaper, '\\');
-        
+
         // separator and escaper MUST BE 1 char length
 
         let output = [];
@@ -1251,17 +1251,17 @@ var mrcAComplete = {
         let doPushPart = false;
         let doPushChar = true;
         let doEscapeNextChar = false;
-        
+
         // we parse the data, iterate over each character
         for (let i=0 ; i<nbData ; i++) {
             curChar = data[i];
             doPushPart = false;
             doPushChar = true;
-            
+
             if (doEscapeNextChar === false) {
                 // previous char was NOT an 'escaper'
                 // we make std process
-                
+
                 // quote handling
                 if (curChar === quote)
                     inQuote = ! inQuote;
@@ -1285,33 +1285,33 @@ var mrcAComplete = {
                 doPushChar = true;
                 doEscapeNextChar = false;
             }
-      
+
             // now execute actions for current char
             if (doPushChar) {
                 part += curChar;
             }
-            if (doPushPart) {        
+            if (doPushPart) {
                 output.push(part);
                 part = '';
             }
         }
-        
+
         // always a value
         output.push(part);
         return output;
     },
-      
+
     _myEncode : function(txt) {
-        /* 
+        /*
          * utility to encode text
-         * 
+         *
          * params :
          *   txt : the text to encode
          * return
          *   the text encoded
          */
         // default : we make essentials encoding : replace chars that break html
-        txt = txt.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); 
+        txt = txt.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
         // return encodeURI(txt);
         // TODO : use the correct API to encode texts
@@ -1322,7 +1322,7 @@ var mrcAComplete = {
     _applyBold : function(src, part, typeSearch) {
         /*
          * apply bold html style to some parts of text
-         * 
+         *
          * we are obliged to write our own method to put some part of text in bold
          * if we use replace() and regexp, we still have small but annoying problems :
          * txt = txt.replace(part, "<b>"+part+"</b>");
@@ -1331,15 +1331,15 @@ var mrcAComplete = {
          * txt = txt.replace(new RegExp(part, "gi"), "<b>"+part+"</b>");
          *     txt="firstName lastName <email>", part="na" --> "first<b>na</b>me last<b>na</b>me <email>", should be "first<b>Na</b>me last<b>Na</b>me <email>"
          *     ---> replaced text has lost his case
-         * 
+         *
          * We must also integrate the encode method.
          * Otherwise, we can have bad results if encoding is applied before :
          *   src : 'lastname <nickname>'
          *   src encoded : 'lastname &lt;nickname&gt;'
          *   if we have to apply bold for 't' :
          *   'las<b>t</b>name &l<b>t</b>;nickname&g<b>t</b>;' ==> html error
-         * 
-         * 
+         *
+         *
          * params :
          *   src : the text to modify
          *   part : the text to search in src ; will be bolded in src
@@ -1365,7 +1365,7 @@ var mrcAComplete = {
                     // 'contains' : always replace
                     doReplace = true;
                 }
-                
+
                 if (doReplace)
                     dest += this._myEncode(src.substring(0, pos)) + tagStart + this._myEncode(src.substring(pos, pos+part.length)) + tagEnd;
                 else
@@ -1383,7 +1383,7 @@ var mrcAComplete = {
         /*
          * Apply bold html style to some parts of text
          * and returns DOM nodes that represent the bolded text.
-         * 
+         *
          * we are obliged to write our own method to put some part of text in bold
          * if we use replace() and regexp, we still have small but annoying problems :
          * txt = txt.replace(part, "<b>"+part+"</b>");
@@ -1392,15 +1392,15 @@ var mrcAComplete = {
          * txt = txt.replace(new RegExp(part, "gi"), "<b>"+part+"</b>");
          *     txt="firstName lastName <email>", part="na" --> "first<b>na</b>me last<b>na</b>me <email>", should be "first<b>Na</b>me last<b>Na</b>me <email>"
          *     ---> replaced text has lost is case
-         * 
+         *
          * We must also integrate the encode method.
          * Otherwise, we can have bad results if encoding is applied before :
          *   src : 'lastname <nickname>'
          *   src encoded : 'lastname &lt;nickname&gt;'
          *   if we have to apply bold for 't' :
          *   'las<b>t</b>name &l<b>t</b>;nickname&g<b>t</b>;' ==> html error
-         * 
-         * 
+         *
+         *
          * params :
          *   src : the text to modify
          *   part : the text to search in src ; will be bolded in src
@@ -1424,7 +1424,7 @@ var mrcAComplete = {
                     // 'contains' : always replace
                     doReplace = true;
                 }
-                
+
                 if (doReplace) {
                     dest.push(document.createTextNode(src.substring(0, pos)));
                     let b = document.createElementNS(mrcAComplete.HTMLNS, "b");
@@ -1445,7 +1445,7 @@ var mrcAComplete = {
     _getPartByPos : function(src, pos) {
         /*
          * in a text separated by commas, search the subtext corresponding to the position
-         * 
+         *
          * params :
          *   src : the text separated by commas
          *   pos : the character position
@@ -1474,8 +1474,8 @@ var mrcAComplete = {
             }
         }
         return {
-                'b' : splitBegin, 
-                'e' : splitEnd, 
+                'b' : splitBegin,
+                'e' : splitEnd,
                 'i' : splitIndex,
                 'isFirstPart' : splitIndex == 0,
                 'isLastPart' : splitIndex == res.length-1,
@@ -1485,11 +1485,11 @@ var mrcAComplete = {
     _getPartByIndex : function(src, idx) {
         /*
          * in a text separated by commas, search the subtext corresponding to the part index
-         * 
+         *
          * params :
          *   src : the text separated by commas
          *   idx : the idx of part
-         * return : 
+         * return :
          *   a dict :
          *       'b'            : the position where the found part begins
          *       'e'            : the position where the found part ends
@@ -1513,8 +1513,8 @@ var mrcAComplete = {
             }
         }
         return {
-                'b' : splitBegin, 
-                'e' : splitEnd, 
+                'b' : splitBegin,
+                'e' : splitEnd,
                 'i' : splitIndex,
                 'isFirstPart' : splitIndex == 0,
                 'isLastPart' : splitIndex == res.length-1,
@@ -1524,7 +1524,7 @@ var mrcAComplete = {
     _insertInPart : function(src, pos, txt) {
         /*
          * in a text separated by commas, replace the subtext corresponding to the part index
-         * 
+         *
          * params :
          *   src : the text separated by commas
          *   pos : the character position
@@ -1558,7 +1558,7 @@ var mrcAComplete = {
          * In a html dom element (with text separated by commas), 
          * replace the subtext corresponding to the part index.
          * Also update cursor and size of element.
-         * 
+         *
          * params :
          *   element : the html dom element (with text separated by commas)
          *   pos : the character position
@@ -1569,7 +1569,7 @@ var mrcAComplete = {
         let oldTxt = element.value;
         let v = this._insertInPart(oldTxt, pos, txt);
         element.value = v['text'];
-        
+
         // optionaly add a comma
         if (this.param_add_comma && v['isLastPart']) {
             element.value += this.PART_SUFFIX+this.SEP+this.PART_PREFIX;
@@ -1590,7 +1590,7 @@ var mrcAComplete = {
     _removeInPart : function(src, txt) {
         /*
          * in a text separated by commas, remove the subtext
-         * 
+         *
          * params :
          *   src : the text separated by commas
          *   txt : the text to remove
@@ -1620,7 +1620,7 @@ var mrcAComplete = {
          * In a html dom element (with text separated by commas), 
          * replace the subtext corresponding to the part index.
          * Also update cursor and size of element.
-         * 
+         *
          * params :
          *   element : the html dom element (with text separated by commas)
          *   txt : the text to remove
@@ -1630,7 +1630,7 @@ var mrcAComplete = {
         let oldTxt = element.value;
         let v = this._removeInPart(oldTxt, txt);
         element.value = v['text'];
-        
+
         // update text cursor : put it at the end of the inserted text
         let sel = element.value.length;
         sel = 0;
@@ -1644,7 +1644,7 @@ var mrcAComplete = {
     _unSelectCurrent : function() {
         /*
          * unselect the current div in the panel
-         * 
+         *
          * params :
          *   none
          * return:
@@ -1661,7 +1661,7 @@ var mrcAComplete = {
     _select : function(newIndex) {
         /*
          * select a div in the panel
-         * 
+         *
          * params :
          *   newIndex : the index of the div to select
          * return :
@@ -1679,7 +1679,7 @@ var mrcAComplete = {
         let res = "";
         let temp = typeof mrcAComplete.mhParser.makeFullAddressString;
         // Application.console.log("typeof makeFullAddressString ="+temp);
-        
+
         if (typeof mrcAComplete.mhParser.makeFullAddress === "function") {
             // TB 24
             res = this.mhParser.makeFullAddress(a, b);
@@ -1689,7 +1689,7 @@ var mrcAComplete = {
             // THIS API DOES NOT PERFORM NECESSARY ENCODINGS...
             // ie : Doe, John <john.doe@free.fr> ==> "Doe, John" <john.doe@free.fr>
             // so it is completely useless...
-            
+
             // so we have to do them ourselve.
             // we perform encodings on name only
             res = a;
@@ -1700,7 +1700,7 @@ var mrcAComplete = {
             // finally, add quotes if comma
             if (res.indexOf(",") >= 0)
                 res = '"' + res + '"';
-            
+
             // then we add the email
             res = res + " <" + b + ">";
         }
@@ -1711,8 +1711,8 @@ var mrcAComplete = {
 
     /*
      * Searches
-     * 
-     * 
+     *
+     *
      * available criteria :
      * '=' IS
      * '!=' IS NOT
@@ -1724,18 +1724,18 @@ var mrcAComplete = {
      * '!c' NOT CONTAINS
      * '~=' SOUNDS LIKE
      * 'regexp' REGEXP
-     * 
-     * 
-     * 
+     *
+     *
+     *
      * code from std search from the address book window
-     * 
-     * let query = Services.prefs.getComplexValue("mail.addr_book.quicksearchquery.format", Components.interfaces.nsIPrefLocalizedString).data;  
+     *
+     * let query = Services.prefs.getComplexValue("mail.addr_book.quicksearchquery.format", Components.interfaces.nsIPrefLocalizedString).data;
      *   --> query = "?(or(PrimaryEmail,c,@V)(DisplayName,c,@V)(FirstName,c,@V)(LastName,c,@V))"
      */
 
 
 
-    // sort elements        
+    // sort elements
     _sort_card : function(a,b) {
         // returns :
         //  -1 if a < b
@@ -1761,7 +1761,7 @@ var mrcAComplete = {
             return v
         }
 
-        // order : 
+        // order :
         let def = {'mrcPopularity' : -1, 'firstName' : 1, 'lastName' : 1}
         let o1 = def[mrcAComplete.param_sort_field_level_1];
         let o2 = def[mrcAComplete.param_sort_field_level_2];
@@ -1788,9 +1788,9 @@ var mrcAComplete = {
 
     _removeDuplicatecards : function(arr) {
         /*
-         * remove duplicate cards from a list 
+         * remove duplicate cards from a list
          * (based on field 'primaryEmail')
-         * 
+         *
          * params :
          *   arr : the arr of cards
          * return:
@@ -1821,11 +1821,11 @@ var mrcAComplete = {
         }
         return out;
     },
-    
+
     _createMyCard : function(abcard) {
         /*
          * xxx
-         * 
+         *
          * params :
          *   abcard : xxx
          * return
@@ -1852,11 +1852,11 @@ var mrcAComplete = {
     _createResCard : function(mycard, primary, text) {
         /*
          * xxx
-         * 
+         *
          * params :
          *   mycard : xxx
-         *   primary : 
-         *   text : 
+         *   primary :
+         *   text :
          * return
          *   object
          */
@@ -1868,8 +1868,8 @@ var mrcAComplete = {
         };
         return temp;
     },
-    
-    
+
+
     _initSearchID : function() {
         /*
          * Reinit internal fields for a future search
@@ -1903,13 +1903,13 @@ var mrcAComplete = {
         }
         // this.searchedAB = {}; // implicitely done
     },
-    
+
     _purgeArchiv : function() {
         /*
          * Simply empty list of archived search listeners,
          * the GC will make the real job later.
          */
-        // SPECIAL : 
+        // SPECIAL :
         // As it is a call-back, we can't use 'this'
         // instead, we must use the let 'mrcAComplete'
         // Application.console.log("AVANT purge:"+mrcAComplete.searchedAB_archiv.join("||"));
@@ -1917,11 +1917,11 @@ var mrcAComplete = {
         mrcAComplete.searchedAB_archiv.splice(0, l);
         // Application.console.log("APRES purge:"+mrcAComplete.searchedAB_archiv.join("||"));
     },
-    
+
     _createHashSearchListener : function(searchListener) {
         /*
-         * 
-         * 
+         *
+         *
          */
         let temp = searchListener.addressBook.dirName + searchListener.searchID;
         // let hash = this._hashCode(temp); // no need to create a real hash
@@ -1929,22 +1929,22 @@ var mrcAComplete = {
         // Application.console.log("_createHashSearchListener : "+hash);
         return hash;
     },
-    
+
     _initSearchListeners : function() {
         this.allListenersStarted = false;
         this._archiveSearchListeners();
         this._initSearchID();
         // Application.console.log(now()+" _initSearchListeners : "+this.searchID);
     },
-    
-            
+
+
     _addSearchListener : function(abSearchListener) {
         abSearchListener.hash = this._createHashSearchListener(abSearchListener);
         let key = abSearchListener.hash;
         this.searchedAB[key] = abSearchListener;
         // Application.console.log("_addSearchListener : "+abSearchListener.addressBook.URI+":"+abSearchListener.hash+", "+this.allListenersStarted);
     },
-    
+
     _completeSearchListener : function(abSearchListener) {
         /*
          * Perform actions when a search is finished on ONE addressbook.
@@ -1958,7 +1958,7 @@ var mrcAComplete = {
                     // this.search_res1.mrc_extend(abSearchListener.localRes);
                     array_extend(this.search_res1, abSearchListener.localRes);
                     break;
-                    
+
                 case 2:
                     // Add results for current searchListenet in global results
                     // this.search_res1.mrc_extend(abSearchListener.localRes1);
@@ -1968,7 +1968,7 @@ var mrcAComplete = {
                     array_extend(this.search_res2, abSearchListener.localRes2);
                     array_extend(this.search_res3, abSearchListener.localRes3);
                     break;
-                    
+
                 case 3:
                     // sum localRes in global res
                     abSearchListener.localRes = this._removeDuplicatecards(abSearchListener.localRes);
@@ -1993,8 +1993,8 @@ var mrcAComplete = {
                 }
                 delete this.searchedAB[key];
             }
-            
-            
+
+
             // Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":"+this.searchedAB+", "+this.allListenersStarted);
             // Then test if search is complete for all addressbooks.
             this._testSearchComplete();
@@ -2003,14 +2003,14 @@ var mrcAComplete = {
             // Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":obsolete = "+abSearchListener.searchID);
         }
     },
-    
+
     _timeOutSearchListener : function(originalSearchID) {
         /*
          * Perform actions when search timeout has been trigerred
-         * 
+         *
          * params :
          *   originalSearchID : the searchID at the time the timeout was created
-         * 
+         *
          */
         if (originalSearchID == this.searchID) {
             // make any search obsolete
@@ -2024,7 +2024,7 @@ var mrcAComplete = {
                 // Application.console.log("k="+k);
                 this._addWarningTimeout(this.searchedAB[k].addressBook.dirName);
             }
-            
+
             // force search complete
             this._archiveSearchListeners();
             this._testSearchComplete();
@@ -2040,27 +2040,27 @@ var mrcAComplete = {
             /*
              * Perform actions when ALL searches are completed.
              */
-            
+
             // make any search obsolete
             this._obsoleteSearchID();
 
             // stop the current timeout
             clearTimeout(this.searchTimeOut);
             // Application.console.log("clearTimeout() ");
-            
+
             // then handle results
             switch(this.param_mode) {
                 case 1:
-                    // 
+                    //
                     this.search_res1 = this._removeDuplicatecards(this.search_res1);
                     this.search_res1.sort(this._sort_card);
 
                     this.datas = {'contains' : this.search_res1};
                     this.nbDatas = this.search_res1.length;
                     break;
-                    
+
                 case 2:
-                    // 
+                    //
                     this.search_res1 = this._removeDuplicatecards(this.search_res1);
                     this.search_res2 = this._removeDuplicatecards(this.search_res2);
                     this.search_res3 = this._removeDuplicatecards(this.search_res3);
@@ -2075,7 +2075,7 @@ var mrcAComplete = {
                             res2.push(this.search_res2[i]);
                     }
                     this.search_res2 = res2;
-                    
+
                     this.search_res1.sort(this._sort_card);
                     this.search_res2.sort(this._sort_card);
                     this.search_res3.sort(this._sort_card);
@@ -2083,7 +2083,7 @@ var mrcAComplete = {
                     this.datas = {'begin' : this.search_res1, 'contains' : this.search_res2, 'list' : this.search_res3};
                     this.nbDatas = this.search_res1.length+this.search_res2.length+this.search_res3.length;
                     break;
-                    
+
                 case 3:
                     // Nothing, already done.
                     break;
@@ -2096,13 +2096,13 @@ var mrcAComplete = {
                     this.datas = {'begin' : this.search_res1};
                     this.nbDatas = this.search_res1.length;
                     break;
-                    
+
             }
-            
+
             if (this.nbDatas == 0 && this.param_show_no_result) {
                 this._addInfoNoResult();
             }
-            
+
             if (this.cbSearch)
                 this.cbSearch();
             // Application.console.log("archiv="+this.searchedAB_archiv.length);
@@ -2120,15 +2120,15 @@ var mrcAComplete = {
         this.searchTimeOut = setTimeout(function () {
                 mrcAComplete._timeOutSearchListener(tempSearchID);
             }, this.param_search_timeout);
-        
+
         // Application.console.log("_startWaitingSearchListeners ");
         this._testSearchComplete();
     },
-    
+
     _addInfoNoResult : function() {
         /*
          * Add an info message saying that no results have been found.
-         * 
+         *
          * params :
          *   None
          * return
@@ -2141,28 +2141,28 @@ var mrcAComplete = {
     _addErrorAddressBook : function(ab_name) {
         /*
          * Add an error message for an addressBook name
-         * 
+         *
          * params :
          *   ab_name : the name of address book
          * return
          *   none
          */
         let message = this.getString("ab_error");
-        message = message.replace(/%s/g, ab_name); 
+        message = message.replace(/%s/g, ab_name);
         this.errors.push(message);
     },
 
     _addWarningTimeout : function(ab_name) {
         /*
          * Add a timeout warning message for an addressBook name
-         * 
+         *
          * params :
          *   ab_name : the name of address book
          * return
          *   none
          */
         let message = this.getString("ab_timeout");
-        message = message.replace(/%s/g, ab_name); 
+        message = message.replace(/%s/g, ab_name);
         this.warnings.push(message);
     },
 
@@ -2172,10 +2172,10 @@ var mrcAComplete = {
         https://wiki.mozilla.org/MailNews:LDAP_Address_Books
 
         https://wiki.mozilla.org/Mozilla_LDAP_SDK_Programmer%27s_Guide/Using_Filter_Configuration_Files_With_LDAP_C_SDK
-    
-        NS_SCRIPTABLE NS_IMETHOD CreateFilter(PRUint32 aMaxSize, const nsACString & aPattern, 
-                                            const nsACString & aPrefix, const nsACString & aSuffix, 
-                                            const nsACString & aAttr, const nsACString & aValue, 
+
+        NS_SCRIPTABLE NS_IMETHOD CreateFilter(PRUint32 aMaxSize, const nsACString & aPattern,
+                                            const nsACString & aPrefix, const nsACString & aSuffix,
+                                            const nsACString & aAttr, const nsACString & aValue,
                                             nsACString & _retval NS_OUTPARAM) = 0;
 
      */
@@ -2183,10 +2183,10 @@ var mrcAComplete = {
     _search_mode_1 : function(aString) {
         /*
          * search for mode 1, put results in internal fields
-         * 
+         *
          * the list contains 1 part :
          *   'contains' : contacts & lists whose fields contains X
-         * 
+         *
          * params :
          *   aString : the text to search in fields of address book
          *   cbSearch : the callback when search is done
@@ -2195,18 +2195,18 @@ var mrcAComplete = {
          */
         // use DisplayName and NickName
         let baseQuery = "(or(PrimaryEmail,@C,@V)(SecondEmail,@C,@V)(FirstName,@C,@V)(LastName,@C,@V)(DisplayName,@C,@V)(NickName,@C,@V))";
-        
-        // one search : CONTAINS     
+
+        // one search : CONTAINS
         let searchQuery1 = baseQuery.replace(/@C/g, 'c');
         searchQuery1 = searchQuery1.replace(/@V/g, encodeURIComponent(aString));
         // ldap query template
         let filterTemplate = "(|(mail=*%v*)(givenName=*%v*)(sn=*%v*)(displayName=*%v*)(cn=*%v*))";
-        
+
         let allAddressBooks = this.abManager.directories;
-        
+
         // init listeners
         this._initSearchListeners();
-        
+
         while (allAddressBooks.hasMoreElements()) {
             let ab = allAddressBooks.getNext();
             if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
@@ -2226,7 +2226,7 @@ var mrcAComplete = {
                         }
                         this._addSearchListener(abSearchListener);
 
-                        let childCards1 = this.abManager.getDirectory(ab.URI + "?" + searchQuery1).childCards;  
+                        let childCards1 = this.abManager.getDirectory(ab.URI + "?" + searchQuery1).childCards;
                         while (childCards1.hasMoreElements()) {
                             let card = childCards1.getNext();
                             if (card instanceof Components.interfaces.nsIAbCard) {
@@ -2238,7 +2238,7 @@ var mrcAComplete = {
                                     abSearchListener.localRes.push(this._createMyCard(card));
                             }
                         }
-                        
+
                         // finish the listener
                         this._completeSearchListener(abSearchListener);
                     } catch (e) {
@@ -2296,12 +2296,12 @@ var mrcAComplete = {
                                     isRemote : true,
                                     cbObject : that,
                                     localRes : [],
-                                    
+
                                     // special LDAP : keep refs of local var to prevent any GC (--> crashes)
                                     _query : query,
                                     _attrs : attributes,
                                     _args : args,
-                                    
+
                                     onSearchFinished : function(aResult, aErrorMesg) {
                                         if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
                                             this.cbObject._completeSearchListener(this);
@@ -2320,7 +2320,7 @@ var mrcAComplete = {
                                 /* CODE FOR TB >= 29 */
                                 /*
                                 let that = this;
-                               
+
                                 function acObserver() {}
 
                                 acObserver.prototype = {
@@ -2365,40 +2365,40 @@ var mrcAComplete = {
                 }
             }
         }
-        
+
         this._startWaitingSearchListeners();
     },
 
     _search_mode_2 : function(aString, cbSearch) {
         /*
          * search for mode 2, put results in internal fields
-         * 
+         *
          * the list contains 3 parts :
          *    'begin' :    contacts whose fields begin with X
          *    'contains' : contacts whose fields contains X (except those in part 1)
          *    'list' :     groups whose fields begin or contains X
-         * 
+         *
          * params :
          *   aString : the text to search in fields of address book
          * return:
          *   none
          */
         // use DisplayName or NickName ?
-        let baseQuery = "(or(PrimaryEmail,@C,@V)(SecondEmail,@C,@V)(FirstName,@C,@V)(LastName,@C,@V)(DisplayName,@C,@V)(NickName,@C,@V))";  
-        
-        // first search : BEGIN WITH     
+        let baseQuery = "(or(PrimaryEmail,@C,@V)(SecondEmail,@C,@V)(FirstName,@C,@V)(LastName,@C,@V)(DisplayName,@C,@V)(NickName,@C,@V))";
+
+        // first search : BEGIN WITH
         let searchQuery1 = baseQuery.replace(/@C/g, 'bw');
         searchQuery1 = searchQuery1.replace(/@V/g, encodeURIComponent(aString));
         // ldap query template
         let filterTemplate1 = "(|(mail=%v*)(givenName=%v*)(sn=%v*)(displayName=%v*)(cn=%v*))";
-        
+
         // second search : CONTAINS
         // We will make the exclusion manually, after all searches completed.
         let searchQuery2 = baseQuery.replace(/@C/g, 'c');
         searchQuery2 = searchQuery2.replace(/@V/g, encodeURIComponent(aString));
         // ldap query template
         let filterTemplate2 = "(|(mail=*%v*)(givenName=*%v*)(sn=*%v*)(displayName=*%v*)(cn=*%v*))";
-        
+
         // third search : GROUP CONTAINS
         // unused because first query uses field 'LastName'
         /*
@@ -2408,7 +2408,7 @@ var mrcAComplete = {
         // TODO : add field to search group
         let filterTemplate3 = "(|(mail=*%v*)(givenName=*%v*)(sn=*%v*)(displayName=*%v*)(cn=*%v*))";
         */
-        
+
         // init listeners
         this._initSearchListeners();
 
@@ -2434,7 +2434,7 @@ var mrcAComplete = {
                         this._addSearchListener(abSearchListener);
 
                         // search 1
-                        let childCards1 = this.abManager.getDirectory(ab.URI + "?" + searchQuery1).childCards;  
+                        let childCards1 = this.abManager.getDirectory(ab.URI + "?" + searchQuery1).childCards;
                         while (childCards1.hasMoreElements()) {
                             card = childCards1.getNext();
                             if (card instanceof Components.interfaces.nsIAbCard) {
@@ -2446,7 +2446,7 @@ var mrcAComplete = {
                         }
 
                         // search 2
-                        let childCards2 = this.abManager.getDirectory(ab.URI + "?" + searchQuery2).childCards;  
+                        let childCards2 = this.abManager.getDirectory(ab.URI + "?" + searchQuery2).childCards;
                         msg = "";
                         while (childCards2.hasMoreElements()) {
                             card = childCards2.getNext();
@@ -2460,7 +2460,7 @@ var mrcAComplete = {
                         // search 3
                         // unused
                         /*
-                        let childCards3 = mrcAbManager.getDirectory(ab.URI + "?" + searchQuery3).childCards;  
+                        let childCards3 = mrcAbManager.getDirectory(ab.URI + "?" + searchQuery3).childCards;
                         // Application.console.log(ab.dirName+" : "+searchResult.toString());
                         msg = "";
                         while (childCards3.hasMoreElements()) {
@@ -2469,7 +2469,7 @@ var mrcAComplete = {
                                 res3.push(this._createMyCard(card));
                             }
                         }
-                        */ 
+                        */
                         // finish the listener
                         this._completeSearchListener(abSearchListener);
                     } catch (e) {
@@ -2680,31 +2680,31 @@ var mrcAComplete = {
                 }
             }
         }
-        
+
         this._startWaitingSearchListeners();
     },
 
     _search_mode_3 : function(aString) {
         /*
          * search for mode 3, put results in internal fields
-         * 
+         *
          * the list contains 1 part for each AddressBook :
          *    contacts & lists whose fields contains X
-         * 
+         *
          * params :
          *   aString : the text to search in fields of address book
          * return:
          *   none
          */
         // use DisplayName and NickName
-        let baseQuery = "(or(PrimaryEmail,@C,@V)(SecondEmail,@C,@V)(FirstName,@C,@V)(LastName,@C,@V)(DisplayName,@C,@V)(NickName,@C,@V))";  
-        
-        // one search : CONTAINS     
+        let baseQuery = "(or(PrimaryEmail,@C,@V)(SecondEmail,@C,@V)(FirstName,@C,@V)(LastName,@C,@V)(DisplayName,@C,@V)(NickName,@C,@V))";
+
+        // one search : CONTAINS
         let searchQuery1 = baseQuery.replace(/@C/g, 'c');
         searchQuery1 = searchQuery1.replace(/@V/g, encodeURIComponent(aString));
         // ldap query template
         let filterTemplate = "(|(mail=*%v*)(givenName=*%v*)(sn=*%v*)(displayName=*%v*)(cn=*%v*))";
-        
+
         // init listeners
         this._initSearchListeners();
 
@@ -2727,7 +2727,7 @@ var mrcAComplete = {
                         }
                         this._addSearchListener(abSearchListener);
 
-                        let childCards1 = this.abManager.getDirectory(ab.URI + "?" + searchQuery1).childCards;  
+                        let childCards1 = this.abManager.getDirectory(ab.URI + "?" + searchQuery1).childCards;
                         while (childCards1.hasMoreElements()) {
                             card = childCards1.getNext();
                             if (card instanceof Components.interfaces.nsIAbCard) {
@@ -2756,7 +2756,7 @@ var mrcAComplete = {
                             if (true) {
                                 // Application.console.log(ab.dirName+" : LDAP search TB24");
                                 /* CODE FOR TB 24-31? */
-                                
+
                                 let query =
                                     Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
                                         .createInstance(Components.interfaces.nsIAbDirectoryQuery);
@@ -2795,7 +2795,7 @@ var mrcAComplete = {
                                     isRemote : true,
                                     cbObject : that,
                                     localRes : [],
-                                    
+
                                     // special LDAP : keep refs of local var to prevent any GC (--> crashes)
                                     _query : query,
                                     _attrs : attributes,
@@ -2814,7 +2814,7 @@ var mrcAComplete = {
 
                                 this._addSearchListener(abDirSearchListener);
                                 query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
-                                
+
                             } else {
                                 // Application.console.log(ab.dirName+" : LDAP search TB31");
                                 /* CODE FOR TB >= 29 */
@@ -2873,10 +2873,10 @@ var mrcAComplete = {
     _search_mode_4 : function(aString) {
         /*
          * search for mode 4, put results in internal fields
-         * 
+         *
          * the list contains 1 part :
          *   'begin' : contacts & lists whose fields begins with X
-         * 
+         *
          * params :
          *   aString : the text to search in fields of address book
          *   cbSearch : the callback when search is done
@@ -2885,18 +2885,18 @@ var mrcAComplete = {
          */
         // use DisplayName and NickName
         let baseQuery = "(or(PrimaryEmail,@C,@V)(SecondEmail,@C,@V)(FirstName,@C,@V)(LastName,@C,@V)(DisplayName,@C,@V)(NickName,@C,@V))";
-        
-        // one search : CONTAINS     
+
+        // one search : CONTAINS
         let searchQuery1 = baseQuery.replace(/@C/g, 'bw');
         searchQuery1 = searchQuery1.replace(/@V/g, encodeURIComponent(aString));
         // ldap query template
         let filterTemplate = "(|(mail=%v*)(givenName=%v*)(sn=%v*)(displayName=%v*)(cn=%v*))";
-        
+
         let allAddressBooks = this.abManager.directories;
-        
+
         // init listeners
         this._initSearchListeners();
-        
+
         while (allAddressBooks.hasMoreElements()) {
             let ab = allAddressBooks.getNext();
             if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
@@ -2916,7 +2916,7 @@ var mrcAComplete = {
                         }
                         this._addSearchListener(abSearchListener);
 
-                        let childCards1 = this.abManager.getDirectory(ab.URI + "?" + searchQuery1).childCards;  
+                        let childCards1 = this.abManager.getDirectory(ab.URI + "?" + searchQuery1).childCards;
                         while (childCards1.hasMoreElements()) {
                             let card = childCards1.getNext();
                             if (card instanceof Components.interfaces.nsIAbCard) {
@@ -2928,7 +2928,7 @@ var mrcAComplete = {
                                     abSearchListener.localRes.push(this._createMyCard(card));
                             }
                         }
-                        
+
                         // finish the listener
                         this._completeSearchListener(abSearchListener);
                     } catch (e) {
@@ -2986,12 +2986,12 @@ var mrcAComplete = {
                                     isRemote : true,
                                     cbObject : that,
                                     localRes : [],
-                                    
+
                                     // special LDAP : keep refs of local var to prevent any GC (--> crashes)
                                     _query : query,
                                     _attrs : attributes,
                                     _args : args,
-                                    
+
                                     onSearchFinished : function(aResult, aErrorMesg) {
                                         if (aResult == Components.interfaces.nsIAbDirectoryQueryResultListener.queryResultComplete) {
                                             this.cbObject._completeSearchListener(this);
@@ -3010,7 +3010,7 @@ var mrcAComplete = {
                                 /* CODE FOR TB >= 29 */
                                 /*
                                 let that = this;
-                               
+
                                 function acObserver() {}
 
                                 acObserver.prototype = {
@@ -3055,7 +3055,7 @@ var mrcAComplete = {
                 }
             }
         }
-        
+
         this._startWaitingSearchListeners();
     },
 
@@ -3063,7 +3063,7 @@ var mrcAComplete = {
         /*
          * call-back to build text for one card.
          * we suppose that the email will always be defined.
-         * 
+         *
          * params:
          *   card : the current card (not LIST)
          *   textBold : the searched text that will be in bold
@@ -3075,11 +3075,11 @@ var mrcAComplete = {
          *     'html' : the html text built for the card
          *     'node' : array of DOM nodes built for the card
          */
-        // SPECIAL : 
+        // SPECIAL :
         // As it is a call-back, we can't use 'this'
         // instead, we must use the let 'mrcAComplete'
-        
-        
+
+
         let cardText = "";
         let cardHtml = "";
         let cardNodes = [];
@@ -3094,7 +3094,7 @@ var mrcAComplete = {
                     names.push(card[fields['name'][i]]);
             }
             cardText = mrcAComplete._makeFullAddress(names.join(" "), card['primaryEmail']);
-            
+
             // ----------------
             // node version
             for (let i=0,l=fields['name'].length ; i<l ; i++) {
@@ -3125,12 +3125,12 @@ var mrcAComplete = {
                     names.push(card[fields['name'][i]]);
             }
             cardText = mrcAComplete._makeFullAddress(names.join(" "), card['secondEmail']);
-            
+
             // ----------------
             // node version
             let aspan = document.createElementNS(mrcAComplete.HTMLNS, "span");
             aspan.setAttribute("class", mrcAComplete.HIDDENNAME_CLASSNAME);
-            for (let i=0,l=fields['name'].length ; i<l ; i++) {            
+            for (let i=0,l=fields['name'].length ; i<l ; i++) {
                 appendChildrenList(aspan, mrcAComplete._applyBoldNode(card[fields['name'][i]], textBold, typeSearch));
                 aspan.appendChild(document.createTextNode(" "));
             }
@@ -3142,7 +3142,7 @@ var mrcAComplete = {
             appendChildrenList(aspan2, mrcAComplete._applyBoldNode(card['secondEmail'], textBold, typeSearch));
             aspan2.appendChild(document.createTextNode(">"));
             cardNodes.push(aspan2);
-            
+
         }
         return {'text': cardText, 'html': cardHtml, 'node' : cardNodes};
     },
@@ -3150,7 +3150,7 @@ var mrcAComplete = {
     _buildOneResult_List : function(card, textBold, typeSearch, primaryEmail) {
         /*
          * call-back to build text for one card of type LIST
-         * 
+         *
          * params:
          *   card : the current card of type LIST
          *   textBold : the searched text that will be in bold
@@ -3162,19 +3162,19 @@ var mrcAComplete = {
          *     'html' : the html text built for the card
          *     'node' : array of DOM nodes built for the card
          */
-        // SPECIAL : 
+        // SPECIAL :
         // As it is a call-back, we can't use 'this'
         // instead, we must use the let 'mrcAComplete'
 
         // get number of contacts in the list
         let childs = MailServices.ab.getDirectory(card.mailListURI).addressLists;
         let nb = childs.length;
-        
+
         // ----------------
         // text version
         let cardText = ""; // Wil be defined only when the user selects it.
         // No real options of presentation : a list has only 'lastname' field.
-        
+
         // ----------------
         // html version : UNUSED
         let cardHtml = "";
@@ -3192,14 +3192,14 @@ var mrcAComplete = {
             aspan.appendChild(document.createTextNode("("+nb+mrcAComplete.NBSP+mrcAComplete.getString('contacts')+")"));
         }
         cardNodes.push(aspan);
-        
+
         return {'text': cardText, 'html': cardHtml, 'node' : cardNodes};
     },
 
     _buildOneResult_CardList : function(card, textBold, typeSearch, primaryEmail) {
         /*
          * call-back to build text for one card
-         * 
+         *
          * params:
          *   card : the current card (LIST or not)
          *   textBold : the searched text that will be in bold
@@ -3211,7 +3211,7 @@ var mrcAComplete = {
          *     'html' : the html text built for the card
          *     'node' : array of DOM nodes built for the card
          */
-        // SPECIAL : 
+        // SPECIAL :
         // As it is a call-back, we can't use 'this'
         // instead, we must use the let 'mrcAComplete'
         if (card.isMailList) {
@@ -3224,7 +3224,7 @@ var mrcAComplete = {
     _buildOnePart : function(params) {
         /*
          * build one part of results list, with results of search
-         * 
+         *
          * params:
          *   params : a dict of parameters :
          *            'data' : the key of the data to use in the dict 'this.datas'
@@ -3293,7 +3293,7 @@ var mrcAComplete = {
     _buildResultInfos : function(popupDiv) {
         /*
          * Add informations about search informations.
-         * 
+         *
          * params :
          *   popupDiv : the html element in which we have to add informations
          * return :
@@ -3315,7 +3315,7 @@ var mrcAComplete = {
     _buildResultWarnings : function(popupDiv) {
         /*
          * Add informations about search warnings.
-         * 
+         *
          * params :
          *   popupDiv : the html element in which we have to add informations
          * return :
@@ -3338,7 +3338,7 @@ var mrcAComplete = {
     _buildResultErrors : function(popupDiv) {
         /*
          * Add informations about search errors.
-         * 
+         *
          * params :
          *   popupDiv : the html element in which we have to add informations
          * return :
@@ -3367,7 +3367,7 @@ var mrcAComplete = {
     _buildResultList_mode_1 : function(textBold) {
         /*
          * build the html list of results for mode 1, with results of search
-         * 
+         *
          * params :
          *   textBold : the searched text, that will be written in bold
          * return :
@@ -3379,10 +3379,10 @@ var mrcAComplete = {
         // empty associated internals fields
         this.panelCards.length = 0;
         this.indexSelectedCard = -1;
-        
+
         // we build div for every part
         let divs = [];
-        let params = [ {'data' : 'contains', 'cb' : this._buildOneResult_CardList, 'search' : 'contains', 'text_part' : textBold}, 
+        let params = [ {'data' : 'contains', 'cb' : this._buildOneResult_CardList, 'search' : 'contains', 'text_part' : textBold},
                      ];
         for (let i=0, len=params.length ; i < len ; i++) {
             let res = this._buildOnePart(params[i]);
@@ -3401,27 +3401,27 @@ var mrcAComplete = {
                 popupDiv.appendChild(sep);
             }
         }
-        
+
         // Add infos if there are some
         this._buildResultInfos(popupDiv);
         // Add infos about warnings if there are some
         this._buildResultWarnings(popupDiv);
         // Add infos about errors if there are some
         this._buildResultErrors(popupDiv);
-        
+
         // select first element
         if (this.nbDatas > 0) {
             this._select(1);
         }
 
-        // we take care of memory : emptying unused arrays: 
+        // we take care of memory : emptying unused arrays:
         this.datas['contains'].length = 0;
     },
 
     _buildResultList_mode_2 : function(textBold) {
         /*
          * build the html list of results for mode 1, with results of search
-         * 
+         *
          * params :
          *   textBold : the searched text, that will be written in bold
          * return :
@@ -3433,11 +3433,11 @@ var mrcAComplete = {
         // empty associated internals fields
         this.panelCards.length = 0;
         this.indexSelectedCard = -1;
-        
+
         // we build div for every part
         let divs = [];
         let params = [ {'data' : 'begin', 'cb' : this._buildOneResult_Card, 'search' : 'begin', 'text_part' : textBold},
-                       {'data' : 'contains', 'cb' : this._buildOneResult_Card, 'search' : 'contains', 'text_part' : textBold}, 
+                       {'data' : 'contains', 'cb' : this._buildOneResult_Card, 'search' : 'contains', 'text_part' : textBold},
                        {'data' : 'list', 'cb' : this._buildOneResult_List, 'search' : 'contains', 'text_part' : textBold} ];
         for (let i=0, len=params.length ; i < len ; i++) {
             let res = this._buildOnePart(params[i]);
@@ -3463,13 +3463,13 @@ var mrcAComplete = {
         this._buildResultWarnings(popupDiv);
         // Add infos about errors if there are some
         this._buildResultErrors(popupDiv);
-        
+
         // select first element
         if (this.nbDatas > 0) {
             this._select(1);
         }
 
-        // we take care of memory : emptying unused arrays: 
+        // we take care of memory : emptying unused arrays:
         this.datas['begin'].length = 0;
         this.datas['contains'].length = 0;
         this.datas['list'].length = 0;
@@ -3478,7 +3478,7 @@ var mrcAComplete = {
     _buildResultList_mode_3 : function(textBold) {
         /*
          * build the html list of results for mode 3, with results of search
-         * 
+         *
          * params :
          *   textBold : the searched text, that will be written in bold
          * return :
@@ -3490,7 +3490,7 @@ var mrcAComplete = {
         // empty associated internals fields
         this.panelCards.length = 0;
         this.indexSelectedCard = -1;
-        
+
         // we build div for every part
         // but the number of part is dynamic
         let divs = [];
@@ -3523,13 +3523,13 @@ var mrcAComplete = {
         this._buildResultWarnings(popupDiv);
         // Add infos about errors if there are some
         this._buildResultErrors(popupDiv);
-        
+
         // select first element
         if (this.nbDatas > 0) {
             this._select(1);
         }
 
-        // we take care of memory : emptying unused arrays: 
+        // we take care of memory : emptying unused arrays:
         for (let i in this.datas)
             this.datas[i].length = 0;
     },
@@ -3537,7 +3537,7 @@ var mrcAComplete = {
     _buildResultList_mode_4 : function(textBold) {
         /*
          * build the html list of results for mode 4, with results of search
-         * 
+         *
          * params :
          *   textBold : the searched text, that will be written in bold
          * return :
@@ -3549,10 +3549,10 @@ var mrcAComplete = {
         // empty associated internals fields
         this.panelCards.length = 0;
         this.indexSelectedCard = -1;
-        
+
         // we build div for every part
         let divs = [];
-        let params = [ {'data' : 'begin', 'cb' : this._buildOneResult_CardList, 'search' : 'begin', 'text_part' : textBold}, 
+        let params = [ {'data' : 'begin', 'cb' : this._buildOneResult_CardList, 'search' : 'begin', 'text_part' : textBold},
                      ];
         for (let i=0, len=params.length ; i < len ; i++) {
             let res = this._buildOnePart(params[i]);
@@ -3571,14 +3571,14 @@ var mrcAComplete = {
                 popupDiv.appendChild(sep);
             }
         }
-        
+
         // Add infos if there are some
         this._buildResultInfos(popupDiv);
         // Add infos about warnings if there are some
         this._buildResultWarnings(popupDiv);
         // Add infos about errors if there are some
         this._buildResultErrors(popupDiv);
-        
+
         // select first element
         if (this.nbDatas > 0) {
             this._select(1);
@@ -3589,19 +3589,19 @@ var mrcAComplete = {
     },
 
     _doEmptyPanel : function() {
-        
+
         let popupDiv = document.getElementById("msgAutocompletePanelDiv");
         removeChildren(popupDiv);
         // empty associated internals fields
         this.panelCards.length = 0;
         this.indexSelectedCard = -1;
     },
-    
+
     _getNbRecipients : function(textAddress) {
         /*
-         * from a text separated by commas, compute the number 
+         * from a text separated by commas, compute the number
          * of non-empty parts.
-         * 
+         *
          * params :
          *   textAddress : the text separated by commas
          * return :
@@ -3615,9 +3615,9 @@ var mrcAComplete = {
             let t = addresses[i].trim();
             if (t != '') nb++;
         }
-        
+
         // TODO : need to count only valid values (real emails) ?
-        
+
         return nb;
     },
 
@@ -3627,7 +3627,7 @@ var mrcAComplete = {
     _updateAllFieldAction : function() {
         /*
          * Updates menuitems for all fields
-         * 
+         *
          * params:
          *   none
          * return:
@@ -3641,7 +3641,7 @@ var mrcAComplete = {
     _updateFieldAction : function(field) {
         /*
          * Update the menuitem associated to a field
-         * 
+         *
          * params:
          *   field : the field
          * returns:
@@ -3662,7 +3662,7 @@ var mrcAComplete = {
     _getFieldFromTextElement : function(element) {
         /*
          * utility : return the field based on the text field
-         * 
+         *
          */
         let field = "";
         for (let i in this.FIELDS) {
@@ -3671,13 +3671,13 @@ var mrcAComplete = {
         return field;
     },
 
-    
+
     _removeRecipient : function(field, email) {
 
         if (this.FIELDS[field]) {
             try {
                 let element = document.getElementById(this.FIELDS[field].txtId);
-                
+
                 this._elementRemoveInPart(element, email);
                 this.updateNbRecipients(element);
 
@@ -3688,7 +3688,7 @@ var mrcAComplete = {
             }
         }
     },
-    
+
     _insertRecipient : function(field, email) {
 
         if (this.FIELDS[field]) {
@@ -3710,17 +3710,17 @@ var mrcAComplete = {
 
 
     /*
-     * 
-     * 
+     *
+     *
      * public methods
-     * 
-     * 
+     *
+     *
      */
 
     getString : function(key) {
         /*
          * wrapper for localization
-         * 
+         *
          * params :
          *   key : the name of the property
          * return :
@@ -3739,7 +3739,7 @@ var mrcAComplete = {
         return res
         /*
          * Alternate way
-         * 
+         *
         let bundleService = Components.classes["@mozilla.org/intl/stringbundle;1"].getService(Components.interfaces.nsIStringBundleService);
         let bundle = bundleService.createBundle("chrome://mrc_compose/locale/mrc_compose.properties");
         let str = bundle.GetStringFromName(key);
@@ -3751,13 +3751,13 @@ var mrcAComplete = {
     getFieldsForCardName: function(card) {
         /*
          * return fields name in order to build a text version of the card
-         * 
+         *
          * params :
          *   card : the address book card
          * return :
          *   a dict :
-         *       'name' : a list of fields names 
-         *       'email' : a list of fields names  
+         *       'name' : a list of fields names
+         *       'email' : a list of fields names
          */
         // rules for choosing a name
         let fieldsName = [];
@@ -3776,21 +3776,21 @@ var mrcAComplete = {
         // rules for choosing an email
         // no rule today
         let fieldsEmail = ['primaryEmail'];
-        
+
         return {'name' : fieldsName, 'email' : fieldsEmail};
     },
-    
+
     getCardAsText : function(card){
         /*
          * returns the card's complete name as text (with quotes)
-         * 
+         *
          * check if it the right method (fields) to show
          * ie : use 'nickName', 'displayName', 'phoneticName'...????
          * is there an official API that handle that ??? NO...
          * email = card.firstName+" "+card.lastName+" <"+card.primaryEmail+">";
-         * 
+         *
          * ==> cf mail/components/addrbook/content/abCommon.js : GenerateAddressFromCard
-         * 
+         *
          * params :
          *   card : the address book card
          * return :
@@ -3812,12 +3812,12 @@ var mrcAComplete = {
         let cardText = this._makeFullAddress(names.join(" "), emails.join(" "));
         return cardText;
     },
-    
+
     getCurrentPart : function(text, pos) {
         /*
          * in a text separated by commas, compute the index of part
          * that contains a character defined by his position
-         * 
+         *
          * params :
          *   text : the text separated by commas
          *   pos : the position of character
@@ -3833,7 +3833,7 @@ var mrcAComplete = {
         /*
          * compute if we need to perform a new query.
          * Impose a delay between two identical searches.
-         * 
+         *
          * params :
          *   newQuery : the text to search
          * return :
@@ -3842,12 +3842,12 @@ var mrcAComplete = {
         let now = new Date().getTime();
         return ((this.lastQuery != newQuery) || ((now - this.lastQueryTime) > this.param_min_search_delay));
     },
-    
+
     search : function(aString, event, element, cbSearch) {
         /*
          * official call to perform search on address book.
          * dynamic call of internal search method
-         * 
+         *
          * params :
          *   aString : the text to search
          *   event : event that generated the search
@@ -3865,18 +3865,18 @@ var mrcAComplete = {
         let meth = "_search_mode_"+this.param_mode;
         this.cbSearch = cbSearch
 
-        // stop the purge timeout 
+        // stop the purge timeout
         clearTimeout(this.timeout_archiv);
-        
+
         // show panel with spinning image while searching
         let deck = document.getElementById('deckAutocompletePanel');
         deck.selectedIndex = this.DECK_WAITING;
         this._doEmptyPanel();
         this.openPopup(event, element);
-        
+
         try {
             this[meth](aString);
-            // DEBUG : 
+            // DEBUG :
             // Force some GC to simulate some low-memory context found by some users.
             // For LDAP searches, it brings some crashes until all variables where referenced.
             // Components.utils.forceGC();
@@ -3888,7 +3888,7 @@ var mrcAComplete = {
     finishSearch : function(aString, event, element) {
         /*
          * Perform actions after search is complete.
-         * 
+         *
          * params :
          *   aString : the searched text
          *   event : the event that generated the search
@@ -3907,8 +3907,8 @@ var mrcAComplete = {
         } else {
             this.hidePopup();
         }
-        
-        // start the purge timeout 
+
+        // start the purge timeout
         // this.timeout_archiv = setTimeout(this._purgeArchiv, this.DELAY_PURGE_ARCHIV);
         // To avoid AMO warning, we copy code of _purgeArchiv().
         this.timeout_archiv = setTimeout(function() {
@@ -3916,7 +3916,7 @@ var mrcAComplete = {
                  * Simply empty list of archived search listeners,
                  * the GC will make the real job later.
                  */
-                // SPECIAL : 
+                // SPECIAL :
                 // As it is a call-back, we can't use 'this'
                 // instead, we must use the let 'mrcAComplete'
                 // Application.console.log("AVANT purge:"+mrcAComplete.searchedAB_archiv.join("||"));
@@ -3927,27 +3927,27 @@ var mrcAComplete = {
     },
 
     infoTypeMore : function(aString, event, element) {
-        
+
         // show panel with spinning image while searching
         let deck = document.getElementById('deckAutocompletePanel');
         deck.selectedIndex = this.DECK_TYPEMORE;
         // prepare message for user
         let delta = this.param_search_min_char - aString.length;
         let message = this.getString("type_more");
-        message = message.replace(/%s/g, delta); 
+        message = message.replace(/%s/g, delta);
         // put message in panel
         let label = document.getElementById('labelTypeMore');
         label.value = message;
-        
+
         this._doEmptyPanel();
         this.openPopup(event, element);
     },
-    
+
     buildResultList : function(textPart) {
         /*
          * official call to perform search on address book.
          * dynamic call of internal builList method
-         * 
+         *
          * params :
          *   textPart : the searched text
          * return :
@@ -3967,7 +3967,7 @@ var mrcAComplete = {
     selectPrevious : function() {
         /*
          * select previous div in panel.
-         * 
+         *
          * params :
          *   none
          * return :
@@ -3985,7 +3985,7 @@ var mrcAComplete = {
     selectNext : function() {
         /*
          * select next div in panel
-         * 
+         *
          * params :
          *   none
          * return :
@@ -3997,13 +3997,13 @@ var mrcAComplete = {
         else
             newIndex = this.indexSelectedCard+1;
         this._unSelectCurrent();
-        this._select(newIndex);    
+        this._select(newIndex);
     },
 
     select : function(newIndex) {
         /*
          * select a div in panel.
-         * 
+         *
          * params :
          *   newIndex : the index of div
          * return :
@@ -4018,13 +4018,13 @@ var mrcAComplete = {
     updateFieldVisibilityOnLoad : function(field) {
         /*
          * update the UI xxxxxxxxxxx
-         * 
+         *
          * params :
          *   field : the internal identifier of field
          * return :
          *   none
          */
-        // check the element : is it one of the N fields ?        
+        // check the element : is it one of the N fields ?
         if (this.FIELDS[field]) {
             // Ensure height can change.
             mrcCompose_WORKAROUND_Height();
@@ -4048,13 +4048,13 @@ var mrcAComplete = {
             }
         }
     },
-    
+
     updateFieldUIAfterKeyUp : function(element) {
         /*
-         * update the UI that handle fields : 
-         * user entered text in textfield 'element', 
+         * update the UI that handle fields :
+         * user entered text in textfield 'element',
          * update the associated menuitem
-         * 
+         *
          * params :
          *   element : html field with adresses
          * return :
@@ -4067,7 +4067,7 @@ var mrcAComplete = {
     updateFieldUI : function(field) {
         /*
          * update the UI that handle fields : 
-         * 
+         *
          * params :
          *   field : text
          * return :
@@ -4087,16 +4087,16 @@ var mrcAComplete = {
         }
     },
 
-    changeFieldVisibility : function(field){     
+    changeFieldVisibility : function(field) {
         /*
          * Update UI and objects in response to a field visibilty change
-         * 
+         *
          */
 
         if (this.FIELDS[field]) {
             // Ensure height can change.
             mrcCompose_WORKAROUND_Height();
-            try{
+            try {
                 let idBox = this.FIELDS[field].boxId;
                 let box = document.getElementById(idBox);
                 box.collapsed = ! box.collapsed;
@@ -4115,15 +4115,15 @@ var mrcAComplete = {
             }
         }
     },
-    
-    forceFieldVisibility : function(field, visible){     
+
+    forceFieldVisibility : function(field, visible) {
         /*
          * Update UI and objects in response to a field visibilty change
-         * 
+         *
          */
 
         if (this.FIELDS[field]) {
-            try{
+            try {
                 let idBox = this.FIELDS[field].boxId;
                 let box = document.getElementById(idBox);
                 let newCollapsed = ! visible;
@@ -4138,7 +4138,7 @@ var mrcAComplete = {
     updateNbRecipients : function(element, collapseIfZero) {
         /*
          * update the UI with the number of recipient for an html email field
-         * 
+         *
          * params :
          *   element : the html field with adresses
          *   collapseIfZero : hide the info if 0 recipients
@@ -4147,7 +4147,7 @@ var mrcAComplete = {
          */
         // optional parameter
         collapseIfZero = this._pick(collapseIfZero, false);
-        
+
         // check the element : is it one of the 3 fields ?
         let field = this._getFieldFromTextElement(element);
         if (field != "") {
@@ -4168,8 +4168,9 @@ var mrcAComplete = {
                     item.hidden = true;
                 }
             } else {
-                if (nbRecipients >= this.param_min_recipients_show) txt = "("+nbRecipients+")";
-                
+                if (nbRecipients >= this.param_min_recipients_show)
+                    txt = "("+nbRecipients+")";
+
                 let label = document.getElementById(idLabel);
                 label.value = txt;
                 label.collapsed = false;
@@ -4184,14 +4185,14 @@ var mrcAComplete = {
             }
         }
     },
-    
-    
-    
+
+
+
 
     validate : function() {
         /*
          * enter the selected card from the panel in the html email textfield
-         * 
+         *
          * params :
          *   none
          * return :
@@ -4228,7 +4229,7 @@ var mrcAComplete = {
     openPopup : function(event, element) {
         /*
          * open the result panel for a html textfield
-         * 
+         *
          * params :
          *   none
          * return :
@@ -4238,11 +4239,11 @@ var mrcAComplete = {
         let popup = document.getElementById("msgAutocompletePanel");
         popup.openPopup(element, "after_start", 0, 0, false, true, event);
     },
-    
+
     hidePopup : function() {
         /*
          * close the result panel
-         * 
+         *
          * params :
          *   none
          * return :
@@ -4255,13 +4256,13 @@ var mrcAComplete = {
         popup.hidePopup();
         this.currentTextBox = null;
     },
-    
+
 
     getNbTotalRecipients : function() {
         /*
          * compute the total nb recipients,
          * from fields TO, CC and BCC.
-         * 
+         *
          * params :
          *   none
          * return :
@@ -4287,12 +4288,12 @@ function mrcCompose_WORKAROUND_Height() {
 }
 
 function mrcComposeFocus() {
-    
+
     // set focus to default "TO" field
     let fieldFocus = "";
     let msgTo = document.getElementById("msgTO");
     // dump("DEBUG mrcComposeFocus\n");
-    
+
     // gMsgCompose is defined when that callback is fired.
     if (gMsgCompose.composeHTML) {
         if (msgTo.value == "")
@@ -4301,7 +4302,8 @@ function mrcComposeFocus() {
         else
             // non-empty TO : reply message
             fieldFocus = mrcAComplete.prefs.getCharPref("first_focus_reply_html");
-        if (fieldFocus == "content") fieldFocus = "content-frame";
+        if (fieldFocus == "content")
+            fieldFocus = "content-frame";
 
         // here, the default focus is the content textfield
         // change focus only if necessary
@@ -4335,11 +4337,12 @@ function mrcComposeFocus() {
         else
             // non-empty TO : reply message
             fieldFocus = mrcAComplete.prefs.getCharPref("first_focus_reply");
-        if (fieldFocus == "content") fieldFocus = "content-frame";
+        if (fieldFocus == "content")
+            fieldFocus = "content-frame";
 
         // Here, no default focus (maybe in the old adressingWindget ?)
         // change focus only if necessary
-        if (fieldFocus != "default"){        
+        if (fieldFocus != "default"){
             // simple way in plain text message : doesn't work anymore in TB24
             // let msg = document.getElementById(fieldFocus);
             // msg.focus();
@@ -4372,39 +4375,41 @@ function mrcComposeFocus() {
     }
 }
 
-window.addEventListener("load", function(e) { 
+window.addEventListener("load", function(e) {
         // dump("DEBUG : load compose window\n");
         mrcAComplete.startup();
     }, false);
 
-window.addEventListener("unload", function(e) { mrcAComplete.shutdown(); }, false);
+window.addEventListener("unload", function(e) {
+        mrcAComplete.shutdown();
+    }, false);
 
 
 
 /*
- * 
- * 
+ *
+ *
  * UI CallBacks
- * 
- * 
- * 
- * 
+ *
+ *
+ *
+ *
  */
 
 function mrcRecipientKeyPress(event, element) {
     /*
      * call-back for 'keypress' event
-     * 
-     * 
+     *
+     *
      * Here we can intercept key event BEFORE being integrated into the text.
-     * 
+     *
      * So we take care of keys :
      * UP, DOWN, ENTER, TAB
-     * 
+     *
      * If the panel is present or not, their behaviour will be different
      */
     gContentChanged=true;
-    
+
     let popup = document.getElementById("msgAutocompletePanel");
     if (popup.state == "open" || popup.state == "showing") { // TODO : check if 'showing' is ok
         switch(event.keyCode) {
@@ -4417,7 +4422,7 @@ function mrcRecipientKeyPress(event, element) {
                 event.stopPropagation();
                 event.preventDefault(); // MOST IMPORTANT LINE : avoid the handling by the textbox
                 break;
-            
+
             case KeyEvent.DOM_VK_DOWN:
                 // select next element of autocomplete div
                 mrcAComplete.selectNext();
@@ -4443,7 +4448,7 @@ function mrcRecipientKeyPress(event, element) {
         }
     } else {
         // default behaviour
-        
+
         // update the # of recipients of the current textbox
         // mrcAComplete.updateNbRecipients(element);
     }
@@ -4452,21 +4457,21 @@ function mrcRecipientKeyPress(event, element) {
 function mrcRecipientKeyUp(event, element) {
     /*
      * call-back for 'keyup' event
-     * 
+     *
      * Here we can intercept key event AFTER being integrated into the text.
-     * --> we can analyse the text and if necessary, open the panel 
-     * 
+     * --> we can analyse the text and if necessary, open the panel
+     *
      */
     // www.the-art-of-web.com/javascript/escape
-    gContentChanged=true;
+    gContentChanged = true;
     // Application.console.log("keyCode="+event.keyCode);
     let sel = element.selectionStart;
-    let textPart = mrcAComplete.getCurrentPart(element.value, sel).trim();    
+    let textPart = mrcAComplete.getCurrentPart(element.value, sel).trim();
     let canUpdatePanel = true;
     let canUpdateUI = true;
 
     // TODO : ajouter un cache sur textPart pour optimiser
-    
+
     let popup = document.getElementById("msgAutocompletePanel");
     if (popup.state == "open" || popup.state == "showing") { // TODO : check if 'showing' is ok
         switch(event.keyCode) {
@@ -4482,7 +4487,7 @@ function mrcRecipientKeyUp(event, element) {
     } else {
         // default behaviour
         // we suppose the search will be done and the popup opened
-        
+
         // text inserted --> automatic height
         if (mrcAComplete.param_automatic_height)
             mrcRecipientResize(element);
@@ -4497,11 +4502,11 @@ function mrcRecipientKeyUp(event, element) {
                 break;
         }
     }
-    
-    
+
+
     // TODO
     // revoir la gestion des flèches dans les différents cas
-    
+
     switch(event.keyCode) {
         case KeyEvent.DOM_VK_PAGE_UP:
         case KeyEvent.DOM_VK_PAGE_DOWN:
@@ -4511,7 +4516,7 @@ function mrcRecipientKeyUp(event, element) {
         case KeyEvent.DOM_VK_UP:
         case KeyEvent.DOM_VK_RIGHT:
         case KeyEvent.DOM_VK_DOWN:
-        
+
             // optimize with cache
             if (textPart == mrcAComplete._textPart_cache) {
                 // no need to update UI
@@ -4530,11 +4535,11 @@ function mrcRecipientKeyUp(event, element) {
 
     // fill cache for next keyups
     mrcAComplete._textPart_cache = textPart;
-    
+
     if (canUpdateUI) {
         // update the UI that handle fields
         mrcAComplete.updateFieldUIAfterKeyUp(element);
-        
+
         // update the # of recipients of the current textbox
         mrcAComplete.updateNbRecipients(element);
 
@@ -4544,13 +4549,13 @@ function mrcRecipientKeyUp(event, element) {
 
     if (canUpdatePanel) {
         if (textPart.length >= mrcAComplete.param_search_min_char) {
-            
+
             /*
             TODO :
             test si le textPart est déjà un email complet "xxxxx <yyy@isp.com>"
             ou non.
             * si oui, faire la recherche sur l'email ! pour etre sur de retrouver le contact
-      
+
             regex simple pour chercher un email
                 /\S+@\S+\.\S+/
 
@@ -4560,9 +4565,9 @@ function mrcRecipientKeyUp(event, element) {
                 {
                     var re = /\S+@\S+\.\S+/;
                     return re.test(email);
-                    
+
             */
-            
+
             // Application.console.log("textPart:'"+textPart+"'");
             let re = /<\S+@\S+\.\S+>$/;
             let res = re.exec(textPart);
@@ -4572,19 +4577,19 @@ function mrcRecipientKeyUp(event, element) {
                 // Application.console.log("raw:'"+raw+"'");
                 textPart = raw.slice(1,-1);
                 // Application.console.log("new textPart:'"+textPart+"'");
-                
+
             }
-                    
-                    
+
+
             if (mrcAComplete.needSearch(textPart)) {
                 // perform search
                 // Application.console.log("searching:'"+textPart+"'");
-                mrcAComplete.search(textPart, event, element, function callback_search() { 
+                mrcAComplete.search(textPart, event, element, function callback_search() {
                         mrcAComplete.finishSearch(textPart, event, element) 
                     } );
             }
         } else if (textPart.length == 0) {
-            
+
             mrcAComplete.hidePopup();
         } else {
             // not enough caracters to start searching : tell that to user
@@ -4596,15 +4601,15 @@ function mrcRecipientKeyUp(event, element) {
 function mrcRecipientResize(element, maxi) {
     /*
      * call-back for 'overflow' event
-     * 
+     *
      */
     try {
         // maxi = mrcAComplete._pick(maxi, mrcAComplete.param_max_height);
         maxi = mrcAComplete.param_max_height;
-        
+
         // Ensure height can change.
         mrcCompose_WORKAROUND_Height();
-        
+
         let sh1 = element.inputField.scrollHeight;
         element.height = 'auto'; // ==> forces the textbox to recompute scrollHeight to adapt to current value
         let sh2 = element.inputField.scrollHeight;
@@ -4618,32 +4623,32 @@ function mrcRecipientResize(element, maxi) {
         mrcAComplete._log("Resize : "+element.id+" : h1="+sh1+"  h2="+sh2+"  fnbLines="+fnbLines+"  nbLines="+nbLines+"  nHeight="+nHeight+"  h="+h+"  h3="+sh3);
     } catch (e) {
         this._logError(e, "mrcRecipientResize()");
-    }      
+    }
 }
 
 function mrcRecipientClick(event) {
     /*
      * call-back for 'click' event
-     * 
+     *
      */
     let id = event.currentTarget.id;
     let pos = id.indexOf(mrcAComplete.ID_PREFIX);
     if (pos == 0) {
         // extract index from id of element
-        let index = id.substr(mrcAComplete.ID_PREFIX.length);        
+        let index = id.substr(mrcAComplete.ID_PREFIX.length);
         // select the clicked element
         mrcAComplete.select(index);
         // validate it
         mrcAComplete.validate();
         // then close popup
         mrcAComplete.hidePopup();
-    } 
+    }
 }
 
 function mrcChangeFieldVisibility(event, field) {
     /*
      * call-back for checkboxes 'show XXX'
-     * 
+     *
      */
     mrcAComplete.changeFieldVisibility(field);
 }
@@ -4651,9 +4656,9 @@ function mrcChangeFieldVisibility(event, field) {
 function mrcMinimizeFields(event) {
     /*
      * call-back for button 'Minimize' :
-     * 
+     *
      * reduce all fields to one-line-height
-     * 
+     *
      */
     try {
         for (let i in mrcAComplete.FIELDS) {
@@ -4662,15 +4667,15 @@ function mrcMinimizeFields(event) {
             /*
              * TODO : BUG : DOES NOT WORK IF THE TEXTFIELD HAS >1 LINE AND NO SCROLLBAR
              * CAN'T FIND WHY... SEEMS AN INTERNAL BEHAVIOUR OF XUL ???
-             * 
+             *
              * AND CAN'T FORCE THE SCROLLBAR TO APPEAR BEFORE NEEDED
-             * 
-             * 
+             *
+             *
              * TESTED WITH A RESIZER IN XUL :
              *     <resizer element="msgTO" dir="bottomright" left="0" top="0" width="16" height="16"/>
              * ...WORKS PERFECTLY WITH THE MOUSE !
              */
-            
+
             // HACK : force scrollHeight AND delay some processing...
             if (element.scrollHeight <= element.height) {
                 element.height = 'auto'; // ==> forces the textbox to recompute scrollHeight to adapt to current value
@@ -4680,11 +4685,11 @@ function mrcMinimizeFields(event) {
 
                 // let t = mrcAComplete.param_first_line_height.toString()+'px';
                 // element.setAttribute("height", t);
-                
+
                 // HACK continue after a delay...
                 let t = setTimeout( function() {mrcMinimizeFields_2(element)}, 10);
             } else {
-            
+
                 element.height = 'auto'; // ==> forces the textbox to recompute scrollHeight to adapt to current value
                 element.height = mrcAComplete.param_first_line_height;
             }
@@ -4697,9 +4702,9 @@ function mrcMinimizeFields(event) {
 function mrcMinimizeFields_2(element) {
     /*
      * call-back for button 'Minimize' :
-     * 
+     *
      * reduce all fields to one-line-height
-     * 
+     *
      */
     try {
         let t = mrcAComplete.param_first_line_height.toString()+'px';
@@ -4713,7 +4718,7 @@ function mrcMaximizeFields(event) {
     /*
      * call-back for button 'Maximize'
      * expand all fields to their maximum
-     * 
+     *
      */
     try {
         for (let i in mrcAComplete.FIELDS) {
@@ -4729,10 +4734,10 @@ function mrcOpenPreferences(event) {
     /*
      * call-back for button 'Preferences'
      * Open mrcCompose's preferences window
-     * 
+     *
      */
     try {
-        window.openDialog('chrome://mrc_compose/content/options.xul',' My Option Dialog','chrome,toolbar'); 
+        window.openDialog('chrome://mrc_compose/content/options.xul',' My Option Dialog','chrome,toolbar');
     } catch (e) {
         mrcAComplete._logError(e, "mrcOpenPreferences()");
     }

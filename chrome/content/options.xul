@@ -34,9 +34,9 @@
    -   -**** END LICENSE BLOCK   -****   -->
 
 <!DOCTYPE overlay [
-    <!ENTITY % dtd2 SYSTEM "chrome://mrc_compose/locale/mrc_compose.dtd" > 
-    <!ENTITY % dtd1 SYSTEM "chrome://messenger/locale/messengercompose/messengercompose.dtd" > 
-    <!ENTITY % dtd3 SYSTEM "chrome://messenger/locale/preferences/compose.dtd" > 
+    <!ENTITY % dtd2 SYSTEM "chrome://mrc_compose/locale/mrc_compose.dtd" >
+    <!ENTITY % dtd1 SYSTEM "chrome://messenger/locale/messengercompose/messengercompose.dtd" >
+    <!ENTITY % dtd3 SYSTEM "chrome://messenger/locale/preferences/compose.dtd" >
     %dtd2;
     %dtd1;
     %dtd3;
@@ -84,7 +84,7 @@
         <preference id="pref_first_focus_reply_html" name="extensions.mrccompose.first_focus_reply_html" type="string"/>
 
         <preference id="pref_ldap_search_version" name="extensions.mrccompose.ldap_search_version" type="string"/>
-        
+
         <preference id="pref_show_no_result" name="extensions.mrccompose.show_no_result" type="bool"/>
         <preference id="pref_show_placeholder" name="extensions.mrccompose.show_placeholder" type="bool"/>
 
@@ -128,7 +128,7 @@
                                 <textbox id="search_ab_URI" type="string" 
                                         hidden="true"
                                         preference="pref_search_ab_URI" 
-                                        preference-editable="true" />     
+                                        preference-editable="true" />
                             </row>
                             <row>
 
@@ -152,7 +152,7 @@
                                    tooltiptext="&addressBookButton.tooltip;"/>
                                 -->
                                 <hbox>
-                                    <button id="editButton" label="&options.edit_directories.label;" 
+                                    <button id="editButton" label="&options.edit_directories.label;"
                                         oncommand="mrcEditDirectories();"/>
 
                                 </hbox>
@@ -210,11 +210,11 @@
                             </row>
                             <row>
                                 <label control="search_timeout" value="&options.search_timeout.label;" tooltip="mrctip"/>
-                                <textbox id="search_timeout" preference="pref_search_timeout" type="number" min="1" max="300000" tooltip="mrctip"/>     
+                                <textbox id="search_timeout" preference="pref_search_timeout" type="number" min="1" max="300000" tooltip="mrctip"/>
                             </row>
                             <row>
                                 <label control="show_no_result" value="&options.show_no_result.label;" tooltip="mrctip"/>
-                                <checkbox id="show_no_result" preference="pref_show_no_result" tooltip="mrctip"/>     
+                                <checkbox id="show_no_result" preference="pref_show_no_result" tooltip="mrctip"/>
                             </row>
 
                         </rows>
@@ -226,7 +226,7 @@
                     </html:div>
                 </scrollbox>
                 -->
-            </hbox>                    
+            </hbox>
         </tabpanel>
 
         <tabpanel>
@@ -240,15 +240,15 @@
                         <rows>
                             <row>
                                 <label control="min_recipients_show" value="&options.min_recipients_show.label;" tooltip="mrctip"/>
-                                <textbox id="min_recipients_show" preference="pref_min_recipients_show" type="number" min="1" max="50" size="3" tooltip="mrctip"/>     
+                                <textbox id="min_recipients_show" preference="pref_min_recipients_show" type="number" min="1" max="50" size="3" tooltip="mrctip"/>
                             </row>
                             <row>
                                 <label control="max_recipients_warning" value="&options.max_recipients_warning.label;" tooltip="mrctip"/>
-                                <textbox id="max_recipients_warning" preference="pref_max_recipients_warning" type="number" min="1" max="50" size="3" tooltip="mrctip"/>     
+                                <textbox id="max_recipients_warning" preference="pref_max_recipients_warning" type="number" min="1" max="50" size="3" tooltip="mrctip"/>
                             </row>
                             <row>
                                 <label control="search_min_char" value="&options.search_min_char.label;" tooltip="mrctip"/>
-                                <textbox id="search_min_char" preference="pref_search_min_char" type="number" min="1" max="50" size="3" tooltip="mrctip"/>     
+                                <textbox id="search_min_char" preference="pref_search_min_char" type="number" min="1" max="50" size="3" tooltip="mrctip"/>
                             </row>
 
                         </rows>
@@ -324,7 +324,7 @@
                             <row>
                                 <label value=""/>
                             </row>
-                            
+
                             <row>
                                 <label control="force_cc" value="&options.showcc.label;"/>
                                 <checkbox id="force_cc" preference="pref_force_cc"  />
@@ -392,7 +392,7 @@
                         <rows>
                             <row>
                                 <label control="min_search_delay" value="&options.min_search_delay.label;" tooltip="mrctip"/>
-                                <textbox id="min_search_delay" preference="pref_min_search_delay" type="number" min="1" max="1000" size="4" tooltip="mrctip"/>     
+                                <textbox id="min_search_delay" preference="pref_min_search_delay" type="number" min="1" max="1000" size="4" tooltip="mrctip"/>
                             </row>
                             <row>
                                 <label control="add_comma" value="&options.add_comma.label;" tooltip="mrctip"/>
@@ -410,7 +410,7 @@
                             </row>
                             -->
                         </rows>
-                        
+
                     </grid>
                     <label value="&options.special_values.label;" style="&options.special_values.style;"/>
                 </vbox>

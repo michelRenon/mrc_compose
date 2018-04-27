@@ -37,26 +37,26 @@
 
 
 <!DOCTYPE overlay [
-    <!ENTITY % dtd2 SYSTEM "chrome://mrc_compose/locale/mrc_compose.dtd" > 
-    <!ENTITY % dtd1 SYSTEM "chrome://messenger/locale/messengercompose/messengercompose.dtd" > 
+    <!ENTITY % dtd2 SYSTEM "chrome://mrc_compose/locale/mrc_compose.dtd" >
+    <!ENTITY % dtd1 SYSTEM "chrome://messenger/locale/messengercompose/messengercompose.dtd" >
     %dtd2;
     %dtd1;
 ]>
 
 <?xml-stylesheet href="chrome://mrc_compose/content/mrc_compose.css" type="text/css"?>
-<overlay id="mrc_compose" 
+<overlay id="mrc_compose"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
     >
     <script type="application/javascript" src="chrome://mrc_compose/content/mrc_compose.js"/><!-- A reference to your JavaScript file -->
-    
+
     <!-- 
-    MUST USE THE EXISTING id OF BUNDLESET OF ORIGINAL XUL FILE 
+    MUST USE THE EXISTING id OF BUNDLESET OF ORIGINAL XUL FILE
       - - > it means we add the stringbundle to the existing stringbundleset
     -->
     <stringbundleset id="stringbundleset">
         <stringbundle id="mrcComposeStringBundle" src="chrome://mrc_compose/locale/mrc_compose.properties"/>
     </stringbundleset>
-    <!-- 
+    <!--
     only collapse this element beacuse some parts of init code need it.
     Currently, not enough time to serch how to completely remove it.
     -->
@@ -68,7 +68,7 @@
     <toolbar id="MsgHeadersToolbar" minheight="10" />
     DONE WITH CSS
     -->
-    
+
     <!-- hide the button "contacts" in the toolbar -->
     <!-- <toolbarbutton id="button-contacts" collapsed="true" /> -->
 
@@ -79,10 +79,10 @@
     <vbox id="attachments-box" collapsed="false" maxheight="50" />
 
     -->
-    
-    
-    
-    
+
+
+
+
     <!-- remove splitter -->
     <splitter id="compose-toolbar-sizer" removeelement="true" />
 
@@ -91,14 +91,14 @@
     we had to find a workaround :
        - delete the current line of "subject"
        - recreate it at the end of new inserted elements
-    
+
     -->
     <hbox id="subject-box" removeelement="true" />
 
 
-    <!-- 
+    <!--
     new elements : To, CC, BCC fields
-    
+
     plus the subject at the end
     -->
 
