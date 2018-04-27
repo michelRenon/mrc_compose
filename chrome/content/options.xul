@@ -53,9 +53,6 @@
      onload="mrcOnPrefLoaded();"
      onunload="mrcOnPrefUnloaded();"
      >
- 
- 
-    <script type="application/javascript" src="chrome://mrc_compose/content/mrc_pref.js"/><!-- A reference to your JavaScript file -->
 
     <prefpane id="mrc-compose-pane" label="" >
       <preferences>
@@ -432,5 +429,8 @@
 
 
     </prefpane>
- 
+
+
+    <script type="application/javascript" src="chrome://mrc_compose/content/mrc_pref.js"/><!-- A reference to your JavaScript file -->
+
 </prefwindow>
