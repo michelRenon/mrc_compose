@@ -52,7 +52,7 @@
 
 function mrcOnPrefLoaded() {
 
-    // Application.console.log("mrcOnPrefLoaded()");
+    mrcLog("mrcOnPrefLoaded()");
     buildABList();
     // mrcLoadHelp(); no need anymore with with help through tooltips.
 
@@ -109,6 +109,7 @@ function onSaveWhiteList() {
         }
     }
     var wlValue = wlArray.join(";;;");
+    mrcLog("onSaveWhiteList() : wlValue="+wlValue);
     var elt = document.getElementById("search_ab_URI")
     elt.setAttribute("value", wlValue);
     elt.value = wlValue;
@@ -122,12 +123,12 @@ function onSaveWhiteList() {
 
 
 function mrcOnPrefUnloaded(){
-    // Application.console.log("mrcOnPrefUnloaded()");
+    mrcLog("mrcOnPrefUnloaded()");
 
 }
 
 function mrcToggleCheckAB(element) {
-    // Application.console.log("mrcToggleChekAB() : "+element.label+";"+element.value);
+    mrcLog("mrcToggleChekAB() : "+element.label+";"+element.value);
     onSaveWhiteList();
 }
 
@@ -172,7 +173,7 @@ function mrcEditDirectories() {
 
 function mrcOnPrefActivate() {
     
-    Application.console.log("mrcOnPrefActivate()");
+    mrcLog("mrcOnPrefActivate()");
     // force rebuild of addressbooks list
     buildABList();
 }
@@ -185,7 +186,7 @@ function mrcOnPrefActivate() {
 
 function buildABList() {
 
-    Application.console.log("buildABList()");
+    mrcLog("buildABList()");
 
     let prefs = Components.classes["@mozilla.org/preferences-service;1"]  
                          .getService(Components.interfaces.nsIPrefService)  
@@ -355,5 +356,21 @@ function mrcLoadHelp() {
 
 function mrcOnPrefComposeLoaded() {
     
-    Application.console.log("mrcOnPrefComposeLoaded");
+    mrcLog("mrcOnPrefComposeLoaded");
+}
+
+function mrcLog(obj) {
+    /*
+        * Send information to the console.
+        *
+        * params :
+        *   obj : text or exception
+        */
+
+
+    let consoleService = Components.classes["@mozilla.org/consoleservice;1"].getService(Components.interfaces.nsIConsoleService);
+    if (obj.message)
+        consoleService.logStringMessage(obj.message);
+    else
+        consoleService.logStringMessage(obj);
 }
