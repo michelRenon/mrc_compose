@@ -300,7 +300,7 @@ function getContents(aURL){
     .classes["@mozilla.org/scriptableinputstream;1"]
     .getService(Components.interfaces.nsIScriptableInputStream);
 
-  var channel=ioService.newChannel(aURL,null,null);
+  var channel=ioService.newChannel2(aURL,null,null);
   var input=channel.open();
   scriptableStream.init(input);
   var str=scriptableStream.read(input.available());
