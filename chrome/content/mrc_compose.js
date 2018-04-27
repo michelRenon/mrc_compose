@@ -858,7 +858,7 @@ var mrcAComplete = {
         this.prefs = Components.classes["@mozilla.org/preferences-service;1"]  
                              .getService(Components.interfaces.nsIPrefService)  
                              .getBranch("extensions.mrccompose.");  
-        this.prefs.QueryInterface(Components.interfaces.nsIPrefBranch);  
+        // this.prefs.QueryInterface(Components.interfaces.nsIPrefBranch);
         this.prefs.addObserver("", this, false);  
 
         this.param_line_height = this.prefs.getIntPref("line_height");
