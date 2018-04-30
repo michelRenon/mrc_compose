@@ -48,15 +48,14 @@
 
 
 /*
-#box-to,
-#box-cc,
-#box-bcc,
-#box-reply,
-#box-ng,
-#box-follow {
-
+#subjectLabel {
+  margin-top: 0;
+  margin-bottom: 4px;
+  margin-inline-end: 6px;
 }
+
 */
+
 
 #msgTO,
 #msgCC,
@@ -67,19 +66,14 @@
   margin-top: 0;
   margin-inline-start: 0;
   margin-inline-end: 1px;
+  min-height: 20px;
   background-color: inherit;
-  -moz-appearance: none !important;
+  -moz-appearance: none;
   border: 1px solid transparent;
-  border-bottom-color: #C6C6C6;
-  border-bottom-left-radius: 0px;
-  border-top-right-radius: 0px;
-  -moz-border-top-colors: none;
-  -moz-border-left-colors: none;
-  -moz-border-right-colors: none;
-  -moz-border-bottom-colors: none;
+  border-bottom-color: #c6c6c6;
   border-radius: 2px;
   padding: 1px 2px;
-  padding-inline-start: 5px !important;
+  padding-inline-start: 5px;
   transition: border .2s, background-color .2s;
 }
 
@@ -97,5 +91,5 @@
 #msgFOLLOW[focused="true"] {
   background-color: white;
   background-image: none;
-  border-color: #C6C6C6;
+  border-color: #c6c6c6;
 }
