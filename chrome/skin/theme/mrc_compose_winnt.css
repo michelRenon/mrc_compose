@@ -47,21 +47,6 @@
  */
 
 
-
-
-/*
-#box-to,
-#box-cc,
-#box-bcc,
-#box-reply,
-#box-ng,
-#box-follow {
-}
-*/
-
-
-
-
 #msgTO,
 #msgCC,
 #msgBCC,
@@ -69,17 +54,16 @@
 #msgNG,
 #msgFOLLOW {
   -moz-appearance: none;
-  -moz-margin-end: 5px;
+  margin-top: 0;
+  margin-inline-end: 5px;
   background-color: inherit;
-  border-color: transparent;
-  -moz-border-top-colors: none;
-  -moz-border-left-colors: none;
-  -moz-border-right-colors: none;
-  -moz-border-bottom-colors: none;
+  border: 1px solid transparent;
   padding: 2px;
-  -moz-padding-start: 5px;
+  padding-inline-start: 5px;
   transition: border .2s, background-color .2s;
 }
+
+
 
 @media (-moz-windows-default-theme) {
     #msgTO,
@@ -88,7 +72,7 @@
     #msgREPLY,
     #msgNG,
     #msgFOLLOW {
-    border-width: 1px;
+        border-bottom-color: #a9b7c9;
   }
 
     #msgTO:hover,
@@ -103,18 +87,19 @@
     #msgREPLY[focused="true"],
     #msgNG[focused="true"],
     #msgFOLLOW[focused="true"] {
-    background-color: -moz-field;
+        background-color: -moz-field;
+        border-color: #a9b7c9;
   }
 }
 
-@media not all and (-moz-windows-default-theme) {
+@media (-moz-windows-default-theme: 0) {
     #msgTO,
     #msgCC,
     #msgBCC,
     #msgREPLY,
     #msgNG,
     #msgFOLLOW {
-    -moz-border-bottom-colors: ThreeDShadow ThreeDHighlight;
+        border-bottom-color: ThreeDShadow;
   }
 
     #msgTO:hover,
@@ -129,10 +114,8 @@
     #msgREPLY[focused="true"],
     #msgNG[focused="true"],
     #msgFOLLOW[focused="true"] {
-    background-color: -moz-field;
-    -moz-border-top-colors: ThreeDShadow ThreeDHighlight;
-    -moz-border-right-colors: ThreeDShadow ThreeDHighlight;
-    -moz-border-bottom-colors: ThreeDShadow ThreeDHighlight;
-    -moz-border-left-colors: ThreeDShadow ThreeDHighlight;
+        background-color: -moz-field;
+        border-color: ThreeDShadow;
   }
 }
+
