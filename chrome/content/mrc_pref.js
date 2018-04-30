@@ -69,6 +69,7 @@ function mrcTooltip() {
      *
      */
     // dump("tooltip="+document.tooltipNode.id+"\n");
+    mrcLog("tooltip="+document.tooltipNode.id+"\n");
     let div = document.getElementById("helptip");
     if (div) {
         let hid = document.tooltipNode.id;
@@ -78,8 +79,11 @@ function mrcTooltip() {
         try {
             txt = getContents("chrome://mrc_compose/locale/help_"+hid+".txt");
         } catch(e) {
+            mrcLog("erreur getContents() ="+e);
             txt = hid;
         }
+        mrcLog("hid="+hid+"\n");
+        mrcLog("txt="+txt+"\n");
 
         //clear the HTML div element of any prior shown custom HTML 
         while(div.firstChild)
@@ -301,7 +305,8 @@ function getContents(aURL){
     .classes["@mozilla.org/scriptableinputstream;1"]
     .getService(Components.interfaces.nsIScriptableInputStream);
 
-  var channel=ioService.newChannel2(aURL,null,null);
+  var channel=ioService.newChannel(aURL,null,null);
+  // var channel=ioService.newChannel2(aURL,null,null, null, document, document, null, null);
   var input=channel.open();
   scriptableStream.init(input);
   var str=scriptableStream.read(input.available());
