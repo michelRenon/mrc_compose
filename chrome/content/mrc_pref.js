@@ -68,7 +68,6 @@ function mrcTooltip() {
      * 'document.tooltipNode' is the element being hovered.
      *
      */
-    // dump("tooltip="+document.tooltipNode.id+"\n");
     mrcLog("tooltip="+document.tooltipNode.id+"\n");
     let div = document.getElementById("helptip");
     if (div) {
@@ -210,21 +209,12 @@ function buildABList() {
 
     // Populate the listbox with address books
     let abItems = [];
-    // for (let ab in fixIterator(MailServices.ab.directories,
-    //                          Components.interfaces.nsIAbDirectory)) {
-
     let abManager = Components.classes["@mozilla.org/abmanager;1"].getService(Components.interfaces.nsIAbManager);
     let allAddressBooks = abManager.directories;
     while (allAddressBooks.hasMoreElements()) {
         let ab = allAddressBooks.getNext();
-        // if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
         if ( !(ab instanceof Components.interfaces.nsIAbDirectory))
             continue;
-
-        // We skip mailing lists and remote address books.
-        // if (ab.isMailList || ab.isRemote)
-        // if (ab.isRemote)
-        //    continue;
 
         let abItem = document.createElement("listitem");
         abItem.setAttribute("type", "checkbox");
@@ -232,7 +222,6 @@ function buildABList() {
         abItem.setAttribute("label", ab.dirName);
         abItem.setAttribute("value", ab.URI);
 
-        // abItem.setAttribute("onclick", "mrcToggleCheckAB(this)" );
         abItem.addEventListener("click", mrcToggleCheckAB, false);
 
         // Due to bug 448582, we have to use setAttribute to set the
