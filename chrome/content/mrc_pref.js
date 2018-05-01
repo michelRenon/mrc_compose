@@ -45,9 +45,7 @@
  *
  */
 
-
-
-
+ChromeUtils.import("chrome://mrc_compose/content/mrc_tools.js");
 
 
 function mrcOnPrefLoaded() {
@@ -78,7 +76,7 @@ function mrcTooltip() {
         try {
             txt = getContents("chrome://mrc_compose/locale/help_"+hid+".txt");
         } catch(e) {
-            mrcLog("erreur getContents() ="+e);
+            mrcLogError("getContents() ="+e);
             txt = hid;
         }
         mrcLog("hid="+hid+"\n");
@@ -351,20 +349,4 @@ function mrcLoadHelp() {
 function mrcOnPrefComposeLoaded() {
 
     mrcLog("mrcOnPrefComposeLoaded");
-}
-
-function mrcLog(obj) {
-    /*
-        * Send information to the console.
-        *
-        * params :
-        *   obj : text or exception
-        */
-
-
-    let consoleService = Components.classes["@mozilla.org/consoleservice;1"].getService(Components.interfaces.nsIConsoleService);
-    if (obj.message)
-        consoleService.logStringMessage(obj.message);
-    else
-        consoleService.logStringMessage(obj);
 }

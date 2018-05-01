@@ -33,6 +33,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+ChromeUtils.import("chrome://mrc_compose/content/mrc_tools.js");
 
 
 /*
@@ -54,9 +55,9 @@ function getString(key) {
      *   the value of property in the current language
      */
     /* old version
-    Application.console.log("getString");
+    mrcLog("getString");
     let bundle = document.getElementById("mrcComposePrefStringBundle");
-    Application.console.log("getString bundle="+bundle);
+    mrcLog("getString bundle="+bundle);
     if (bundle)
         return bundle.getString(key);
     else
@@ -67,10 +68,10 @@ function getString(key) {
      * Alternate way
      *
      */
-    // Application.console.log("getString");
+    // mrcLog("getString");
     let bundleService = Components.classes["@mozilla.org/intl/stringbundle;1"].getService(Components.interfaces.nsIStringBundleService);
     let bundle = bundleService.createBundle("chrome://mrc_compose/locale/mrc_compose.properties");
-    // Application.console.log("getString bundle="+bundle);
+    // mrcLog("getString bundle="+bundle);
     let str = key;
     if (bundle)
         str = bundle.GetStringFromName(key);
@@ -86,7 +87,7 @@ function mrcLabelClick(event) {
 
 window.addEventListener("load", function(e) {
         // dump("DEBUG : load compose window\n");
-        // Application.console.log("load preferences compose window()");
+        // mrcLog("load preferences compose window()");
         /*
         chercher le checkbox d'id 'autocompleteLDAP' dans la fenetre id 'MailPreferences'
         remonter au parent (hbox)
@@ -94,17 +95,17 @@ window.addEventListener("load", function(e) {
         */
         let text = getString('autocomplete');
         let text2 = getString('autocomplete2');
-        // Application.console.log("text="+text+"     text2="+text2);
+        // mrcLog("text="+text+"     text2="+text2);
 
         let src = document.getElementById('emailCollectionOutgoing');
-        // Application.console.log("src="+src.nodeName);
+        // mrcLog("src="+src.nodeName);
         let tab = src.parentNode.parentNode;
-        // Application.console.log("tab="+tab.nodeName);
+        // mrcLog("tab="+tab.nodeName);
         let groupbox = tab.childNodes[0];
         let description = groupbox.childNodes[1];
-        // Application.console.log("description="+description.value);
+        // mrcLog("description="+description.value);
         description.value = text;
-        // Application.console.log("description apres="+description.value);
+        // mrcLog("description apres="+description.value);
 
         var hbox = document.createElement("hbox");
 
@@ -129,4 +130,4 @@ window.addEventListener("load", function(e) {
 
     }, false);
 
-// Application.console.log("window.addEventListener()");
+// mrcLog("window.addEventListener()");
