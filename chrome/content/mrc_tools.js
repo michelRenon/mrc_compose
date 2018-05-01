@@ -90,7 +90,8 @@ function mrcLog(obj, context) {
         *   obj : text, num, object or exception
         *   context : text, (optionnal) some information about context of log
         */
-    if (true) {
+    // if (true) { // dev : show logs
+    if (false) { // prod : no logs
         context = mrcPick(context, '');
 
         let message = "mrcCompose : ";
