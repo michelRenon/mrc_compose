@@ -416,7 +416,7 @@ function LoadIdentity(startup)
 // public method called by the address picker sidebar
 function AddRecipient(recipientType, address)
 {
-    // Application.console.log("AddRecipient("+recipientType+", "+address+")");
+    // this._log("AddRecipient("+recipientType+", "+address+")");
     switch(recipientType) {
         case "addr_to" :
             mrcAComplete._insertRecipient('fieldTO', address);
@@ -914,13 +914,13 @@ var mrcAComplete = {
         // Get the name of the application running us
         // info.name; // Returns "Firefox" for Firefox or "Thunderbird" for TB
         // info.version; // Returns "2.0.0.1" for Firefox version 2.0.0.1, "24.5.0"
-        // Application.console.log("APP NAME="+info.name+" ; APP VERSION="+info.version);
+        // this._log("APP NAME="+info.name+" ; APP VERSION="+info.version);
         // APP NAME=Thunderbird ; APP VERSION=24.5.0
 
         var xulRuntime = Components.classes["@mozilla.org/xre/app-info;1"]
                            .getService(Components.interfaces.nsIXULRuntime);
         var os_name = xulRuntime.OS.toLowerCase();
-        // Application.console.log("OS = "+xulRuntime.OS);
+        // this._log("OS = "+xulRuntime.OS);
         // 'Linux', 'WINNT', 'Darwin'
 
         // Adapt visibility of placeholders, based on prefs.
@@ -931,9 +931,6 @@ var mrcAComplete = {
                 test.setAttribute("placeholder", "");
             }
         }
-
-
-        this._log("TEST TB60 avec log + modif");
 
 
         /*
@@ -1101,10 +1098,8 @@ var mrcAComplete = {
             message += " : "+context+" : "
 
         if (obj.message) {
-            // Application.console.log(message+obj.message);
             Components.utils.reportError(message+obj.message);
         } else {
-            // Application.console.log(message+obj);
             Components.utils.reportError(message+obj);
         }
     },
@@ -1213,13 +1208,13 @@ var mrcAComplete = {
         }
         return output;
         */
-        // Application.console.log("_splitEmailList:'"+data+"'");
+        // this._log("_splitEmailList:'"+data+"'");
         let output1 = this._splitEmail_cache_output;
         if (data != this._splitEmail_cache_data) {
 
             output1 = this._splitEmailList_js_version(data);
-            // Application.console.log("1 : "+output1.join("||"));
-            // Application.console.log("2 : "+output.join("||"));
+            // this._log("1 : "+output1.join("||"));
+            // this._log("2 : "+output.join("||"));
 
             this._splitEmail_cache_data = data;
             this._splitEmail_cache_output = output1;
@@ -1702,7 +1697,7 @@ var mrcAComplete = {
     _makeFullAddress : function(a, b) {
         let res = "";
         let temp = typeof mrcAComplete.mhParser.makeFullAddressString;
-        // Application.console.log("typeof makeFullAddressString ="+temp);
+        // this._log("typeof makeFullAddressString ="+temp);
 
         if (typeof mrcAComplete.mhParser.makeFullAddress === "function") {
             // TB 24
@@ -1729,7 +1724,7 @@ var mrcAComplete = {
             // then we add the email
             res = res + " <" + b + ">";
         }
-        // Application.console.log("_makeFullAddress="+res);
+        // this._log("_makeFullAddress="+res);
         return res;
     },
 
@@ -1904,7 +1899,7 @@ var mrcAComplete = {
          * Reinit internal fields for a future search
          */
         this.searchID++;
-        // Application.console.log(now()+" _initSearchID : "+this.searchID);
+        // this._log(now()+" _initSearchID : "+this.searchID);
         this.search_res1 = [];
         this.search_res2 = [];
         this.search_res3 = [];
@@ -1941,10 +1936,10 @@ var mrcAComplete = {
         // SPECIAL :
         // As it is a call-back, we can't use 'this'
         // instead, we must use the let 'mrcAComplete'
-        // Application.console.log("AVANT purge:"+mrcAComplete.searchedAB_archiv.join("||"));
+        // this._log("AVANT purge:"+mrcAComplete.searchedAB_archiv.join("||"));
         let l = mrcAComplete.searchedAB_archiv.length;
         mrcAComplete.searchedAB_archiv.splice(0, l);
-        // Application.console.log("APRES purge:"+mrcAComplete.searchedAB_archiv.join("||"));
+        // this._log("APRES purge:"+mrcAComplete.searchedAB_archiv.join("||"));
     },
 
     _createHashSearchListener : function(searchListener) {
@@ -1955,7 +1950,7 @@ var mrcAComplete = {
         let temp = searchListener.addressBook.dirName + searchListener.searchID;
         // let hash = this._hashCode(temp); // no need to create a real hash
         let hash = temp;
-        // Application.console.log("_createHashSearchListener : "+hash);
+        // this._log("_createHashSearchListener : "+hash);
         return hash;
     },
 
@@ -1963,7 +1958,7 @@ var mrcAComplete = {
         this.allListenersStarted = false;
         this._archiveSearchListeners();
         this._initSearchID();
-        // Application.console.log(now()+" _initSearchListeners : "+this.searchID);
+        // this._log(now()+" _initSearchListeners : "+this.searchID);
     },
 
 
@@ -1971,14 +1966,14 @@ var mrcAComplete = {
         abSearchListener.hash = this._createHashSearchListener(abSearchListener);
         let key = abSearchListener.hash;
         this.searchedAB[key] = abSearchListener;
-        // Application.console.log("_addSearchListener : "+abSearchListener.addressBook.URI+":"+abSearchListener.hash+", "+this.allListenersStarted);
+        // this._log("_addSearchListener : "+abSearchListener.addressBook.URI+":"+abSearchListener.hash+", "+this.allListenersStarted);
     },
 
     _completeSearchListener : function(abSearchListener) {
         /*
          * Perform actions when a search is finished on ONE addressbook.
          */
-        // Application.console.log(now()+" _completeSearchListener : "+abSearchListener.searchID+"/"+this.searchID+":"+abSearchListener.addressBook.dirName);
+        // this._log(now()+" _completeSearchListener : "+abSearchListener.searchID+"/"+this.searchID+":"+abSearchListener.addressBook.dirName);
         if (abSearchListener.searchID == this.searchID) {
             // OK, it's a searchListener for current search
             switch(this.param_mode) {
@@ -2024,12 +2019,12 @@ var mrcAComplete = {
             }
 
 
-            // Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":"+this.searchedAB+", "+this.allListenersStarted);
+            // this._log("_completeSearchListener : "+abSearchListener.addressBook.URI+":"+this.searchedAB+", "+this.allListenersStarted);
             // Then test if search is complete for all addressbooks.
             this._testSearchComplete();
         } else {
             // it's an obsolete searchListener :
-            // Application.console.log("_completeSearchListener : "+abSearchListener.addressBook.URI+":obsolete = "+abSearchListener.searchID);
+            // this._log("_completeSearchListener : "+abSearchListener.addressBook.URI+":obsolete = "+abSearchListener.searchID);
         }
     },
 
@@ -2044,13 +2039,13 @@ var mrcAComplete = {
         if (originalSearchID == this.searchID) {
             // make any search obsolete
             this._obsoleteSearchID();
-            // Application.console.log(now()+" _timeOutSearchListener : "+this.searchID);
+            // this._log(now()+" _timeOutSearchListener : "+this.searchID);
 
             let keys = Object.keys(this.searchedAB);
-            // Application.console.log("_timeOutSearchListener() keys="+keys+":"+(typeof keys));
+            // this._log("_timeOutSearchListener() keys="+keys+":"+(typeof keys));
             for (let i=0, l=keys.length ; i<l; i++) {
                 let k = keys[i];
-                // Application.console.log("k="+k);
+                // this._log("k="+k);
                 this._addWarningTimeout(this.searchedAB[k].addressBook.dirName);
             }
 
@@ -2063,7 +2058,7 @@ var mrcAComplete = {
     },
 
     _testSearchComplete : function() {
-        // Application.console.log(now()+" _testSearchComplete : "+this.searchID);
+        // this._log(now()+" _testSearchComplete : "+this.searchID);
         let keys = Object.keys(this.searchedAB);
         if (keys.length == 0 && this.allListenersStarted == true) {
             /*
@@ -2075,7 +2070,7 @@ var mrcAComplete = {
 
             // stop the current timeout
             clearTimeout(this.searchTimeOut);
-            // Application.console.log("clearTimeout() ");
+            // this._log("clearTimeout() ");
 
             // then handle results
             switch(this.param_mode) {
@@ -2136,7 +2131,7 @@ var mrcAComplete = {
             if (this.cbSearch) {
                 this.cbSearch();
             }
-            // Application.console.log("archiv="+this.searchedAB_archiv.length);
+            // this._log("archiv="+this.searchedAB_archiv.length);
         }
     },
 
@@ -2153,7 +2148,7 @@ var mrcAComplete = {
                 mrcAComplete._timeOutSearchListener(tempSearchID);
             }, this.param_search_timeout);
 
-        // Application.console.log("_startWaitingSearchListeners ");
+        // this._log("_startWaitingSearchListeners ");
         this._testSearchComplete();
     },
 
@@ -2243,7 +2238,7 @@ var mrcAComplete = {
             let ab = allAddressBooks.getNext();
             if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
                 // recherche 1
-                // Application.console.log("AB LOCAL = " + ab.dirName);
+                // this._log("AB LOCAL = " + ab.dirName);
                 let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                 if (doSearch) {
                     try {
@@ -2280,16 +2275,16 @@ var mrcAComplete = {
                 }
             } else {
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
-                    // Application.console.log("param_search="+this.param_search_ab_URI+" ; ab.URI="+ab.URI)
+                    // this._log("param_search="+this.param_search_ab_URI+" ; ab.URI="+ab.URI)
                     // check if user wants to search in this AB
                     let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                     if (doSearch) {
                         try {
-                            // Application.console.log("AB LDAP = " + ab.dirName);
+                            // this._log("AB LDAP = " + ab.dirName);
                             /* CODE FOR TB 24 to 31? */
                             // if (this.param_ldap_search_version == 'TB24') {
                             if (true) {
-                                // Application.console.log(ab.dirName+" : LDAP search TB24");
+                                // this._log(ab.dirName+" : LDAP search TB24");
                                 let query =
                                     Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
                                             .createInstance(Components.interfaces.nsIAbDirectoryQuery);
@@ -2349,7 +2344,7 @@ var mrcAComplete = {
                                 this._addSearchListener(abDirSearchListener);
                                 query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
                             } else {
-                                // Application.console.log(ab.dirName+" : LDAP search TB31");
+                                // this._log(ab.dirName+" : LDAP search TB31");
                                 /* CODE FOR TB >= 29 */
                                 /*
                                 let that = this;
@@ -2494,7 +2489,7 @@ var mrcAComplete = {
                         // unused
                         /*
                         let childCards3 = mrcAbManager.getDirectory(ab.URI + "?" + searchQuery3).childCards;
-                        // Application.console.log(ab.dirName+" : "+searchResult.toString());
+                        // this._log(ab.dirName+" : "+searchResult.toString());
                         msg = "";
                         while (childCards3.hasMoreElements()) {
                             card = childCards3.getNext();
@@ -2789,7 +2784,7 @@ var mrcAComplete = {
                         try {
                             // if (this.param_ldap_search_version == 'TB24') {
                             if (true) {
-                                // Application.console.log(ab.dirName+" : LDAP search TB24");
+                                // this._log(ab.dirName+" : LDAP search TB24");
                                 /* CODE FOR TB 24-31? */
 
                                 let query =
@@ -2852,7 +2847,7 @@ var mrcAComplete = {
                                 query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
 
                             } else {
-                                // Application.console.log(ab.dirName+" : LDAP search TB31");
+                                // this._log(ab.dirName+" : LDAP search TB31");
                                 /* CODE FOR TB >= 29 */
                                 /*
                                 let that = this;
@@ -2896,7 +2891,7 @@ var mrcAComplete = {
                         } catch (e) {
                             this._addErrorAddressBook(ab.dirName);
                             this._logError(e, "_search_mode_3()");
-                            // Application.console.log(ab.dirName+" : LDAP _search_mode_3 ERROR");
+                            // this._log(ab.dirName+" : LDAP _search_mode_3 ERROR");
                         }
                     }
                 }
@@ -2937,7 +2932,7 @@ var mrcAComplete = {
             let ab = allAddressBooks.getNext();
             if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
                 // recherche 1
-                // Application.console.log("AB LOCAL = " + ab.dirName);
+                // this._log("AB LOCAL = " + ab.dirName);
                 let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                 if (doSearch) {
                     try {
@@ -2975,16 +2970,16 @@ var mrcAComplete = {
                 }
             } else {
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
-                    // Application.console.log("param_search="+this.param_search_ab_URI+" ; ab.URI="+ab.URI)
+                    // this._log("param_search="+this.param_search_ab_URI+" ; ab.URI="+ab.URI)
                     // check if user wants to search in this AB
                     let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                     if (doSearch) {
                         try {
-                            // Application.console.log("AB LDAP = " + ab.dirName);
+                            // this._log("AB LDAP = " + ab.dirName);
                             /* CODE FOR TB 24 to 31? */
                             // if (this.param_ldap_search_version == 'TB24') {
                             if (true) {
-                                // Application.console.log(ab.dirName+" : LDAP search TB24");
+                                // this._log(ab.dirName+" : LDAP search TB24");
                                 let query =
                                     Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
                                             .createInstance(Components.interfaces.nsIAbDirectoryQuery);
@@ -3044,7 +3039,7 @@ var mrcAComplete = {
                                 this._addSearchListener(abDirSearchListener);
                                 query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
                             } else {
-                                // Application.console.log(ab.dirName+" : LDAP search TB31");
+                                // this._log(ab.dirName+" : LDAP search TB31");
                                 /* CODE FOR TB >= 29 */
                                 /*
                                 let that = this;
@@ -3741,7 +3736,7 @@ var mrcAComplete = {
         if (this.FIELDS[field]) {
             try {
                 if (email != null && email != "") {
-                    // Application.console.log("DEBUG _insertRecipient() : "+field+", "+email);
+                    // this._log("DEBUG _insertRecipient() : "+field+", "+email);
                     let element = document.getElementById(this.FIELDS[field].txtId);
                     this._elementInsertInPart(element, element.value.length, email);
                     this.updateNbRecipients(element);
@@ -3906,7 +3901,7 @@ var mrcAComplete = {
          * return :
          *   none
          */
-        // Application.console.log(now()+" search() "+this.searchID);
+        // this._log(now()+" search() "+this.searchID);
         this.datas = {}; // TODO : check if it's the right way to empty dictionary
         this.errors = [];
         this.warnings = [];
@@ -3950,7 +3945,7 @@ var mrcAComplete = {
         this.lastQueryTime = new Date().getTime()
         // Is there something to show ? results, infos, warnings or errors ?
         let nb = this.nbDatas + this.infos.length + this.warnings.length + this.errors.length;
-        // Application.console.log("finishSearch, nb="+nb);
+        // this._log("finishSearch, nb="+nb);
         if (nb > 0) {
             this.buildResultList(aString);
             this.openPopup(event, element);
@@ -3969,10 +3964,10 @@ var mrcAComplete = {
                 // SPECIAL :
                 // As it is a call-back, we can't use 'this'
                 // instead, we must use the let 'mrcAComplete'
-                // Application.console.log("AVANT purge:"+mrcAComplete.searchedAB_archiv.join("||"));
+                // this._log("AVANT purge:"+mrcAComplete.searchedAB_archiv.join("||"));
                 let l = mrcAComplete.searchedAB_archiv.length;
                 mrcAComplete.searchedAB_archiv.splice(0, l);
-                // Application.console.log("APRES purge:"+mrcAComplete.searchedAB_archiv.join("||"));
+                // this._log("APRES purge:"+mrcAComplete.searchedAB_archiv.join("||"));
             }, this.DELAY_PURGE_ARCHIV);
     },
 
@@ -4269,7 +4264,7 @@ var mrcAComplete = {
             } else {
                 // --> enter his email in the text
                 email = card.text;
-                // Application.console.log("EMAIL = "+email);
+                // this._log("EMAIL = "+email);
             }
             this._elementInsertInPart(this.currentTextBox, this.currentTextBox.selectionStart, email);
             this.updateNbRecipients(this.currentTextBox);
@@ -4519,7 +4514,7 @@ function mrcRecipientKeyUp(event, element) {
      */
     // www.the-art-of-web.com/javascript/escape
     gContentChanged = true;
-    // Application.console.log("keyCode="+event.keyCode);
+    // mrcAComplete._log("keyCode="+event.keyCode);
     let sel = element.selectionStart;
     let textPart = mrcAComplete.getCurrentPart(element.value, sel).trim();
     let canUpdatePanel = true;
@@ -4579,7 +4574,7 @@ function mrcRecipientKeyUp(event, element) {
                 // no need to search
                 canUpdatePanel = false;
             } else {
-                // Application.console.log("texPart changed:"+textPart);
+                // mrcAComplete._log("texPart changed:"+textPart);
                 // no need to update UI
                 canUpdateUI = false;
                 // need to search
@@ -4623,22 +4618,22 @@ function mrcRecipientKeyUp(event, element) {
 
             */
 
-            // Application.console.log("textPart:'"+textPart+"'");
+            // mrcAComplete._log("textPart:'"+textPart+"'");
             let re = /<\S+@\S+\.\S+>$/;
             let res = re.exec(textPart);
             if (res && res.length > 0) {
                 // we extract the pure email
                 let raw = res[0];
-                // Application.console.log("raw:'"+raw+"'");
+                // mrcAComplete._log("raw:'"+raw+"'");
                 textPart = raw.slice(1,-1);
-                // Application.console.log("new textPart:'"+textPart+"'");
+                // mrcAComplete._log("new textPart:'"+textPart+"'");
 
             }
 
 
             if (mrcAComplete.needSearch(textPart)) {
                 // perform search
-                // Application.console.log("searching:'"+textPart+"'");
+                // mrcAComplete._log("searching:'"+textPart+"'");
                 mrcAComplete.search(textPart, event, element, function callback_search() {
                         mrcAComplete.finishSearch(textPart, event, element)
                     });
@@ -4718,7 +4713,7 @@ function mrcMinimizeFields(event) {
     try {
         for (let i in mrcAComplete.FIELDS) {
             let element = document.getElementById(mrcAComplete.FIELDS[i].txtId);
-            // Application.console.log(i+", height="+element.height+", sh="+element.inputField.scrollHeight);
+            // mrcAComplete._log(i+", height="+element.height+", sh="+element.inputField.scrollHeight);
             /*
              * TODO : BUG : DOES NOT WORK IF THE TEXTFIELD HAS >1 LINE AND NO SCROLLBAR
              * CAN'T FIND WHY... SEEMS AN INTERNAL BEHAVIOUR OF XUL ???
