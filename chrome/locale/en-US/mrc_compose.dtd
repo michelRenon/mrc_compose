@@ -39,7 +39,7 @@
 <!ENTITY options.sort_field_1.label "Popularity">
 <!ENTITY options.sort_field_2.label "lastName">
 <!ENTITY options.sort_field_3.label "firstName">
-<!ENTITY options.show_popularity.label "Show Popularity (?): ">            
+<!ENTITY options.show_popularity.label "Show Popularity (?): ">
 <!ENTITY options.show_no_result.label "Show 'No result' (?) : ">
 
 <!-- tab 2 -->
@@ -72,7 +72,7 @@
 <!-- tab 4 -->
 <!ENTITY options.min_search_delay.label "Min search delay (ms) (?): ">
 <!ENTITY options.search_timeout.label "Timeout for LDAP searches (ms) (?)">
-<!ENTITY options.add_comma.label "Automatic add comma (?): ">            
+<!ENTITY options.add_comma.label "Automatic add comma (?): ">
 
 <!ENTITY options.special_values.label "These values are special. It's better not to change them.">
 <!ENTITY options.special_values.style "font-size:1.2em; font-style:italic"> 

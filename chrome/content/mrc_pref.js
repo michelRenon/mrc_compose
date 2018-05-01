@@ -36,23 +36,21 @@
 
 
 /*
- * 
+ *
  * Javascript code for mrc_compose preference pane
- * 
- * 
- * 
- * 
- * 
+ *
+ *
+ *
+ *
+ *
  */
 
-
-
-
+ChromeUtils.import("chrome://mrc_compose/content/mrc_tools.js");
 
 
 function mrcOnPrefLoaded() {
 
-    // Application.console.log("mrcOnPrefLoaded()");
+    mrcLog("mrcOnPrefLoaded()");
     buildABList();
     // mrcLoadHelp(); no need anymore with with help through tooltips.
 
@@ -63,12 +61,12 @@ function mrcOnPrefLoaded() {
 function mrcTooltip() {
     /*
      * Defines content of default tooltip in pref window.
-     * 
+     *
      * 'this' is the tooltip object
      * 'document.tooltipNode' is the element being hovered.
-     * 
+     *
      */
-    // dump("tooltip="+document.tooltipNode.id+"\n");
+    mrcLog("tooltip="+document.tooltipNode.id+"\n");
     let div = document.getElementById("helptip");
     if (div) {
         let hid = document.tooltipNode.id;
@@ -78,19 +76,22 @@ function mrcTooltip() {
         try {
             txt = getContents("chrome://mrc_compose/locale/help_"+hid+".txt");
         } catch(e) {
+            mrcLogError("getContents() ="+e);
             txt = hid;
         }
-                
+        mrcLog("hid="+hid+"\n");
+        mrcLog("txt="+txt+"\n");
+
         //clear the HTML div element of any prior shown custom HTML 
-        while(div.firstChild) 
+        while(div.firstChild)
             div.removeChild(div.firstChild);
 
-        let injectHTML = Components.classes["@mozilla.org/feed-unescapehtml;1"] 
+        let injectHTML = Components.classes["@mozilla.org/feed-unescapehtml;1"]
         .getService(Components.interfaces.nsIScriptableUnescapeHTML) 
-        .parseFragment(txt, false, null, div); 
+        .parseFragment(txt, false, null, div);
 
         //attach the DOM object to the HTML div element 
-        div.appendChild(injectHTML); 
+        div.appendChild(injectHTML);
     }
 }
 function onSaveWhiteList() {
@@ -109,10 +110,11 @@ function onSaveWhiteList() {
         }
     }
     var wlValue = wlArray.join(";;;");
-    var elt = document.getElementById("search_ab_URI")
+    mrcLog("onSaveWhiteList() : wlValue="+wlValue);
+    var elt = document.getElementById("search_ab_URI");
     elt.setAttribute("value", wlValue);
     elt.value = wlValue;
-    
+
     // bug : doesn't propagate the pref value...
     // we force an event
     var dummyEvent = document.createEvent('Event');
@@ -122,12 +124,12 @@ function onSaveWhiteList() {
 
 
 function mrcOnPrefUnloaded(){
-    // Application.console.log("mrcOnPrefUnloaded()");
+    mrcLog("mrcOnPrefUnloaded()");
 
 }
 
 function mrcToggleCheckAB(element) {
-    // Application.console.log("mrcToggleChekAB() : "+element.label+";"+element.value);
+    mrcLog("mrcToggleChekAB() : "+element.label+";"+element.value);
     onSaveWhiteList();
 }
 
@@ -143,7 +145,7 @@ function mrcDefaultLineHeight(event) {
     /*
      * callback to put default values for fields 'first_line_height'
      * and 'line_height'
-     * 
+     *
      */
 
 
@@ -157,13 +159,13 @@ function mrcDefaultLineHeight(event) {
     let prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
     prefs.setIntPref("extensions.mrccompose.first_line_height", v["first"]);
     prefs.setIntPref("extensions.mrccompose.line_height", v["line"]);
-    
-    
-    
+
+
+
 }
 
 function mrcEditDirectories() {
-    
+
     window.openDialog("chrome://messenger/content/addressbook/pref-editdirectories.xul",
                   "editDirectories", "chrome,modal=yes,resizable=no", null);
 }
@@ -171,28 +173,28 @@ function mrcEditDirectories() {
 
 
 function mrcOnPrefActivate() {
-    
-    Application.console.log("mrcOnPrefActivate()");
+
+    mrcLog("mrcOnPrefActivate()");
     // force rebuild of addressbooks list
     buildABList();
 }
 
 /*
- * 
+ *
  * Internals
- * 
+ *
  */
 
 function buildABList() {
 
-    Application.console.log("buildABList()");
+    mrcLog("buildABList()");
 
-    let prefs = Components.classes["@mozilla.org/preferences-service;1"]  
-                         .getService(Components.interfaces.nsIPrefService)  
-                         .getBranch("extensions.mrccompose.");  
+    let prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                         .getService(Components.interfaces.nsIPrefService)
+                         .getBranch("extensions.mrccompose.");
 
     let first_load_done = prefs.getBoolPref("first_load_done");
-    
+
     let currentArray = [];
     currentArray = document.getElementById("search_ab_URI").value.split(";;;");
 
@@ -205,21 +207,12 @@ function buildABList() {
 
     // Populate the listbox with address books
     let abItems = [];
-    // for (let ab in fixIterator(MailServices.ab.directories,
-    //                          Components.interfaces.nsIAbDirectory)) {
-
     let abManager = Components.classes["@mozilla.org/abmanager;1"].getService(Components.interfaces.nsIAbManager);
     let allAddressBooks = abManager.directories;
     while (allAddressBooks.hasMoreElements()) {
         let ab = allAddressBooks.getNext();
-        // if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
         if ( !(ab instanceof Components.interfaces.nsIAbDirectory))
             continue;
-            
-        // We skip mailing lists and remote address books.
-        // if (ab.isMailList || ab.isRemote)
-        // if (ab.isRemote)
-        //    continue;
 
         let abItem = document.createElement("listitem");
         abItem.setAttribute("type", "checkbox");
@@ -227,9 +220,8 @@ function buildABList() {
         abItem.setAttribute("label", ab.dirName);
         abItem.setAttribute("value", ab.URI);
 
-        // abItem.setAttribute("onclick", "mrcToggleCheckAB(this)" );
-        abItem.addEventListener("click", mrcToggleCheckAB, false); 
-     
+        abItem.addEventListener("click", mrcToggleCheckAB, false);
+
         // Due to bug 448582, we have to use setAttribute to set the
         // checked value of the listitem.
         if (!first_load_done)
@@ -257,12 +249,12 @@ function buildABList() {
         prefs.setBoolPref("first_load_done", true);
         onSaveWhiteList();
     }
-    
+
 }
 
 function getLineHeight() {
-    
-    // std textbox is 
+
+    // std textbox is
     // ubuntu :  28px for first line, then 17px for others
     // windows : 20px and 13px
     // mac :     20px and 14 px
@@ -278,7 +270,7 @@ function getLineHeight() {
         case "WINNT":
             v = {'first':20, 'line':13};
             break;
-    
+
         default:
             v = {'first':20, 'line':13};
             break;
@@ -292,7 +284,7 @@ function getContents(aURL){
     /*
      * Read a file from a chrome path.
      * from http://forums.mozillazine.org/viewtopic.php?p=921150
-     * 
+     *
      */
   var ioService=Components.classes["@mozilla.org/network/io-service;1"]
     .getService(Components.interfaces.nsIIOService);
@@ -301,6 +293,7 @@ function getContents(aURL){
     .getService(Components.interfaces.nsIScriptableInputStream);
 
   var channel=ioService.newChannel(aURL,null,null);
+  // var channel=ioService.newChannel2(aURL,null,null, null, document, document, null, null);
   var input=channel.open();
   scriptableStream.init(input);
   var str=scriptableStream.read(input.available());
@@ -323,8 +316,8 @@ function mrcLoadHelp() {
             try {
                 txt = getContents("chrome://mrc_compose/locale/"+hid+".txt");
             } catch(e) {}
-            
-            //clear the HTML div element of any prior shown custom HTML 
+
+            //clear the HTML div element of any prior shown custom HTML
             while(div.firstChild) 
                 div.removeChild(div.firstChild);
 
@@ -334,7 +327,7 @@ function mrcLoadHelp() {
             let injectHTML = "";
             // special : Gecko 13 does not have 'parseFragment()'
             if (parserUtils.parseFragment)
-                injectHTML = parserUtils.parseFragment(txt, 0, false, null, div); 
+                injectHTML = parserUtils.parseFragment(txt, 0, false, null, div);
             else {
                 // Old API to parse html, xml, svg.
                 var parser = Components.classes["@mozilla.org/xmlextras/domparser;1"]
@@ -354,6 +347,6 @@ function mrcLoadHelp() {
 
 
 function mrcOnPrefComposeLoaded() {
-    
-    Application.console.log("mrcOnPrefComposeLoaded");
+
+    mrcLog("mrcOnPrefComposeLoaded");
 }

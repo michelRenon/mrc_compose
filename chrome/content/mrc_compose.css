@@ -40,17 +40,17 @@
 
 
 /*
- * 
+ *
  * specific for MRC AUTOCOMPLETE
- * 
+ *
  * Some css values are copied from http://getbootstrap.com/examples/theme/
- * 
+ *
  */
- 
+
 #msgAutocompletePanel {
     height:10px;
-    
-    
+
+
     /* TEST TB23 * /
     background-color: #f80;
     border: 3px solid #fcc;
@@ -82,7 +82,7 @@
     color: #888;
     font-style: italic;
 }
- 
+
 #msgAutocompletePanelDiv .container {
     display: block;
     margin : 0;
@@ -208,6 +208,7 @@
 
 #mrc-compose-options-button {
     list-style-image: url("chrome://mrc_compose/content/icon_options.png");
+    max-height: 28px;
 }
 
 #MsgHeadersToolbar {
@@ -219,12 +220,12 @@
 .notificationRecipient {
 
   /* copy from 'notification.css' */
-  
+
   color: rgba(0,0,0,0.95);
   background: url("chrome://global/skin/notification/warning-bar-background.png") #ffc703 repeat-x top left;
   border-top: 1px solid #ffe970;
   border-bottom: 1px solid #bf8a01;
-  
+
   margin-left: 5px;
   margin-right: 5px;
   margin-bottom: 10px;
@@ -237,7 +238,7 @@
 
 
 #helptip {
-    display:block; 
+    display:block;
     min-width:100px;
     min-height:20px;
     margin:0;

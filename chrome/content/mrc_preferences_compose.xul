@@ -37,27 +37,27 @@
 
 
 <!DOCTYPE overlay [
-    <!ENTITY % dtd2 SYSTEM "chrome://mrc_compose/locale/mrc_compose.dtd" > 
+    <!ENTITY % dtd2 SYSTEM "chrome://mrc_compose/locale/mrc_compose.dtd" >
     %dtd2;
 ]>
 <!--
 <?xml-stylesheet href="chrome://mrc_compose/content/mrc_compose.css" type="text/css"?>
 -->
-<overlay id="mrc_preferences_compose" 
+<overlay id="mrc_preferences_compose"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
     >
-    
+
     <script type="application/javascript" src="chrome://mrc_compose/content/mrc_preferences_compose.js"/><!-- A reference to your JavaScript file -->
 
-    <!-- 
-    MUST USE THE EXISTING id OF BUNDLESET OF ORIGINAL XUL FILE 
+    <!--
+    MUST USE THE EXISTING id OF BUNDLESET OF ORIGINAL XUL FILE
        it means we add the stringbundle to the existing stringbundleset
     <stringbundleset id="stringbundleset">
         <stringbundle id="mrcComposePrefStringBundle" src="chrome://mrc_compose/locale/mrc_compose.properties"/>
     </stringbundleset>
     -->
 
-    
+
     <checkbox id="addressingAutocomplete" removeelement="true" />
     <checkbox id="autocompleteLDAP" removeelement="true" />
     <menulist id="directoriesList" removeelement="true" />

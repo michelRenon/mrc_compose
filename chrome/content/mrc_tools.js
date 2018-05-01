@@ -1,3 +1,4 @@
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -32,64 +33,75 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-/* ===== messengercompose.css ===========================================
-  == Styles for the main Messenger Compose window.
-  ======================================================================= */
-
 
 
 /*
- * 
- * specific for MRC AUTOCOMPLETE
- * 
- * Values are copied from mail/themes/osx/mail/compose/messengercompose.css
- * 
+ *
+ * Javascript code for mrc_compose tools
+ *
+ *
+ *
+ *
+ *
  */
 
 
-/*
-#subjectLabel {
-  margin-top: 0;
-  margin-bottom: 4px;
-  margin-inline-end: 6px;
+
+var EXPORTED_SYMBOLS = ["mrcLog", "mrcLogError", "mrcPick"];
+
+
+
+    /*
+     * Utility to handle default values.
+     * Used for simulating optional parameters in functions,
+     * because they are available in Gecko 15.
+     * From http://stackoverflow.com/a/894929
+     */
+function mrcPick(arg, def) {
+    return (typeof arg !== "undefined" ? arg : def);
 }
 
-*/
+function mrcLogError(obj, context) {
+    /*
+        * Send information to the console.
+        *
+        * params :
+        *   obj : text or exception
+        *   context : text, (optionnal) some informationabout context of log
+        */
+    context = mrcPick(context, '');
 
+    let message = "ERREUR MRC-COMPOSE : ";
+    if (context != '')
+        message += " : "+context+" : "
 
-#msgTO,
-#msgCC,
-#msgBCC,
-#msgREPLY,
-#msgNG,
-#msgFOLLOW {
-  margin-top: 0;
-  margin-inline-start: 0;
-  margin-inline-end: 1px;
-  min-height: 20px;
-  background-color: inherit;
-  -moz-appearance: none;
-  border: 1px solid transparent;
-  border-bottom-color: #c6c6c6;
-  border-radius: 2px;
-  padding: 1px 2px;
-  padding-inline-start: 5px;
-  transition: border .2s, background-color .2s;
+    if (obj.message) {
+        Components.utils.reportError(message+obj.message);
+    } else {
+        Components.utils.reportError(message+obj);
+    }
 }
 
-#msgTO:hover,
-#msgCC:hover,
-#msgBCC:hover,
-#msgREPLY:hover,
-#msgNG:hover,
-#msgFOLLOW:hover,
-#msgTO[focused="true"],
-#msgCC[focused="true"],
-#msgBCC[focused="true"],
-#msgREPLY[focused="true"],
-#msgNG[focused="true"],
-#msgFOLLOW[focused="true"] {
-  background-color: white;
-  background-image: none;
-  border-color: #c6c6c6;
+function mrcLog(obj, context) {
+    /*
+        * Send information to the console.
+        *
+        * params :
+        *   obj : text, num, object or exception
+        *   context : text, (optionnal) some information about context of log
+        */
+    if (true) {
+        context = mrcPick(context, '');
+
+        let message = "mrcCompose : ";
+        if (context != '') {
+            message += context+" : ";
+        }
+        if (message !== '') {
+            console.log(message, obj);
+        } else {
+            console.log(obj);
+        }
+    }
 }
+
