@@ -952,7 +952,6 @@ var mrcAComplete = {
             let styleSheetURI = Services.io.newURI(styleSheets[i], null, null);
             styleSheetService.loadAndRegisterSheet(styleSheetURI, styleSheetService.AUTHOR_SHEET);
         }
-        mrcLogError("Test de message d'erreur");
     },
 
     shutdown: function() {
