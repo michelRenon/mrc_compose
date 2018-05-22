@@ -188,9 +188,9 @@
                                 <label control="sort_field_level_2" value="&options.sort_field_level_2.label;"/>
                                 <menulist id="sort_field_level_2" preference="pref_sort_field_level_2" >
                                     <menupopup>
-                                        <menuitem label="popularity" value="mrcPopularity"/>
-                                        <menuitem label="lastName" value="lastName"/>
-                                        <menuitem label="firstName" value="firstName"/>
+                                        <menuitem label="&options.sort_field_1.label;" value="mrcPopularity"/>
+                                        <menuitem label="&options.sort_field_2.label;" value="lastName"/>
+                                        <menuitem label="&options.sort_field_3.label;" value="firstName"/>
                                     </menupopup>
                                 </menulist>
                             </row>
@@ -198,9 +198,9 @@
                                 <label control="sort_field_level_3" value="&options.sort_field_level_3.label;"/>
                                 <menulist id="sort_field_level_3" preference="pref_sort_field_level_3" >
                                     <menupopup>
-                                        <menuitem label="popularity" value="mrcPopularity"/>
-                                        <menuitem label="lastName" value="lastName"/>
-                                        <menuitem label="firstName" value="firstName"/>
+                                        <menuitem label="&options.sort_field_1.label;" value="mrcPopularity"/>
+                                        <menuitem label="&options.sort_field_2.label;" value="lastName"/>
+                                        <menuitem label="&options.sort_field_3.label;" value="firstName"/>
                                     </menupopup>
                                 </menulist>
                             </row>
