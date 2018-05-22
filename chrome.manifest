@@ -5,5 +5,6 @@ overlay chrome://messenger/content/preferences/compose.xul chrome://mrc_compose/
 
 locale  mrc_compose en-US   chrome/locale/en-US/
 locale  mrc_compose fr-FR   chrome/locale/fr-FR/
+locale  mrc_compose es-ES   chrome/locale/es-ES/
 
 skin    mrc_compose         classic/1.0             chrome/skin/
