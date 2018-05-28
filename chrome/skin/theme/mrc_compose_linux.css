@@ -92,6 +92,7 @@ Theme linux pour TB60
   margin-inline-start: 6px;
   margin-inline-end: 5px;
   background-color: inherit;
+  color: inherit;
   border: 1px solid transparent;
   border-bottom-color: rgba(0, 0, 0, 0.25); /* var(--toolbarbutton-hover-bordercolor); */
   padding: 4px 2px;
@@ -111,7 +112,6 @@ Theme linux pour TB60
 #msgNG[focused="true"],
 #msgFOLLOW:hover,
 #msgFOLLOW[focused="true"] {
-  background-color: -moz-field;
   border-color: rgba(0, 0, 0, 0.25); /* var(--toolbarbutton-hover-bordercolor); */
 }
 

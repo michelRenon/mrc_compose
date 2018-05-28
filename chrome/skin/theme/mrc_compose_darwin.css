@@ -68,6 +68,7 @@
   margin-inline-end: 1px;
   min-height: 20px;
   background-color: inherit;
+  color: inherit;
   -moz-appearance: none;
   border: 1px solid transparent;
   border-bottom-color: #c6c6c6;
@@ -89,7 +90,6 @@
 #msgREPLY[focused="true"],
 #msgNG[focused="true"],
 #msgFOLLOW[focused="true"] {
-  background-color: white;
   background-image: none;
   border-color: #c6c6c6;
 }
