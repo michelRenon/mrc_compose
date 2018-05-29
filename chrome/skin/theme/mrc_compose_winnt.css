@@ -57,6 +57,7 @@
   margin-top: 0;
   margin-inline-end: 5px;
   background-color: inherit;
+  color: inherit;
   border: 1px solid transparent;
   padding: 2px;
   padding-inline-start: 5px;
@@ -87,7 +88,6 @@
     #msgREPLY[focused="true"],
     #msgNG[focused="true"],
     #msgFOLLOW[focused="true"] {
-        background-color: -moz-field;
         border-color: #a9b7c9;
   }
 }
@@ -114,7 +114,6 @@
     #msgREPLY[focused="true"],
     #msgNG[focused="true"],
     #msgFOLLOW[focused="true"] {
-        background-color: -moz-field;
         border-color: ThreeDShadow;
   }
 }
