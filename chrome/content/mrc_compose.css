@@ -207,8 +207,11 @@
 
 
 #mrc-compose-options-button {
-    list-style-image: url("chrome://mrc_compose/content/icon_options.png");
-    max-height: 28px;
+    height: 28px;
+	width: 28px;
+	-moz-context-properties: fill;
+	fill: currentColor;
+    list-style-image: url("chrome://mrc_compose/content/icon_options.svg");
 }
 
 #MsgHeadersToolbar {
