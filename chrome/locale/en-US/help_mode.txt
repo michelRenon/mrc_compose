@@ -1,3 +1,7 @@
+"0" : the list contains 1 part :
+    'begin' :    contacts whose fields begin with X
+    With mode "0", it's better to set "Nb line max in each part" to 15-30.
+
 "1" : the list contains 1 part :
     'contains' : contacts &amp; lists whose fields contains X
     With mode "1", it's better to set "Nb line max in each part" to 15-30.
