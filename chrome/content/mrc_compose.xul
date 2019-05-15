@@ -116,7 +116,7 @@
                 </hbox>
             </deck>
         </panel>
-
+		
         <hbox id="box-to" >
             <hbox align="center" pack="end" style="&headersSpace.style;">
                 <hbox align="left" pack="start" flex="1">
@@ -146,7 +146,7 @@
             </hbox>
 
             <vbox flex="1">
-                <textbox id="msgTO" flex="1" class="toolbar" disableonsend="true" spellcheck="true"
+                <textbox id="msgTO" flex="1" class="toolbar" disableonsend="true" spellcheck="false"
                              multiline="true"
                              placeholder="&field.placeholder;"
                              onkeypress="mrcRecipientKeyPress(event, this)"
@@ -165,7 +165,7 @@
                 <label value="&ccAddr.label;" />
             </hbox>
             <vbox flex="1">
-                <textbox id="msgCC" flex="1" class="toolbar" disableonsend="true" spellcheck="true" focus="false"
+                <textbox id="msgCC" flex="1" class="toolbar" disableonsend="true" spellcheck="false" focus="false"
                              multiline="true"
                              placeholder="&field.placeholder;"
                              onkeypress="mrcRecipientKeyPress(event, this)"
@@ -184,7 +184,7 @@
                 <label value="&bccAddr.label;" />
             </hbox>
             <vbox flex="1">
-                <textbox id="msgBCC" flex="1" class="toolbar" disableonsend="true" spellcheck="true"
+                <textbox id="msgBCC" flex="1" class="toolbar" disableonsend="true" spellcheck="false"
                              multiline="true"
                              placeholder="&field.placeholder;"
                              onkeypress="mrcRecipientKeyPress(event, this)"
@@ -203,7 +203,7 @@
                 <label value="&replyAddr.label;" />
             </hbox>
             <vbox flex="1">
-                <textbox id="msgREPLY" flex="1" class="toolbar" disableonsend="true" spellcheck="true"
+                <textbox id="msgREPLY" flex="1" class="toolbar" disableonsend="true" spellcheck="false"
                              multiline="true"
                              placeholder="&field.placeholder;"
                              onkeypress="mrcRecipientKeyPress(event, this)"
@@ -221,7 +221,7 @@
                 <label value="&newsgroupsAddr.label;" />
             </hbox>
             <vbox flex="1">
-                <textbox id="msgNG" flex="1" class="toolbar" disableonsend="true" spellcheck="true"
+                <textbox id="msgNG" flex="1" class="toolbar" disableonsend="true" spellcheck="false"
                              multiline="true"
                              placeholder="&field.placeholder;"
                              onkeypress="mrcRecipientKeyPress(event, this)"
@@ -239,7 +239,7 @@
                 <label value="&followupAddr.label;" />
             </hbox>
             <vbox flex="1">
-                <textbox id="msgFOLLOW" flex="1" class="toolbar" disableonsend="true" spellcheck="true"
+                <textbox id="msgFOLLOW" flex="1" class="toolbar" disableonsend="true" spellcheck="false"
                              multiline="true"
                              placeholder="&field.placeholder;"
                              onkeypress="mrcRecipientKeyPress(event, this)"

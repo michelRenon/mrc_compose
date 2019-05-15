@@ -1,1 +1,1 @@
-﻿Núm. máximo de líneas en cada campo. Arriba de este número se usará la rueda del ratón.
+N&uacutem. m&aacute;ximo de l&iacuteneas en cada campo. Arriba de este n&uacutemero se usar&aacute la rueda del rat&oacute;n.

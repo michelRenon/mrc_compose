@@ -1,1 +1,1 @@
-﻿Altura de la primera línea de cada campo (en pixeles).
+Altura de la primera l&iacute;nea de cada campo (en pixeles).

@@ -1,29 +1,35 @@
-﻿<h4>Mode</h4>
+<h4>Modo</h4>
 <ul>
-    <li>"1" : the list contains 1 part :
+    <li>"0" : la lista contiene 1 grupo :
         <ul>
-            <li>'contains' : contacts &amp; lists whose fields contains X</li>
+            <li>'inician' :    aquellos contactos y listas con informaci&oacute;n que inicie con lo escrito</li>
         </ul>
-        With "mode" "1", it's better to set "Nb line max in each part" to 15-30.
+        Con el modo "0", es mejor establecer "N&oacute;m. m&aacute;x. en cada grupo" de 15 a 30.
     </li>
-    <li>"2" : the list contains 3 parts :
+    <li>"1" : la lista contiene 1 grupo :
         <ul>
-            <li>'begin' :    contacts whose fields begin with X</li>
-            <li>'contains' : contacts whose fields contains X (except those in part 1)</li>
-            <li>'list' :     groups whose fields contains X</li>
+            <li>'contienen' : los contactos y listas cuya informaci&oacute;n que contiene lo escrito</li>
         </ul>
-        With mode "2", it's better to set "Nb line max in each part" to 5-10.<br/>
+        Con el modo "1", es mejor establecer "N&oacute;m. m&aacute;x. en cada secci&oacute;n" de 15 a 30.
     </li>
-    <li>"3" : the list contains 1 part for each AddressBook :
+    <li>"2" : la lista contiene 2 grupos :
         <ul>
-            <li>contacts &amp; lists whose fields contains X</li>
+            <li>'inician' : aquellos contactos y listas con informaci&oacute;n que inicie con lo escrito</li>
+            <li>'contienen' : los contactos y listas cuya informaci&oacute;n que contiene lo escrito (excepto los del primer grupo)</li>
+            <li>'lista' : grupos cuya informaci&oacute;n contiene lo escrito</li>
         </ul>
-        With mode "3", it's better to set "Nb line max in each part" to 5-10.<br/>
+        Con modo "2", es mejor establecer "N&oacute;m. m&aacute;x. en cada grupo" de 5 a 10.<br/>
+    </li>
+    <li>"3" : la lista contiene 1 grupo de cada libreta de direcciones :
+        <ul>
+            <li>contactos y listas cuya informaci&oacute;n contiene lo escrito de cada libreta</li>
+        </ul>
+        Con modo "3", es mejor establecer "N&oacute;m. m&aacute;x. en cada grupo" de 5 a 10.<br/>
     </li>
 </ul>
-Searched fields are :
+Los campos en los que se busca son :
 <ul>
-<li>'PrimaryEmail', 'FirstName', 'LastName', 'NickName' for contacts</li>
-<li>fields is 'LastName' for list</li>
+<li>'Correo principal', 'Nombre', 'Apellidos', 'Apodo' para contactos</li>
+<li>'Apellidos' para las listas.</li>
 </ul>
-On slow machines, it's better to choose "1".
+En equipos lentos, es mejor elegir "1".
