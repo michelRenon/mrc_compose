@@ -1,1 +1,1 @@
-﻿El retraso mínimo entre cada busqueda identica (milisegundos).
+El retraso m&iacute;nimo entre cada busqueda identica (milisegundos).

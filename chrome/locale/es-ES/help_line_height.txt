@@ -1,1 +1,1 @@
-﻿Altura de las otras líneas de los campos (en pixeles).
+Altura de las otras l&iacute;neas de los campos (en pixeles).
