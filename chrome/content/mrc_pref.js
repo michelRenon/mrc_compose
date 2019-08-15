@@ -45,12 +45,12 @@
  *
  */
 
-ChromeUtils.import("chrome://mrc_compose/content/mrc_tools.js");
+var tools = ChromeUtils.import("chrome://mrc_compose/content/mrc_tools.js");
 
 
 function mrcOnPrefLoaded() {
 
-    mrcLog("mrcOnPrefLoaded()");
+    tools.mrcLog("mrcOnPrefLoaded()");
     buildABList();
     // mrcLoadHelp(); no need anymore with with help through tooltips.
 
@@ -66,7 +66,7 @@ function mrcTooltip() {
      * 'document.tooltipNode' is the element being hovered.
      *
      */
-    mrcLog("tooltip="+document.tooltipNode.id+"\n");
+    tools.mrcLog("tooltip="+document.tooltipNode.id+"\n");
     let div = document.getElementById("helptip");
     if (div) {
         let hid = document.tooltipNode.id;
@@ -76,11 +76,11 @@ function mrcTooltip() {
         try {
             txt = getContents("chrome://mrc_compose/locale/help_"+hid+".txt");
         } catch(e) {
-            mrcLogError("getContents() ="+e);
+            tools.mrcLogError("getContents() ="+e);
             txt = hid;
         }
-        mrcLog("hid="+hid+"\n");
-        mrcLog("txt="+txt+"\n");
+        tools.mrcLog("hid="+hid+"\n");
+        tools.mrcLog("txt="+txt+"\n");
 
         //clear the HTML div element of any prior shown custom HTML 
         while(div.firstChild)
@@ -110,7 +110,7 @@ function onSaveWhiteList() {
         }
     }
     var wlValue = wlArray.join(";;;");
-    mrcLog("onSaveWhiteList() : wlValue="+wlValue);
+    tools.mrcLog("onSaveWhiteList() : wlValue="+wlValue);
     var elt = document.getElementById("search_ab_URI");
     elt.setAttribute("value", wlValue);
     elt.value = wlValue;
@@ -124,12 +124,12 @@ function onSaveWhiteList() {
 
 
 function mrcOnPrefUnloaded(){
-    mrcLog("mrcOnPrefUnloaded()");
+    tools.mrcLog("mrcOnPrefUnloaded()");
 
 }
 
 function mrcToggleCheckAB(element) {
-    mrcLog("mrcToggleChekAB() : "+element.label+";"+element.value);
+    tools.mrcLog("mrcToggleChekAB() : "+element.label+";"+element.value);
     onSaveWhiteList();
 }
 

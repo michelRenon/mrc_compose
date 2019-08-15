@@ -76,9 +76,11 @@ function mrcLogError(obj, context) {
         message += " : "+context+" : "
 
     if (obj.message) {
-        Components.utils.reportError(message+obj.message);
+        // Components.utils.reportError(message+obj.message);
+        console.log(message+obj.message);
     } else {
-        Components.utils.reportError(message+obj);
+        // Components.utils.reportError(message+obj);
+        console.log(message+obj);
     }
 }
 
