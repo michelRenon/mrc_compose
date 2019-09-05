@@ -45,16 +45,16 @@
  *
  */
 
-ChromeUtils.import("chrome://mrc_compose/content/mrc_tools.js");
+var mrc_tools = ChromeUtils.import("chrome://mrc_compose/content/mrc_tools.js");
 
 
 function mrcOnPrefLoaded() {
 
-    mrcLog("mrcOnPrefLoaded()");
+    mrc_tools.mrcLog("mrcOnPrefLoaded()");
     buildABList();
     // mrcLoadHelp(); no need anymore with with help through tooltips.
 
-    window.addEventListener("activate", mrcOnPrefActivate); 
+    window.addEventListener("activate", mrcOnPrefActivate);
 }
 
 
@@ -66,7 +66,7 @@ function mrcTooltip() {
      * 'document.tooltipNode' is the element being hovered.
      *
      */
-    mrcLog("tooltip="+document.tooltipNode.id+"\n");
+    mrc_tools.mrcLog("tooltip="+document.tooltipNode.id+"\n");
     let div = document.getElementById("helptip");
     if (div) {
         let hid = document.tooltipNode.id;
@@ -76,21 +76,21 @@ function mrcTooltip() {
         try {
             txt = getContents("chrome://mrc_compose/locale/help_"+hid+".txt");
         } catch(e) {
-            mrcLogError("getContents() ="+e);
+            mrc_tools.mrcLogError("getContents() ="+e);
             txt = hid;
         }
-        mrcLog("hid="+hid+"\n");
-        mrcLog("txt="+txt+"\n");
+        mrc_tools.mrcLog("hid="+hid+"\n");
+        mrc_tools.mrcLog("txt="+txt+"\n");
 
-        //clear the HTML div element of any prior shown custom HTML 
+        //clear the HTML div element of any prior shown custom HTML
         while(div.firstChild)
             div.removeChild(div.firstChild);
 
         let injectHTML = Components.classes["@mozilla.org/feed-unescapehtml;1"]
-        .getService(Components.interfaces.nsIScriptableUnescapeHTML) 
+        .getService(Components.interfaces.nsIScriptableUnescapeHTML)
         .parseFragment(txt, false, null, div);
 
-        //attach the DOM object to the HTML div element 
+        //attach the DOM object to the HTML div element
         div.appendChild(injectHTML);
     }
 }
@@ -110,7 +110,7 @@ function onSaveWhiteList() {
         }
     }
     var wlValue = wlArray.join(";;;");
-    mrcLog("onSaveWhiteList() : wlValue="+wlValue);
+    mrc_tools.mrcLog("onSaveWhiteList() : wlValue="+wlValue);
     var elt = document.getElementById("search_ab_URI");
     elt.setAttribute("value", wlValue);
     elt.value = wlValue;
@@ -124,12 +124,12 @@ function onSaveWhiteList() {
 
 
 function mrcOnPrefUnloaded(){
-    mrcLog("mrcOnPrefUnloaded()");
+    mrc_tools.mrcLog("mrcOnPrefUnloaded()");
 
 }
 
 function mrcToggleCheckAB(element) {
-    mrcLog("mrcToggleChekAB() : "+element.label+";"+element.value);
+    mrc_tools.mrcLog("mrcToggleChekAB() : "+element.label+";"+element.value);
     onSaveWhiteList();
 }
 
@@ -174,7 +174,7 @@ function mrcEditDirectories() {
 
 function mrcOnPrefActivate() {
 
-    mrcLog("mrcOnPrefActivate()");
+    mrc_tools.mrcLog("mrcOnPrefActivate()");
     // force rebuild of addressbooks list
     buildABList();
 }
@@ -187,7 +187,7 @@ function mrcOnPrefActivate() {
 
 function buildABList() {
 
-    mrcLog("buildABList()");
+    mrc_tools.mrcLog("buildABList()");
 
     let prefs = Components.classes["@mozilla.org/preferences-service;1"]
                          .getService(Components.interfaces.nsIPrefService)
@@ -318,7 +318,7 @@ function mrcLoadHelp() {
             } catch(e) {}
 
             //clear the HTML div element of any prior shown custom HTML
-            while(div.firstChild) 
+            while(div.firstChild)
                 div.removeChild(div.firstChild);
 
             //safely convert HTML string to a simple DOM object, striping it of javascript and more complex tags
@@ -336,8 +336,8 @@ function mrcLoadHelp() {
                 injectHTML = htmlDoc.firstChild;
             }
 
-            //attach the DOM object to the HTML div element 
-            div.appendChild(injectHTML); 
+            //attach the DOM object to the HTML div element
+            div.appendChild(injectHTML);
         }
     }
 }
@@ -348,5 +348,5 @@ function mrcLoadHelp() {
 
 function mrcOnPrefComposeLoaded() {
 
-    mrcLog("mrcOnPrefComposeLoaded");
+    mrc_tools.mrcLog("mrcOnPrefComposeLoaded");
 }
