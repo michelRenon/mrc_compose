@@ -1,0 +1,20 @@
+{
+  "manifest_version": 2,
+  "applications": {
+    "gecko": {
+      "id": "mrc_compose@mr-consultant.net",
+      "strict_min_version": "68.0"
+    }
+  },
+  "version": "1.9.1",
+  "name": "MRC Compose",
+  "description": "Provides 3 standards fields (TO, CC, BCC) with autocomplete to Thunderbird's compose pane.",
+  "author": "Michel Renon",
+  "homepage_url": "https://github.com/michelRenon/mrc_compose/",
+  "legacy": {
+    "options": {
+      "page": "chrome://mrc_compose/content/options.xul",
+      "open_in_tab": false
+    }
+  }
+}
