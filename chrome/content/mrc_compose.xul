@@ -45,6 +45,7 @@
 
 <?xml-stylesheet href="chrome://mrc_compose/content/mrc_compose.css" type="text/css"?>
 <overlay id="mrc_compose"
+    xmlns:html="http://www.w3.org/1999/xhtml"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
     >
     <script type="application/javascript" src="chrome://mrc_compose/content/mrc_compose.js"/><!-- A reference to your JavaScript file -->
@@ -103,8 +104,7 @@
     -->
 
     <vbox id="addresses-box" >
-        <panel id="msgAutocompletePanel" noautofocus="true" level="parent"
-            xmlns:html="http://www.w3.org/1999/xhtml" >
+        <panel id="msgAutocompletePanel" noautofocus="true" level="parent">
             <deck id="deckAutocompletePanel" selectedIndex="0">
                 <hbox flex="1">
                     <image id="img_wait" collapsed="false"/>
