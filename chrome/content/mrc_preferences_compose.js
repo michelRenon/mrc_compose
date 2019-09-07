@@ -33,7 +33,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-tools.ChromeUtils.import("chrome://mrc_compose/content/mrc_tools.js");
+var mrcTools = ChromeUtils.import("chrome://mrc_compose/content/mrc_tools.js");
 
 
 /*
@@ -95,17 +95,17 @@ window.addEventListener("load", function(e) {
         */
         let text = getString('autocomplete');
         let text2 = getString('autocomplete2');
-        // tools.mrcLog("text="+text+"     text2="+text2);
+        // mrcTools.mrcLog("text="+text+"     text2="+text2);
 
         let src = document.getElementById('emailCollectionOutgoing');
-        // tools.mrcLog("src="+src.nodeName);
+        // mrcTools.mrcLog("src="+src.nodeName);
         let tab = src.parentNode.parentNode;
-        // tools.mrcLog("tab="+tab.nodeName);
+        // mrcTools.mrcLog("tab="+tab.nodeName);
         let groupbox = tab.childNodes[0];
         let description = groupbox.childNodes[1];
-        // tools.mrcLog("description="+description.value);
+        // mrcTools.mrcLog("description="+description.value);
         description.value = text;
-        // tools.mrcLog("description apres="+description.value);
+        // mrcTools.mrcLog("description apres="+description.value);
 
         var hbox = document.createElement("hbox");
 
@@ -130,4 +130,4 @@ window.addEventListener("load", function(e) {
 
     }, false);
 
-// tools.mrcLog("window.addEventListener()");
+// mrcTools.mrcLog("window.addEventListener()");

@@ -98,7 +98,7 @@
 
 // "use strict";
 
-var tools = ChromeUtils.import("chrome://mrc_compose/content/mrc_tools.js");
+var mrcTools = ChromeUtils.import("chrome://mrc_compose/content/mrc_tools.js");
 
 
 
@@ -417,7 +417,7 @@ function LoadIdentity(startup)
 // public method called by the address picker sidebar
 function AddRecipient(recipientType, address)
 {
-    // tools.mrcLog("AddRecipient("+recipientType+", "+address+")");
+    // mrcTools.mrcLog("AddRecipient("+recipientType+", "+address+")");
     switch(recipientType) {
         case "addr_to" :
             mrcAComplete._insertRecipient('fieldTO', address);
@@ -453,7 +453,7 @@ function AddRecipient(recipientType, address)
 // Public method called by the contants sidebar.
 function AddRecipientsArray(aRecipientType, aAddressArray)
 {
-    tools.mrcLog("AddRecipientsArray("+aRecipientType+", "+aAddressArray+")");
+    mrcTools.mrcLog("AddRecipientsArray("+aRecipientType+", "+aAddressArray+")");
     switch(aRecipientType) {
         case "addr_to" :
             mrcAComplete._insertRecipient('fieldTO', aAddressArray);
@@ -536,7 +536,7 @@ function debug_obj(obj){
     for (let i in obj) {
         txt += i+":"+obj[i]+"||";
     }
-    tools.mrcLog(txt);
+    mrcTools.mrcLog(txt);
 }
 
 function _get(obj, field_name, default_value) {
@@ -915,13 +915,13 @@ var mrcAComplete = {
         // Get the name of the application running us
         // info.name; // Returns "Firefox" for Firefox or "Thunderbird" for TB
         // info.version; // Returns "2.0.0.1" for Firefox version 2.0.0.1, "24.5.0"
-        // tools.mrcLog("APP NAME="+info.name+" ; APP VERSION="+info.version);
+        // mrcTools.mrcLog("APP NAME="+info.name+" ; APP VERSION="+info.version);
         // APP NAME=Thunderbird ; APP VERSION=24.5.0
 
         var xulRuntime = Components.classes["@mozilla.org/xre/app-info;1"]
                            .getService(Components.interfaces.nsIXULRuntime);
         var os_name = xulRuntime.OS.toLowerCase();
-        // tools.mrcLog("OS = "+xulRuntime.OS);
+        // mrcTools.mrcLog("OS = "+xulRuntime.OS);
         // 'Linux', 'WINNT', 'Darwin'
 
         // Adapt visibility of placeholders, based on prefs.
@@ -966,7 +966,7 @@ var mrcAComplete = {
          *  method to implement nsIPrefBranch interface
          *
          */
-        tools.mrcLog("nsIPrefBranch::observe : "+subject+","+topic+","+data);
+        mrcTools.mrcLog("nsIPrefBranch::observe : "+subject+","+topic+","+data);
         if (topic != "nsPref:changed") {
             return;
         }
@@ -1154,13 +1154,13 @@ var mrcAComplete = {
         }
         return output;
         */
-        // tools.mrcLog("_splitEmailList:'"+data+"'");
+        // mrcTools.mrcLog("_splitEmailList:'"+data+"'");
         let output1 = this._splitEmail_cache_output;
         if (data != this._splitEmail_cache_data) {
 
             output1 = this._splitEmailList_js_version(data);
-            // tools.mrcLog("1 : "+output1.join("||"));
-            // tools.mrcLog("2 : "+output.join("||"));
+            // mrcTools.mrcLog("1 : "+output1.join("||"));
+            // mrcTools.mrcLog("2 : "+output.join("||"));
 
             this._splitEmail_cache_data = data;
             this._splitEmail_cache_output = output1;
@@ -1196,9 +1196,9 @@ var mrcAComplete = {
          * returns :
          *    array of emails, still quoted and backslashed
          */
-        separator = tools.mrcPick(separator, ',');
-        quote = tools.mrcPick(quote, '"');
-        escaper = tools.mrcPick(escaper, '\\');
+        separator = mrcTools.mrcPick(separator, ',');
+        quote = mrcTools.mrcPick(quote, '"');
+        escaper = mrcTools.mrcPick(escaper, '\\');
 
         // separator and escaper MUST BE 1 char length
 
@@ -1643,7 +1643,7 @@ var mrcAComplete = {
     _makeFullAddress : function(a, b) {
         let res = "";
         let temp = typeof mrcAComplete.mhParser.makeFullAddressString;
-        // tools.mrcLog("typeof makeFullAddressString ="+temp);
+        // mrcTools.mrcLog("typeof makeFullAddressString ="+temp);
 
         if (typeof mrcAComplete.mhParser.makeFullAddress === "function") {
             // TB 24
@@ -1670,7 +1670,7 @@ var mrcAComplete = {
             // then we add the email
             res = res + " <" + b + ">";
         }
-        // tools.mrcLog("_makeFullAddress="+res);
+        // mrcTools.mrcLog("_makeFullAddress="+res);
         return res;
     },
 
@@ -1778,7 +1778,7 @@ var mrcAComplete = {
                 }
 
             } catch (e) {
-                tools.mrcLogError(e, "_removeDuplicatecards()");
+                mrcTools.mrcLogError(e, "_removeDuplicatecards()");
             }
         }
         // obj nows contains unique properties
@@ -1845,7 +1845,7 @@ var mrcAComplete = {
          * Reinit internal fields for a future search
          */
         this.searchID++;
-        // tools.mrcLog(now()+" _initSearchID : "+this.searchID);
+        // mrcTools.mrcLog(now()+" _initSearchID : "+this.searchID);
         this.search_res1 = [];
         this.search_res2 = [];
         this.search_res3 = [];
@@ -1882,10 +1882,10 @@ var mrcAComplete = {
         // SPECIAL :
         // As it is a call-back, we can't use 'this'
         // instead, we must use the let 'mrcAComplete'
-        // tools.mrcLog("AVANT purge:"+mrcAComplete.searchedAB_archiv.join("||"));
+        // mrcTools.mrcLog("AVANT purge:"+mrcAComplete.searchedAB_archiv.join("||"));
         let l = mrcAComplete.searchedAB_archiv.length;
         mrcAComplete.searchedAB_archiv.splice(0, l);
-        // tools.mrcLog("APRES purge:"+mrcAComplete.searchedAB_archiv.join("||"));
+        // mrcTools.mrcLog("APRES purge:"+mrcAComplete.searchedAB_archiv.join("||"));
     },
 
     _createHashSearchListener : function(searchListener) {
@@ -1896,7 +1896,7 @@ var mrcAComplete = {
         let temp = searchListener.addressBook.dirName + searchListener.searchID;
         // let hash = this._hashCode(temp); // no need to create a real hash
         let hash = temp;
-        // tools.mrcLog("_createHashSearchListener : "+hash);
+        // mrcTools.mrcLog("_createHashSearchListener : "+hash);
         return hash;
     },
 
@@ -1904,7 +1904,7 @@ var mrcAComplete = {
         this.allListenersStarted = false;
         this._archiveSearchListeners();
         this._initSearchID();
-        // tools.mrcLog(now()+" _initSearchListeners : "+this.searchID);
+        // mrcTools.mrcLog(now()+" _initSearchListeners : "+this.searchID);
     },
 
 
@@ -1912,14 +1912,14 @@ var mrcAComplete = {
         abSearchListener.hash = this._createHashSearchListener(abSearchListener);
         let key = abSearchListener.hash;
         this.searchedAB[key] = abSearchListener;
-        // tools.mrcLog("_addSearchListener : "+abSearchListener.addressBook.URI+":"+abSearchListener.hash+", "+this.allListenersStarted);
+        // mrcTools.mrcLog("_addSearchListener : "+abSearchListener.addressBook.URI+":"+abSearchListener.hash+", "+this.allListenersStarted);
     },
 
     _completeSearchListener : function(abSearchListener) {
         /*
          * Perform actions when a search is finished on ONE addressbook.
          */
-        // tools.mrcLog(now()+" _completeSearchListener : "+abSearchListener.searchID+"/"+this.searchID+":"+abSearchListener.addressBook.dirName);
+        // mrcTools.mrcLog(now()+" _completeSearchListener : "+abSearchListener.searchID+"/"+this.searchID+":"+abSearchListener.addressBook.dirName);
         if (abSearchListener.searchID == this.searchID) {
             // OK, it's a searchListener for current search
             switch(this.param_mode) {
@@ -1965,12 +1965,12 @@ var mrcAComplete = {
             }
 
 
-            // tools.mrcLog("_completeSearchListener : "+abSearchListener.addressBook.URI+":"+this.searchedAB+", "+this.allListenersStarted);
+            // mrcTools.mrcLog("_completeSearchListener : "+abSearchListener.addressBook.URI+":"+this.searchedAB+", "+this.allListenersStarted);
             // Then test if search is complete for all addressbooks.
             this._testSearchComplete();
         } else {
             // it's an obsolete searchListener :
-            // tools.mrcLog("_completeSearchListener : "+abSearchListener.addressBook.URI+":obsolete = "+abSearchListener.searchID);
+            // mrcTools.mrcLog("_completeSearchListener : "+abSearchListener.addressBook.URI+":obsolete = "+abSearchListener.searchID);
         }
     },
 
@@ -1985,13 +1985,13 @@ var mrcAComplete = {
         if (originalSearchID == this.searchID) {
             // make any search obsolete
             this._obsoleteSearchID();
-            // tools.mrcLog(now()+" _timeOutSearchListener : "+this.searchID);
+            // mrcTools.mrcLog(now()+" _timeOutSearchListener : "+this.searchID);
 
             let keys = Object.keys(this.searchedAB);
-            // tools.mrcLog("_timeOutSearchListener() keys="+keys+":"+(typeof keys));
+            // mrcTools.mrcLog("_timeOutSearchListener() keys="+keys+":"+(typeof keys));
             for (let i=0, l=keys.length ; i<l; i++) {
                 let k = keys[i];
-                // tools.mrcLog("k="+k);
+                // mrcTools.mrcLog("k="+k);
                 this._addWarningTimeout(this.searchedAB[k].addressBook.dirName);
             }
 
@@ -2004,7 +2004,7 @@ var mrcAComplete = {
     },
 
     _testSearchComplete : function() {
-        // tools.mrcLog(now()+" _testSearchComplete : "+this.searchID);
+        // mrcTools.mrcLog(now()+" _testSearchComplete : "+this.searchID);
         let keys = Object.keys(this.searchedAB);
         if (keys.length == 0 && this.allListenersStarted == true) {
             /*
@@ -2016,7 +2016,7 @@ var mrcAComplete = {
 
             // stop the current timeout
             clearTimeout(this.searchTimeOut);
-            // tools.mrcLog("clearTimeout() ");
+            // mrcTools.mrcLog("clearTimeout() ");
 
             // then handle results
             switch(this.param_mode) {
@@ -2077,7 +2077,7 @@ var mrcAComplete = {
             if (this.cbSearch) {
                 this.cbSearch();
             }
-            // tools.mrcLog("archiv="+this.searchedAB_archiv.length);
+            // mrcTools.mrcLog("archiv="+this.searchedAB_archiv.length);
         }
     },
 
@@ -2094,7 +2094,7 @@ var mrcAComplete = {
                 mrcAComplete._timeOutSearchListener(tempSearchID);
             }, this.param_search_timeout);
 
-        // tools.mrcLog("_startWaitingSearchListeners ");
+        // mrcTools.mrcLog("_startWaitingSearchListeners ");
         this._testSearchComplete();
     },
 
@@ -2184,7 +2184,7 @@ var mrcAComplete = {
             let ab = allAddressBooks.getNext();
             if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
                 // recherche 1
-                // tools.mrcLog("AB LOCAL = " + ab.dirName);
+                // mrcTools.mrcLog("AB LOCAL = " + ab.dirName);
                 let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                 if (doSearch) {
                     try {
@@ -2216,21 +2216,21 @@ var mrcAComplete = {
                         this._completeSearchListener(abSearchListener);
                     } catch (e) {
                         this._addErrorAddressBook(ab.dirName);
-                        tools.mrcLogError(e, "_search_mode_1()");
+                        mrcTools.mrcLogError(e, "_search_mode_1()");
                     }
                 }
             } else {
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
-                    // tools.mrcLog("param_search="+this.param_search_ab_URI+" ; ab.URI="+ab.URI)
+                    // mrcTools.mrcLog("param_search="+this.param_search_ab_URI+" ; ab.URI="+ab.URI)
                     // check if user wants to search in this AB
                     let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                     if (doSearch) {
                         try {
-                            // tools.mrcLog("AB LDAP = " + ab.dirName);
+                            // mrcTools.mrcLog("AB LDAP = " + ab.dirName);
                             /* CODE FOR TB 24 to 31? */
                             // if (this.param_ldap_search_version == 'TB24') {
                             if (true) {
-                                // tools.mrcLog(ab.dirName+" : LDAP search TB24");
+                                // mrcTools.mrcLog(ab.dirName+" : LDAP search TB24");
                                 let query =
                                     Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
                                             .createInstance(Components.interfaces.nsIAbDirectoryQuery);
@@ -2290,7 +2290,7 @@ var mrcAComplete = {
                                 this._addSearchListener(abDirSearchListener);
                                 query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
                             } else {
-                                // tools.mrcLog(ab.dirName+" : LDAP search TB31");
+                                // mrcTools.mrcLog(ab.dirName+" : LDAP search TB31");
                                 /* CODE FOR TB >= 29 */
                                 /*
                                 let that = this;
@@ -2333,7 +2333,7 @@ var mrcAComplete = {
                             }
                         } catch (e) {
                             this._addErrorAddressBook(ab.dirName);
-                            tools.mrcLogError(e, "_search_mode_1()");
+                            mrcTools.mrcLogError(e, "_search_mode_1()");
                         }
                     }
                 }
@@ -2435,7 +2435,7 @@ var mrcAComplete = {
                         // unused
                         /*
                         let childCards3 = mrcAbManager.getDirectory(ab.URI + "?" + searchQuery3).childCards;
-                        // tools.mrcLog(ab.dirName+" : "+searchResult.toString());
+                        // mrcTools.mrcLog(ab.dirName+" : "+searchResult.toString());
                         msg = "";
                         while (childCards3.hasMoreElements()) {
                             card = childCards3.getNext();
@@ -2448,7 +2448,7 @@ var mrcAComplete = {
                         this._completeSearchListener(abSearchListener);
                     } catch (e) {
                         this._addErrorAddressBook(ab.dirName);
-                        tools.mrcLogError(e, "_search_mode_1()");
+                        mrcTools.mrcLogError(e, "_search_mode_1()");
                     }
                 }
             } else {
@@ -2650,7 +2650,7 @@ var mrcAComplete = {
                             */
                         } catch (e) {
                             this._addErrorAddressBook(ab.dirName);
-                            tools.mrcLogError(e, "_search_mode_2()");
+                            mrcTools.mrcLogError(e, "_search_mode_2()");
                         }
                     }
                 }
@@ -2719,7 +2719,7 @@ var mrcAComplete = {
                         this._completeSearchListener(abSearchListener);
                     } catch (e) {
                         this._addErrorAddressBook(ab.dirName);
-                        tools.mrcLogError(e, "_search_mode_1()");
+                        mrcTools.mrcLogError(e, "_search_mode_1()");
                     }
                 }
             } else {
@@ -2730,7 +2730,7 @@ var mrcAComplete = {
                         try {
                             // if (this.param_ldap_search_version == 'TB24') {
                             if (true) {
-                                // tools.mrcLog(ab.dirName+" : LDAP search TB24");
+                                // mrcTools.mrcLog(ab.dirName+" : LDAP search TB24");
                                 /* CODE FOR TB 24-31? */
 
                                 let query =
@@ -2793,7 +2793,7 @@ var mrcAComplete = {
                                 query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
 
                             } else {
-                                // tools.mrcLog(ab.dirName+" : LDAP search TB31");
+                                // mrcTools.mrcLog(ab.dirName+" : LDAP search TB31");
                                 /* CODE FOR TB >= 29 */
                                 /*
                                 let that = this;
@@ -2836,8 +2836,8 @@ var mrcAComplete = {
                             }
                         } catch (e) {
                             this._addErrorAddressBook(ab.dirName);
-                            tools.mrcLogError(e, "_search_mode_3()");
-                            // tools.mrcLog(ab.dirName+" : LDAP _search_mode_3 ERROR");
+                            mrcTools.mrcLogError(e, "_search_mode_3()");
+                            // mrcTools.mrcLog(ab.dirName+" : LDAP _search_mode_3 ERROR");
                         }
                     }
                 }
@@ -2878,7 +2878,7 @@ var mrcAComplete = {
             let ab = allAddressBooks.getNext();
             if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
                 // recherche 1
-                // tools.mrcLog("AB LOCAL = " + ab.dirName);
+                // mrcTools.mrcLog("AB LOCAL = " + ab.dirName);
                 let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                 if (doSearch) {
                     try {
@@ -2911,21 +2911,21 @@ var mrcAComplete = {
                         this._completeSearchListener(abSearchListener);
                     } catch (e) {
                         this._addErrorAddressBook(ab.dirName);
-                        tools.mrcLogError(e, "_search_mode_4()");
+                        mrcTools.mrcLogError(e, "_search_mode_4()");
                     }
                 }
             } else {
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
-                    // tools.mrcLog("param_search="+this.param_search_ab_URI+" ; ab.URI="+ab.URI)
+                    // mrcTools.mrcLog("param_search="+this.param_search_ab_URI+" ; ab.URI="+ab.URI)
                     // check if user wants to search in this AB
                     let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                     if (doSearch) {
                         try {
-                            // tools.mrcLog("AB LDAP = " + ab.dirName);
+                            // mrcTools.mrcLog("AB LDAP = " + ab.dirName);
                             /* CODE FOR TB 24 to 31? */
                             // if (this.param_ldap_search_version == 'TB24') {
                             if (true) {
-                                // tools.mrcLog(ab.dirName+" : LDAP search TB24");
+                                // mrcTools.mrcLog(ab.dirName+" : LDAP search TB24");
                                 let query =
                                     Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
                                             .createInstance(Components.interfaces.nsIAbDirectoryQuery);
@@ -2985,7 +2985,7 @@ var mrcAComplete = {
                                 this._addSearchListener(abDirSearchListener);
                                 query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
                             } else {
-                                // tools.mrcLog(ab.dirName+" : LDAP search TB31");
+                                // mrcTools.mrcLog(ab.dirName+" : LDAP search TB31");
                                 /* CODE FOR TB >= 29 */
                                 /*
                                 let that = this;
@@ -3028,7 +3028,7 @@ var mrcAComplete = {
                             }
                         } catch (e) {
                             this._addErrorAddressBook(ab.dirName);
-                            tools.mrcLogError(e, "_search_mode_4()");
+                            mrcTools.mrcLogError(e, "_search_mode_4()");
                         }
                     }
                 }
@@ -3672,7 +3672,7 @@ var mrcAComplete = {
                 // to be coherent : inform TB that content of current Msg has really changed
                 gContentChanged=true;
             } catch (e) {
-                tools.mrcLogError(e, " _removeRecipient()");
+                mrcTools.mrcLogError(e, " _removeRecipient()");
             }
         }
     },
@@ -3682,7 +3682,7 @@ var mrcAComplete = {
         if (this.FIELDS[field]) {
             try {
                 if (email != null && email != "") {
-                    // tools.mrcLog("DEBUG _insertRecipient() : "+field+", "+email);
+                    // mrcTools.mrcLog("DEBUG _insertRecipient() : "+field+", "+email);
                     let element = document.getElementById(this.FIELDS[field].txtId);
                     this._elementInsertInPart(element, element.value.length, email);
                     this.updateNbRecipients(element);
@@ -3691,7 +3691,7 @@ var mrcAComplete = {
                     gContentChanged=true;
                 }
             } catch (e) {
-                tools.mrcLogError(e, " _insertRecipient()");
+                mrcTools.mrcLogError(e, " _insertRecipient()");
             }
         }
     },
@@ -3847,7 +3847,7 @@ var mrcAComplete = {
          * return :
          *   none
          */
-        // tools.mrcLog(now()+" search() "+this.searchID);
+        mrcTools.mrcLog(now()+" search() "+this.searchID);
         this.datas = {}; // TODO : check if it's the right way to empty dictionary
         this.errors = [];
         this.warnings = [];
@@ -3872,7 +3872,7 @@ var mrcAComplete = {
             // For LDAP searches, it brings some crashes until all variables where referenced.
             // Components.utils.forceGC();
         } catch (e) {
-            tools.mrcLogError(e, "SEARCH()");
+            mrcTools.mrcLogError(e, "SEARCH()");
         }
     },
 
@@ -3891,7 +3891,7 @@ var mrcAComplete = {
         this.lastQueryTime = new Date().getTime()
         // Is there something to show ? results, infos, warnings or errors ?
         let nb = this.nbDatas + this.infos.length + this.warnings.length + this.errors.length;
-        // tools.mrcLog(nb, "finishSearch, nb=");
+        // mrcTools.mrcLog(nb, "finishSearch, nb=");
         if (nb > 0) {
             this.buildResultList(aString);
             this.openPopup(event, element);
@@ -3910,10 +3910,10 @@ var mrcAComplete = {
                 // SPECIAL :
                 // As it is a call-back, we can't use 'this'
                 // instead, we must use the let 'mrcAComplete'
-                // tools.mrcLog("AVANT purge:"+mrcAComplete.searchedAB_archiv.join("||"));
+                // mrcTools.mrcLog("AVANT purge:"+mrcAComplete.searchedAB_archiv.join("||"));
                 let l = mrcAComplete.searchedAB_archiv.length;
                 mrcAComplete.searchedAB_archiv.splice(0, l);
-                // tools.mrcLog("APRES purge:"+mrcAComplete.searchedAB_archiv.join("||"));
+                // mrcTools.mrcLog("APRES purge:"+mrcAComplete.searchedAB_archiv.join("||"));
             }, this.DELAY_PURGE_ARCHIV);
     },
 
@@ -4037,7 +4037,7 @@ var mrcAComplete = {
                 }
                 this._updateFieldAction(field);
             } catch (e) {
-                tools.mrcLogError(e, "updateFieldVisibility()");
+                mrcTools.mrcLogError(e, "updateFieldVisibility()");
             }
         }
     },
@@ -4104,7 +4104,7 @@ var mrcAComplete = {
                     txt.focus();
                 }
             } catch (e) {
-                tools.mrcLogError(e, "changeFieldVisibility("+field+")");
+                mrcTools.mrcLogError(e, "changeFieldVisibility("+field+")");
             }
         }
     },
@@ -4124,7 +4124,7 @@ var mrcAComplete = {
                     this.changeFieldVisibility(field);
                 }
             } catch (e) {
-                tools.mrcLogError(e, "forceFieldVisibility()");
+                mrcTools.mrcLogError(e, "forceFieldVisibility()");
             }
         }
     },
@@ -4140,7 +4140,7 @@ var mrcAComplete = {
          *   none
          */
         // optional parameter
-        collapseIfZero = tools.mrcPick(collapseIfZero, false);
+        collapseIfZero = mrcTools.mrcPick(collapseIfZero, false);
 
         // check the element : is it one of the 3 fields ?
         let field = this._getFieldFromTextElement(element);
@@ -4197,7 +4197,7 @@ var mrcAComplete = {
         let card = this.panelCards[this.indexSelectedCard-1];
         if (typeof card !== "undefined") {
             // console.log(" debug validate:", card);
-            tools.mrcLog(card, " debug validate:");
+            mrcTools.mrcLog(card, " debug validate:");
             if (card.isMailList) {
                 // add emails of every member of the list
                 let childs = MailServices.ab.getDirectory(card.mailListURI).addressLists;
@@ -4211,7 +4211,7 @@ var mrcAComplete = {
             } else {
                 // --> enter his email in the text
                 email = card.text;
-                // tools.mrcLog("EMAIL = "+email);
+                // mrcTools.mrcLog("EMAIL = "+email);
             }
             this._elementInsertInPart(this.currentTextBox, this.currentTextBox.selectionStart, email);
             this.updateNbRecipients(this.currentTextBox);
@@ -4461,7 +4461,7 @@ function mrcRecipientKeyUp(event, element) {
      */
     // www.the-art-of-web.com/javascript/escape
     gContentChanged = true;
-    // tools.mrcLog("keyCode="+event.keyCode);
+    // mrcTools.mrcLog("keyCode="+event.keyCode);
     let sel = element.selectionStart;
     let textPart = mrcAComplete.getCurrentPart(element.value, sel).trim();
     let canUpdatePanel = true;
@@ -4521,7 +4521,7 @@ function mrcRecipientKeyUp(event, element) {
                 // no need to search
                 canUpdatePanel = false;
             } else {
-                // tools.mrcLog("texPart changed:"+textPart);
+                // mrcTools.mrcLog("texPart changed:"+textPart);
                 // no need to update UI
                 canUpdateUI = false;
                 // need to search
@@ -4565,22 +4565,22 @@ function mrcRecipientKeyUp(event, element) {
 
             */
 
-            // tools.mrcLog("textPart:'"+textPart+"'");
+            // mrcTools.mrcLog("textPart:'"+textPart+"'");
             let re = /<\S+@\S+\.\S+>$/;
             let res = re.exec(textPart);
             if (res && res.length > 0) {
                 // we extract the pure email
                 let raw = res[0];
-                // tools.mrcLog("raw:'"+raw+"'");
+                // mrcTools.mrcLog("raw:'"+raw+"'");
                 textPart = raw.slice(1,-1);
-                // tools.mrcLog("new textPart:'"+textPart+"'");
+                // mrcTools.mrcLog("new textPart:'"+textPart+"'");
 
             }
 
 
             if (mrcAComplete.needSearch(textPart)) {
                 // perform search
-                // tools.mrcLog("searching:'"+textPart+"'");
+                mrcTools.mrcLog("searching:'"+textPart+"'");
                 mrcAComplete.search(textPart, event, element, function callback_search() {
                         mrcAComplete.finishSearch(textPart, event, element)
                     });
@@ -4617,9 +4617,9 @@ function mrcRecipientResize(element, maxi) {
         // dump("h1="+sh1+"  h2="+sh2+"  fnbLines="+fnbLines+"  nbLines="+nbLines+"  nHeight="+nHeight+"  h="+h+"\n");
         element.height = h;
         let sh3 = element.inputField.scrollHeight;
-        tools.mrcLog("Resize : "+element.id+" : h1="+sh1+"  h2="+sh2+"  fnbLines="+fnbLines+"  nbLines="+nbLines+"  nHeight="+nHeight+"  h="+h+"  h3="+sh3);
+        mrcTools.mrcLog("Resize : "+element.id+" : h1="+sh1+"  h2="+sh2+"  fnbLines="+fnbLines+"  nbLines="+nbLines+"  nHeight="+nHeight+"  h="+h+"  h3="+sh3);
     } catch (e) {
-        tools.mrcLogError(e, "mrcRecipientResize()");
+        mrcTools.mrcLogError(e, "mrcRecipientResize()");
     }
 }
 
@@ -4660,7 +4660,7 @@ function mrcMinimizeFields(event) {
     try {
         for (let i in mrcAComplete.FIELDS) {
             let element = document.getElementById(mrcAComplete.FIELDS[i].txtId);
-            // tools.mrcLog(i+", height="+element.height+", sh="+element.inputField.scrollHeight);
+            // mrcTools.mrcLog(i+", height="+element.height+", sh="+element.inputField.scrollHeight);
             /*
              * TODO : BUG : DOES NOT WORK IF THE TEXTFIELD HAS >1 LINE AND NO SCROLLBAR
              * CAN'T FIND WHY... SEEMS AN INTERNAL BEHAVIOUR OF XUL ???
@@ -4692,7 +4692,7 @@ function mrcMinimizeFields(event) {
             }
         }
     } catch (e) {
-        tools.mrcLogError(e, "mrcMinimizeFields()");
+        mrcTools.mrcLogError(e, "mrcMinimizeFields()");
     }
 }
 
@@ -4707,7 +4707,7 @@ function mrcMinimizeFields_2(element) {
         let t = mrcAComplete.param_first_line_height.toString()+'px';
         element.setAttribute("height", t);
     } catch (e) {
-        tools.mrcLogError(e, "mrcMinimizeFields_2()");
+        mrcTools.mrcLogError(e, "mrcMinimizeFields_2()");
     }
 }
 
@@ -4723,7 +4723,7 @@ function mrcMaximizeFields(event) {
             mrcRecipientResize(element);
         }
     } catch (e) {
-        tools.mrcLogError(e, "mrcMaximizeFields()");
+        mrcTools.mrcLogError(e, "mrcMaximizeFields()");
     }
 }
 
@@ -4736,6 +4736,6 @@ function mrcOpenPreferences(event) {
     try {
         window.openDialog('chrome://mrc_compose/content/options.xul',' My Option Dialog','chrome,toolbar');
     } catch (e) {
-        tools.mrcLogError(e, "mrcOpenPreferences()");
+        mrcTools.mrcLogError(e, "mrcOpenPreferences()");
     }
 }
