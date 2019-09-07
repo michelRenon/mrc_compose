@@ -3855,7 +3855,7 @@ var mrcAComplete = {
         this.nbDatas = 0;
         let meth = "_search_mode_"+this.param_mode;
         this.cbSearch = cbSearch
-
+        mrcTools.mrcLog("meth="+meth);
         // stop the purge timeout
         clearTimeout(this.timeout_archiv);
 
@@ -4529,6 +4529,8 @@ function mrcRecipientKeyUp(event, element) {
             }
             break;
     }
+
+    mrcTools.mrcLog("mrcRecipientKeyUp : keyCode="+event.keyCode+" canUpdateUI="+canUpdateUI+" canUpdatePanel="+canUpdatePanel);
 
     // fill cache for next keyups
     mrcAComplete._textPart_cache = textPart;
