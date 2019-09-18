@@ -50,18 +50,11 @@
     >
     <script type="application/javascript" src="chrome://mrc_compose/content/mrc_compose.js"/><!-- A reference to your JavaScript file -->
 
-    <!-- 
-    MUST USE THE EXISTING id OF BUNDLESET OF ORIGINAL XUL FILE
-      - - > it means we add the stringbundle to the existing stringbundleset
-    -->
-    <stringbundleset id="stringbundleset">
-        <stringbundle id="mrcComposeStringBundle" src="chrome://mrc_compose/locale/mrc_compose.properties"/>
-    </stringbundleset>
     <!--
     only collapse this element beacuse some parts of init code need it.
     Currently, not enough time to serch how to completely remove it.
     -->
-    <listbox id="addressingWidget" hidden="true" flex="0" height="10" maxheight="20" rows="1"/>
+    <richlistitem id="addressingWidget" hidden="true" flex="0" height="10" maxheight="20" rows="1"/>
 
     <!-- change min height of toolbar from 203 to ...  -->
     <!--
@@ -116,7 +109,7 @@
                 </hbox>
             </deck>
         </panel>
-		
+
         <hbox id="box-to" >
             <hbox align="center" pack="end" style="&headersSpace.style;">
                 <hbox align="left" pack="start" flex="1">
@@ -269,8 +262,8 @@
             </vbox>
         </hbox>
     </vbox>
-    
-    
+
+
 
 
 </overlay>

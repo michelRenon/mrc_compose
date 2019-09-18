@@ -405,7 +405,9 @@ function LoadIdentity(startup)
         }
 
       if (!startup) {
-          if (getPref("mail.autoComplete.highlightNonMatches")) {
+          getPref = Components.classes["@mozilla.org/preferences-service;1"]
+                              .getService(Components.interfaces.nsIPrefService)
+          if (getPref.getBoolPref("mail.autoComplete.highlightNonMatches")) {
             document.getElementById('addressCol2#1').highlightNonMatches = true;
           }
 
@@ -3716,9 +3718,9 @@ var mrcAComplete = {
          */
         let res = key;
         try {
-            let bundle = document.getElementById("mrcComposeStringBundle");
+            let bundle = Services.strings.createBundle("chrome://mrc_compose/locale/mrc_compose.properties");
             if (bundle) {
-                res = bundle.getString(key);
+                res = bundle.GetStringFromName(key);
             } else {
                 res = key;
             }
