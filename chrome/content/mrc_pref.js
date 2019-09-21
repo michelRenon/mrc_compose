@@ -101,11 +101,17 @@ function onSaveWhiteList() {
      */
     var wList = document.getElementById("search_ab_URI_list");
     var wlArray = [];
+    // mrcTools.mrcLog("onSaveWhiteList() : wList.getRowCount()="+wList.getRowCount());
 
     for (var i = 0; i < wList.getRowCount(); i++) {
         var wlNode = wList.getItemAtIndex(i);
-        if (wlNode.checked) {
+        // mrcTools.mrcLog("onSaveWhiteList() : wlNode="+wlNode);
+        var checkbox = wlNode.getElementsByClassName("check")[0];
+        // mrcTools.mrcLog("onSaveWhiteList() : checkbox="+checkbox);
+        // mrcTools.mrcLog("onSaveWhiteList() : checkbox.checked="+checkbox.checked);
+        if (checkbox.checked) {
             let abURI = wlNode.getAttribute("value");
+            // mrcTools.mrcLog("onSaveWhiteList() : abURI="+abURI);
             wlArray.push(abURI);
         }
     }
@@ -197,6 +203,8 @@ function buildABList() {
 
     let currentArray = [];
     currentArray = document.getElementById("search_ab_URI").value.split(";;;");
+    // mrcTools.mrcLog("currentArray : "+currentArray);
+
 
     // set up the whitelist UI
     let wList = document.getElementById("search_ab_URI_list");
@@ -214,29 +222,24 @@ function buildABList() {
         if ( !(ab instanceof Components.interfaces.nsIAbDirectory))
             continue;
 
-        let abItem = document.createElement("listitem");
-        abItem.setAttribute("type", "checkbox");
-        abItem.setAttribute("class", "listitem-iconic");
-        abItem.setAttribute("label", ab.dirName);
-        abItem.setAttribute("value", ab.URI);
-
-        abItem.addEventListener("click", mrcToggleCheckAB, false);
-
-        // Due to bug 448582, we have to use setAttribute to set the
-        // checked value of the listitem.
         if (!first_load_done)
             // we force all ab
-            abItem.setAttribute("checked", true);
+            checked = true;
         else
-            abItem.setAttribute("checked", (currentArray.indexOf(ab.URI) != -1));
+            checked = currentArray.indexOf(ab.URI) != -1;
 
+        abItem = createABItemList(checked, ab.dirName, ab.URI);
         abItems.push(abItem);
     }
 
+    // TODO
+    // build items for Cardbook ABs
+
+
     // Sort the list
     function sortFunc(a, b) {
-        return a.getAttribute("label").toLowerCase()
-           > b.getAttribute("label").toLowerCase();
+        return a.getAttribute("sort_label").toLowerCase()
+           > b.getAttribute("sort_label").toLowerCase();
     }
 
     abItems.sort(sortFunc);
@@ -250,6 +253,40 @@ function buildABList() {
         onSaveWhiteList();
     }
 
+}
+
+function createABItemList(ab_check, ab_name, ab_uri) {
+
+
+    let abItem = document.createElement("richlistitem");
+    // abItem.setAttribute("type", "checkbox");
+    // abItem.setAttribute("class", "listitem-iconic");
+
+    let abHboxItem = document.createElement("hbox");
+    abHboxItem.setAttribute("flex", "1");
+
+    let newCheck = document.createElement("checkbox");
+    newCheck.setAttribute("class", "check");
+    // newCheck.value = ab.dirName;
+    // Due to bug 448582, we have to use setAttribute to set the
+    // checked value of the listitem.
+    newCheck.setAttribute("checked", ab_check);
+    newCheck.addEventListener("click", mrcToggleCheckAB, false);
+    abHboxItem.appendChild(newCheck);
+
+    // abItem.setAttribute("label", ab.dirName);
+    let newLabel = document.createElement("label");
+    newLabel.setAttribute("flex", "1");
+    newLabel.value = ab_name;
+    // debug
+    newLabel.value += " ("+ab_uri+")";
+    abHboxItem.appendChild(newLabel);
+
+    abItem.appendChild(abHboxItem);
+    abItem.setAttribute("sort_label", ab_name);
+    abItem.setAttribute("value", ab_uri);
+
+    return abItem;
 }
 
 function getLineHeight() {

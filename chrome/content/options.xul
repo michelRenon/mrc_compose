@@ -100,7 +100,7 @@
                             <row>
 
                                 <label control="search_ab_URI_list" value="&options.search_ab_URI_list.label;"/>
-                                <listbox id="search_ab_URI_list" rows="5"/>
+                                <richlistbox id="search_ab_URI_list" style="min-height:100px"/>
                             </row>
 
                             <row>
