@@ -222,13 +222,22 @@ function buildABList() {
         if ( !(ab instanceof Components.interfaces.nsIAbDirectory))
             continue;
 
+        ab_type = "?";
+        if (ab instanceof Components.interfaces.nsIAbDirectory && !ab.isRemote) {
+            ab_type = "Thunderbird";
+        } else {
+            if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
+                ab_type = "LDAP";
+            }
+        }
+
         if (!first_load_done)
             // we force all ab
             checked = true;
         else
             checked = currentArray.indexOf(ab.URI) != -1;
 
-        abItem = createABItemList(checked, ab.dirName, ab.URI);
+        abItem = createABItemList(checked, ab.dirName, ab.URI, ab_type);
         abItems.push(abItem);
     }
 
@@ -255,7 +264,7 @@ function buildABList() {
 
 }
 
-function createABItemList(ab_check, ab_name, ab_uri) {
+function createABItemList(ab_check, ab_name, ab_uri, ab_type) {
 
 
     let abItem = document.createElement("richlistitem");
@@ -281,6 +290,11 @@ function createABItemList(ab_check, ab_name, ab_uri) {
     // debug
     newLabel.value += " ("+ab_uri+")";
     abHboxItem.appendChild(newLabel);
+
+    let newLabelType = document.createElement("label");
+    newLabelType.value = ab_type;
+    newLabelType.setAttribute("style", "color: gray");
+    abHboxItem.appendChild(newLabelType);
 
     abItem.appendChild(abHboxItem);
     abItem.setAttribute("sort_label", ab_name);
