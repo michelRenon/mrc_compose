@@ -57,13 +57,7 @@
      >
 
     <vbox id="mrc-compose-pane" label="" >
-    <!--
-    <tooltip id="mrctip" orient="vertical" onpopupshowing="mrcTooltip();">
-        <vbox>
-            <html:div  id="helptip" />
-        </vbox>
-    </tooltip>
-    -->
+
     <tooltip id="mrctip_mode" orient="vertical" >
         <vbox>
             <html:div id="helptip">&options.mode.help;</html:div>
@@ -74,7 +68,6 @@
             <html:div id="helptip">&options.max_elements_part_menu.help;</html:div>
         </vbox>
     </tooltip>
-
 
     <tabbox>
     <tabs>

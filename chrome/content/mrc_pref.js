@@ -52,48 +52,12 @@ function mrcOnPrefLoaded() {
 
     mrcTools.mrcLog("mrcOnPrefLoaded()");
     buildABList();
-    // mrcLoadHelp(); no need anymore with with help through tooltips.
 
     window.addEventListener("activate", mrcOnPrefActivate); 
 }
 
 
-function mrcTooltip() {
-    /*
-     * Defines content of default tooltip in pref window.
-     *
-     * 'this' is the tooltip object
-     * 'document.tooltipNode' is the element being hovered.
-     *
-     */
-    mrcTools.mrcLog("tooltip="+document.tooltipNode.id+"\n");
-    let div = document.getElementById("helptip");
-    if (div) {
-        let hid = document.tooltipNode.id;
-        if (hid == "")
-            hid = document.tooltipNode.control;
-        let txt = "no help";
-        try {
-            txt = getContents("chrome://mrc_compose/locale/help_"+hid+".txt");
-        } catch(e) {
-            mrcTools.mrcLogError("getContents() ="+e);
-            txt = hid;
-        }
-        mrcTools.mrcLog("hid="+hid+"\n");
-        mrcTools.mrcLog("txt="+txt+"\n");
 
-        //clear the HTML div element of any prior shown custom HTML 
-        while(div.firstChild)
-            div.removeChild(div.firstChild);
-
-        let injectHTML = Components.classes["@mozilla.org/feed-unescapehtml;1"]
-        .getService(Components.interfaces.nsIScriptableUnescapeHTML) 
-        .parseFragment(txt, false, null, div);
-
-        //attach the DOM object to the HTML div element 
-        div.appendChild(injectHTML);
-    }
-}
 function onSaveWhiteList() {
     /**
      * Propagate changes to the whitelist menu list back to
@@ -328,74 +292,6 @@ function getLineHeight() {
     }
     return v;
 }
-
-
-
-function getContents(aURL){
-    /*
-     * Read a file from a chrome path.
-     * from http://forums.mozillazine.org/viewtopic.php?p=921150
-     *
-     */
-  var ioService=Components.classes["@mozilla.org/network/io-service;1"]
-    .getService(Components.interfaces.nsIIOService);
-  var scriptableStream=Components
-    .classes["@mozilla.org/scriptableinputstream;1"]
-    .getService(Components.interfaces.nsIScriptableInputStream);
-
-  var channel=ioService.newChannel(aURL,null,null);
-  // var channel=ioService.newChannel2(aURL,null,null, null, document, document, null, null);
-  var input=channel.open();
-  scriptableStream.init(input);
-  var str=scriptableStream.read(input.available());
-  scriptableStream.close();
-  input.close();
-  return str;
-}
-
-
-function mrcLoadHelp() {
-    /*
-     * Obsolete.
-     */
-
-    for (let i = 1 ; i <= 4 ; i++) {
-        let hid = "help"+i;
-        let div = document.getElementById(hid);
-        if (div) {
-            let txt = "";
-            try {
-                txt = getContents("chrome://mrc_compose/locale/"+hid+".txt");
-            } catch(e) {}
-
-            //clear the HTML div element of any prior shown custom HTML
-            while(div.firstChild) 
-                div.removeChild(div.firstChild);
-
-            //safely convert HTML string to a simple DOM object, striping it of javascript and more complex tags
-            var parserUtils = Components.classes["@mozilla.org/parserutils;1"]
-                  .getService(Components.interfaces.nsIParserUtils);
-            let injectHTML = "";
-            // special : Gecko 13 does not have 'parseFragment()'
-            if (parserUtils.parseFragment)
-                injectHTML = parserUtils.parseFragment(txt, 0, false, null, div);
-            else {
-                // Old API to parse html, xml, svg.
-                var parser = Components.classes["@mozilla.org/xmlextras/domparser;1"]
-                            .createInstance(Components.interfaces.nsIDOMParser);
-                var htmlDoc = parser.parseFromString(txt, "text/html");
-                injectHTML = htmlDoc.firstChild;
-            }
-
-            //attach the DOM object to the HTML div element 
-            div.appendChild(injectHTML); 
-        }
-    }
-}
-
-
-
-
 
 function mrcOnPrefComposeLoaded() {
 
