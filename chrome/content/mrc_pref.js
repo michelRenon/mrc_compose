@@ -232,27 +232,21 @@ function createABItemList(ab_check, ab_name, ab_uri, ab_type) {
 
 
     let abItem = document.createElement("richlistitem");
-    // abItem.setAttribute("type", "checkbox");
-    // abItem.setAttribute("class", "listitem-iconic");
 
     let abHboxItem = document.createElement("hbox");
     abHboxItem.setAttribute("flex", "1");
 
     let newCheck = document.createElement("checkbox");
     newCheck.setAttribute("class", "check");
-    // newCheck.value = ab.dirName;
-    // Due to bug 448582, we have to use setAttribute to set the
-    // checked value of the listitem.
     newCheck.setAttribute("checked", ab_check);
     newCheck.addEventListener("click", mrcToggleCheckAB, false);
     abHboxItem.appendChild(newCheck);
 
-    // abItem.setAttribute("label", ab.dirName);
     let newLabel = document.createElement("label");
     newLabel.setAttribute("flex", "1");
     newLabel.value = ab_name;
     // debug
-    newLabel.value += " ("+ab_uri+")";
+    // newLabel.value += " ("+ab_uri+")";
     abHboxItem.appendChild(newLabel);
 
     let newLabelType = document.createElement("label");
