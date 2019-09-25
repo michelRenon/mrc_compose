@@ -1,4 +1,4 @@
-﻿<!ENTITY field.placeholder "escriba uno o mas destinatarios separados por comas" >
+<!ENTITY field.placeholder "escriba uno o mas destinatarios separados por comas" >
 <!ENTITY field.warning_number "Advertencia : deberías mover tus destinarios en '&bccAddr.label;'." >
 
 <!ENTITY fieldcc.show "Mostrar '&ccAddr.label;'" >
