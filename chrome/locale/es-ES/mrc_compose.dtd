@@ -78,3 +78,51 @@
 <!ENTITY options.special_values.style "font-size:1.2em; font-style:italic"> 
 
 <!ENTITY options.ldap_search_version.label "Usar esta versíon de API de LDAP :">
+
+
+
+<!-- help tooltips -->
+
+<!ENTITY options.add_comma.help "Agrega una coma entre cada destinatario.">
+<!ENTITY options.automatic_height.help "Adapta la altura de los campos de acuerdo a los caracteres escritos.">
+<!ENTITY options.default_line_height.help "Reestablece los campos 'Altura de la primera línea' y 'Altura de la línea'.">
+<!ENTITY options.first_line_height.help "Altura de la primera línea de cada campo (en pixeles).">
+<!ENTITY options.line_height.help "Altura de las otras líneas de los campos (en pixeles).">
+<!ENTITY options.max_elements_part_menu.help "Núm. max. de líneas en cada sección.
+    Con Modo '0', Puede establecer 'Núm. max. de líneas en cada sección' entre 15 y 30.
+    Con Modo '1', Es mejor establecer 'Núm. max. de líneas en cada sección' entre 15 y 30.
+    Con Modo '2', Se recomienda establecer 'Núm. max. de líneas en cada sección' entre 5 y 10.
+    Con Modo '3', lo ideal  'Núm. max. de líneas en cada sección' es entre 5 y 10.">
+<!ENTITY options.max_nb_line.help "Núm. máximo de líneas en cada campo. Arriba de este número se usará la rueda del ratón.">
+<!ENTITY options.max_recipients_warning.help "Para los campos 'Para' y 'Cc', se muestra una advertencia si el nómero de destinatarios supera este nómero.
+La advertencia le dice al usuario que es mejor usar el campo 'bcc' en su lugar.">
+<!ENTITY options.min_recipients_show.help "El nómero de destinatarios es indicado a la izquierda de la etiqueta de cada campo.
+Se muestra solo si supera este nómero.">
+<!ENTITY options.min_search_delay.help "El retraso mínimo entre cada busqueda identica (milisegundos).">
+<!ENTITY options.mode.help "'0' : la lista contiene 1 grupo :
+    'inician' :    aquellos contactos y listas con información que inicien con lo escrito
+    Con el modo '0', es mejor establecer 'Núm. max. de líneas en cada sección' de 15 a 30.
+
+'1' : la lista contiene 1 grupo :
+    'contienen' : los contactos y listas cuya información que contiene lo escrito
+    Con el modo '1', es mejor establecer 'Núm. max. de líneas en cada sección' de 15 a 30.
+
+'2' : la lista contiene 2 grupos :
+    'inician' :    aquellos contactos y listas con información que inicie con lo escrito
+    'contienen' : los contactos y listas cuya información que contiene lo escrito (excepto los del primer grupo)
+    Con modo '2', es mejor establecer 'Núm. max. de líneas en cada sección' de 5 a 10.
+
+'3' : la lista contiene 1 grupo de cada libreta de direcciones :
+    contactos y listas cuya información contiene lo escrito de cada libreta
+    Con modo '3', es mejor establecer 'Núm. max. de líneas en cada sección' de 5 a 10.
+
+Los campos en los que se busca son :
+- 'Correo principal', 'Nombre', 'Apellidos', 'Apodo' para contactos
+- 'Apellidos' para las listas.
+
+En equipos lentos, es mejor elegir '1'.">
+<!ENTITY options.search_min_char.help "La busqueda inicia después de escribir este nóm. de caracteres.
+En equipos lentos, es mejor elegir 2 o 3.">
+<!ENTITY options.search_timeout.help "Tiempo máx. de espera para busquedas en LDAP (milisegundos).">
+<!ENTITY options.show_no_result.help "Si no hay resultados, muestra una panel informativo.">
+<!ENTITY options.show_popularity.help "Muestra la popularidad de los contactos.">

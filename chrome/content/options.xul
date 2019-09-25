@@ -57,15 +57,23 @@
      >
 
     <vbox id="mrc-compose-pane" label="" >
-
+    <!--
     <tooltip id="mrctip" orient="vertical" onpopupshowing="mrcTooltip();">
         <vbox>
             <html:div  id="helptip" />
         </vbox>
     </tooltip>
-
-
-
+    -->
+    <tooltip id="mrctip_mode" orient="vertical" >
+        <vbox>
+            <html:div id="helptip">&options.mode.help;</html:div>
+        </vbox>
+    </tooltip>
+    <tooltip id="mrctip_max_elmts_part" orient="vertical" >
+        <vbox>
+            <html:div id="helptip">&options.max_elements_part_menu.help;</html:div>
+        </vbox>
+    </tooltip>
 
 
     <tabbox>
@@ -127,8 +135,8 @@
 
 
                             <row>
-                                <label control="mode" value="&options.mode.label;" tooltip="mrctip"/>
-                                <menulist id="mode" preference="extensions.mrccompose.mode" tooltip="mrctip">
+                                <label control="mode" value="&options.mode.label;" tooltip="mrctip_mode"/>
+                                <menulist id="mode" preference="extensions.mrccompose.mode" tooltip="mrctip_mode">
                                     <menupopup>
                                         <menuitem label="&options.mode_value4.label;" value="4"/>
                                         <menuitem label="&options.mode_value1.label;" value="1"/>
@@ -138,8 +146,8 @@
                                 </menulist>
                             </row>
                             <row>
-                                <label control="max_elements_part_menu" value="&options.max_elements_part_menu.label;" tooltip="mrctip"/>
-                                <textbox id="max_elements_part_menu" preference="extensions.mrccompose.max_elements_part_menu" type="number" min="1" max="50" size="3" tooltip="mrctip"/>
+                                <label control="max_elements_part_menu" value="&options.max_elements_part_menu.label;" tooltip="mrctip_max_elmts_part"/>
+                                <textbox id="max_elements_part_menu" preference="extensions.mrccompose.max_elements_part_menu" type="number" min="1" max="50" size="3" tooltip="mrctip_max_elmts_part"/>
                             </row>
                             <row>
                                 <label control="sort_field_level_1" value="&options.sort_field_level_1.label;"/>
@@ -172,16 +180,16 @@
                                 </menulist>
                             </row>
                             <row>
-                                <label control="show_popularity" value="&options.show_popularity.label;" tooltip="mrctip"/>
-                                <checkbox id="show_popularity" preference="extensions.mrccompose.show_popularity" tooltip="mrctip"/>
+                                <label control="show_popularity" value="&options.show_popularity.label;" tooltiptext="&options.show_popularity.help;"/>
+                                <checkbox id="show_popularity" preference="extensions.mrccompose.show_popularity" tooltiptext="&options.show_popularity.help;"/>
                             </row>
                             <row>
-                                <label control="search_timeout" value="&options.search_timeout.label;" tooltip="mrctip"/>
-                                <textbox id="search_timeout" preference="extensions.mrccompose.search_timeout" type="number" min="1" max="300000" tooltip="mrctip"/>
+                                <label control="search_timeout" value="&options.search_timeout.label;" tooltiptext="&options.search_timeout.help;"/>
+                                <textbox id="search_timeout" preference="extensions.mrccompose.search_timeout" type="number" min="1" max="300000" tooltiptext="&options.search_timeout.help;"/>
                             </row>
                             <row>
-                                <label control="show_no_result" value="&options.show_no_result.label;" tooltip="mrctip"/>
-                                <checkbox id="show_no_result" preference="extensions.mrccompose.show_no_result" tooltip="mrctip"/>
+                                <label control="show_no_result" value="&options.show_no_result.label;" tooltiptext="&options.show_no_result.help;"/>
+                                <checkbox id="show_no_result" preference="extensions.mrccompose.show_no_result" tooltiptext="&options.show_no_result.help;"/>
                             </row>
 
                         </rows>
@@ -206,16 +214,16 @@
                         </columns>
                         <rows>
                             <row>
-                                <label control="min_recipients_show" value="&options.min_recipients_show.label;" tooltip="mrctip"/>
-                                <textbox id="min_recipients_show" preference="extensions.mrccompose.min_recipients_show" type="number" min="1" max="50" size="3" tooltip="mrctip"/>
+                                <label control="min_recipients_show" value="&options.min_recipients_show.label;" tooltiptext="&options.min_recipients_show.help;"/>
+                                <textbox id="min_recipients_show" preference="extensions.mrccompose.min_recipients_show" type="number" min="1" max="50" size="3" tooltiptext="&options.min_recipients_show.help;"/>
                             </row>
                             <row>
-                                <label control="max_recipients_warning" value="&options.max_recipients_warning.label;" tooltip="mrctip"/>
-                                <textbox id="max_recipients_warning" preference="extensions.mrccompose.max_recipients_warning" type="number" min="1" max="50" size="3" tooltip="mrctip"/>
+                                <label control="max_recipients_warning" value="&options.max_recipients_warning.label;" tooltiptext="&options.max_recipients_warning.help;"/>
+                                <textbox id="max_recipients_warning" preference="extensions.mrccompose.max_recipients_warning" type="number" min="1" max="50" size="3" tooltiptext="&options.max_recipients_warning.help;"/>
                             </row>
                             <row>
-                                <label control="search_min_char" value="&options.search_min_char.label;" tooltip="mrctip"/>
-                                <textbox id="search_min_char" preference="extensions.mrccompose.search_min_char" type="number" min="1" max="50" size="3" tooltip="mrctip"/>
+                                <label control="search_min_char" value="&options.search_min_char.label;" tooltiptext="&options.search_min_char.help;"/>
+                                <textbox id="search_min_char" preference="extensions.mrccompose.search_min_char" type="number" min="1" max="50" size="3" tooltiptext="&options.search_min_char.help;"/>
                             </row>
 
                         </rows>
@@ -317,24 +325,24 @@
                             </row>
 
                             <row>
-                                <label control="max_nb_line" value="&options.max_nb_line.label;" tooltip="mrctip"/>
-                                <textbox id="max_nb_line" preference="extensions.mrccompose.max_nb_line" type="number" min="1" max="10" size="3" tooltip="mrctip"/>
+                                <label control="max_nb_line" value="&options.max_nb_line.label;" tooltiptext="&options.max_nb_line.help;"/>
+                                <textbox id="max_nb_line" preference="extensions.mrccompose.max_nb_line" type="number" min="1" max="10" size="3" tooltiptext="&options.max_nb_line.help;"/>
                             </row>
                             <row>
-                                <label control="first_line_height" value="&options.first_line_height.label;" tooltip="mrctip"/>
-                                <textbox id="first_line_height" preference="extensions.mrccompose.first_line_height" type="number" min="10" max="30" size="3" tooltip="mrctip" />
+                                <label control="first_line_height" value="&options.first_line_height.label;" tooltiptext="&options.first_line_height.help;"/>
+                                <textbox id="first_line_height" preference="extensions.mrccompose.first_line_height" type="number" min="10" max="30" size="3" tooltiptext="&options.first_line_height.help;" />
                             </row>
                             <row>
-                                <label control="line_height" value="&options.line_height.label;" tooltip="mrctip" />
-                                <textbox id="line_height" preference="extensions.mrccompose.line_height" type="number" min="10" max="30" size="3" tooltip="mrctip" />
+                                <label control="line_height" value="&options.line_height.label;" tooltiptext="&options.line_height.help;" />
+                                <textbox id="line_height" preference="extensions.mrccompose.line_height" type="number" min="10" max="30" size="3" tooltiptext="&options.line_height.help;"/>
                             </row>
                             <row>
-                                <label control="default_line_height" value="&options.default_line_height.label;" tooltip="mrctip"/>
-                                <button id="default_line_height" label="&options.default_line_height.button;" oncommand="mrcDefaultLineHeight(event);"  tooltip="mrctip"/>
+                                <label control="default_line_height" value="&options.default_line_height.label;" tooltiptext="&options.default_line_height.help;"/>
+                                <button id="default_line_height" label="&options.default_line_height.button;" oncommand="mrcDefaultLineHeight(event);"  tooltiptext="&options.default_line_height.help;"/>
                             </row>
                             <row>
-                                <label control="automatic_height" value="&options.automatic_height.label;" tooltip="mrctip"/>
-                                <checkbox id="automatic_height" preference="extensions.mrccompose.automatic_height" tooltip="mrctip"  />
+                                <label control="automatic_height" value="&options.automatic_height.label;" tooltiptext="&options.automatic_height.help;"/>
+                                <checkbox id="automatic_height" preference="extensions.mrccompose.automatic_height" tooltiptext="&options.automatic_height.help;"/>
                             </row>
                         </rows>
                     </grid>
@@ -358,12 +366,12 @@
                         </columns>
                         <rows>
                             <row>
-                                <label control="min_search_delay" value="&options.min_search_delay.label;" tooltip="mrctip"/>
-                                <textbox id="min_search_delay" preference="extensions.mrccompose.min_search_delay" type="number" min="1" max="1000" size="4" tooltip="mrctip"/>
+                                <label control="min_search_delay" value="&options.min_search_delay.label;" tooltiptext="&options.min_search_delay.help;"/>
+                                <textbox id="min_search_delay" preference="extensions.mrccompose.min_search_delay" type="number" min="1" max="1000" size="4" tooltiptext="&options.min_search_delay.help;"/>
                             </row>
                             <row>
-                                <label control="add_comma" value="&options.add_comma.label;" tooltip="mrctip"/>
-                                <checkbox id="add_comma" preference="extensions.mrccompose.add_comma" tooltip="mrctip" />
+                                <label control="add_comma" value="&options.add_comma.label;" tooltiptext="&options.add_comma.help;"/>
+                                <checkbox id="add_comma" preference="extensions.mrccompose.add_comma" tooltiptext="&options.add_comma.help;"/>
                             </row>
                             <!--
                             <row>
