@@ -247,173 +247,191 @@ function CompFields2Recipients(msgCompFields)
   }
 }
 
-function LoadIdentity(startup)
-{
-    var identityElement = document.getElementById("msgIdentity");
-    var prevIdentity = gCurrentIdentity;
+function LoadIdentity(startup) {
+  var identityElement = document.getElementById("msgIdentity");
+  var prevIdentity = gCurrentIdentity;
 
-    if (identityElement) {
-        var idKey = identityElement.value; // TB24, TB31
-        var idKey = identityElement.selectedItem.getAttribute("identitykey"); // TB38
-        gCurrentIdentity = MailServices.accounts.getIdentity(idKey);
-        /*
-        let accountKey = null;
-        // Set the account key value on the menu list.
-        if (identityElement.selectedItem) {
-          accountKey = identityElement.selectedItem.getAttribute("accountkey");
-          identityElement.setAttribute("accountkey", accountKey);
-          hideIrrelevantAddressingOptions(accountKey);
+  if (identityElement) {
+    let idKey = null;
+    let accountKey = null;
+    if (identityElement.selectedItem) {
+      // Set the identity key value on the menu list.
+      idKey = identityElement.selectedItem.getAttribute("identitykey");
+      identityElement.setAttribute("identitykey", idKey);
+      gCurrentIdentity = MailServices.accounts.getIdentity(idKey);
+
+      // Set the account key value on the menu list.
+      accountKey = identityElement.selectedItem.getAttribute("accountkey");
+      identityElement.setAttribute("accountkey", accountKey);
+      hideIrrelevantAddressingOptions(accountKey);
+    }
+    /*
+    let maxRecipients = awGetNumberOfRecipients();
+    for (let i = 1; i <= maxRecipients; i++) {
+      let params = JSON.parse(awGetInputElement(i).searchParam);
+      params.idKey = idKey;
+      params.accountKey = accountKey;
+      awGetInputElement(i).searchParam = JSON.stringify(params);
+    }
+    */
+    if (!startup && prevIdentity && idKey != prevIdentity.key) {
+      var prevReplyTo = prevIdentity.replyTo;
+      var prevCc = "";
+      var prevBcc = "";
+      var prevReceipt = prevIdentity.requestReturnReceipt;
+      var prevDSN = prevIdentity.DSN;
+      var prevAttachVCard = prevIdentity.attachVCard;
+
+      if (prevIdentity.doCc)
+        prevCc += prevIdentity.doCcList;
+
+      if (prevIdentity.doBcc)
+        prevBcc += prevIdentity.doBccList;
+
+      var newReplyTo = gCurrentIdentity.replyTo;
+      var newCc = "";
+      var newBcc = "";
+      var newReceipt = gCurrentIdentity.requestReturnReceipt;
+      var newDSN = gCurrentIdentity.DSN;
+      var newAttachVCard = gCurrentIdentity.attachVCard;
+
+      if (gCurrentIdentity.doCc)
+        newCc += gCurrentIdentity.doCcList;
+
+      if (gCurrentIdentity.doBcc)
+        newBcc += gCurrentIdentity.doBccList;
+
+      var needToCleanUp = false;
+      var msgCompFields = gMsgCompose.compFields;
+
+      if (!gReceiptOptionChanged &&
+          prevReceipt == msgCompFields.returnReceipt &&
+          prevReceipt != newReceipt) {
+        msgCompFields.returnReceipt = newReceipt;
+        document.getElementById("returnReceiptMenu").setAttribute("checked", msgCompFields.returnReceipt);
+      }
+
+      if (!gDSNOptionChanged &&
+          prevDSN == msgCompFields.DSN &&
+          prevDSN != newDSN) {
+        msgCompFields.DSN = newDSN;
+        document.getElementById("dsnMenu").setAttribute("checked", msgCompFields.DSN);
+      }
+
+      if (!gAttachVCardOptionChanged &&
+          prevAttachVCard == msgCompFields.attachVCard &&
+          prevAttachVCard != newAttachVCard) {
+        msgCompFields.attachVCard = newAttachVCard;
+        document.getElementById("cmd_attachVCard").setAttribute("checked", msgCompFields.attachVCard);
+      }
+      /*
+      if (newReplyTo != prevReplyTo) {
+        needToCleanUp = true;
+        if (prevReplyTo != "")
+          awRemoveRecipients(msgCompFields, "addr_reply", prevReplyTo);
+        if (newReplyTo != "")
+          awAddRecipients(msgCompFields, "addr_reply", newReplyTo);
+      }
+
+      let toAddrs = new Set(msgCompFields.splitRecipients(
+        msgCompFields.to, true, {}));
+      let ccAddrs = new Set(msgCompFields.splitRecipients(
+        msgCompFields.cc, true, {}));
+
+      if (newCc != prevCc) {
+        needToCleanUp = true;
+        if (prevCc)
+          awRemoveRecipients(msgCompFields, "addr_cc", prevCc);
+        if (newCc) {
+          // Ensure none of the Ccs are already in To.
+          let cc2 = msgCompFields.splitRecipients(newCc, true, {});
+          newCc = cc2.filter(x => !toAddrs.has(x)).join(", ");
+          awAddRecipients(msgCompFields, "addr_cc", newCc);
         }
+      }
 
-        let maxRecipients = awGetMaxRecipients();
-        for (let i = 1; i <= maxRecipients; i++)
+      if (newBcc != prevBcc) {
+        needToCleanUp = true;
+        if (prevBcc)
+          awRemoveRecipients(msgCompFields, "addr_bcc", prevBcc);
+        if (newBcc) {
+          // Ensure none of the Bccs are already in To or Cc.
+          let bcc2 = msgCompFields.splitRecipients(newBcc, true, {});
+          let toCcAddrs = new Set([...toAddrs, ...ccAddrs]);
+          newBcc = bcc2.filter(x => !toCcAddrs.has(x)).join(", ");
+          awAddRecipients(msgCompFields, "addr_bcc", newBcc);
+        }
+      }
+
+      if (needToCleanUp)
+        awCleanupRows();
+      */
+        // start of specific code
+        if (newReplyTo != prevReplyTo)
         {
-          let params = JSON.parse(awGetInputElement(i).searchParam);
-          params.idKey = idKey;
-          params.accountKey = accountKey;
-          awGetInputElement(i).searchParam = JSON.stringify(params);
+            if (prevReplyTo != "") {
+                mrcAComplete._removeRecipient('fieldREPLY', prevReplyTo);
+            }
+            if (newReplyTo != "") {
+                mrcAComplete._insertRecipient('fieldREPLY', newReplyTo);
+            }
+            mrcAComplete.updateFieldVisibilityOnLoad('fieldREPLY');
         }
-        */
-        if (!startup && prevIdentity && idKey != prevIdentity.key)
+
+        if (newCc != prevCc)
         {
-          var prevReplyTo = prevIdentity.replyTo;
-          var prevCc = "";
-          var prevBcc = "";
-          var prevReceipt = prevIdentity.requestReturnReceipt;
-          var prevDSN = prevIdentity.DSN;
-          var prevAttachVCard = prevIdentity.attachVCard;
-
-          if (prevIdentity.doCc) {
-            prevCc += prevIdentity.doCcList;
-          }
-          if (prevIdentity.doBcc) {
-            prevBcc += prevIdentity.doBccList;
-          }
-          var newReplyTo = gCurrentIdentity.replyTo;
-          var newCc = "";
-          var newBcc = "";
-          var newReceipt = gCurrentIdentity.requestReturnReceipt;
-          var newDSN = gCurrentIdentity.DSN;
-          var newAttachVCard = gCurrentIdentity.attachVCard;
-
-          if (gCurrentIdentity.doCc) {
-            newCc += gCurrentIdentity.doCcList;
-          }
-          if (gCurrentIdentity.doBcc) {
-            newBcc += gCurrentIdentity.doBccList;
-          }
-          var needToCleanUp = false;
-          var msgCompFields = gMsgCompose.compFields;
-
-          if (!gReceiptOptionChanged &&
-              prevReceipt == msgCompFields.returnReceipt &&
-              prevReceipt != newReceipt)
-          {
-            msgCompFields.returnReceipt = newReceipt;
-            document.getElementById("returnReceiptMenu").setAttribute('checked',msgCompFields.returnReceipt);
-          }
-
-          if (!gDSNOptionChanged &&
-              prevDSN == msgCompFields.DSN &&
-              prevDSN != newDSN)
-          {
-            msgCompFields.DSN = newDSN;
-            document.getElementById("dsnMenu").setAttribute('checked',msgCompFields.DSN);
-          }
-
-          if (!gAttachVCardOptionChanged &&
-              prevAttachVCard == msgCompFields.attachVCard &&
-              prevAttachVCard != newAttachVCard)
-          {
-            msgCompFields.attachVCard = newAttachVCard;
-            document.getElementById("cmd_attachVCard").setAttribute('checked',msgCompFields.attachVCard);
-          }
-        /*
-          if (newReplyTo != prevReplyTo)
-          {
-            needToCleanUp = true;
-            if (prevReplyTo != "")
-              awRemoveRecipients(msgCompFields, "addr_reply", prevReplyTo);
-            if (newReplyTo != "")
-              awAddRecipients(msgCompFields, "addr_reply", newReplyTo);
-          }
-
-          if (newCc != prevCc)
-          {
-            needToCleanUp = true;
-            if (prevCc != "")
-              awRemoveRecipients(msgCompFields, "addr_cc", prevCc);
-            if (newCc != "")
-              awAddRecipients(msgCompFields, "addr_cc", newCc);
-          }
-
-          if (newBcc != prevBcc)
-          {
-            needToCleanUp = true;
-            if (prevBcc != "")
-              awRemoveRecipients(msgCompFields, "addr_bcc", prevBcc);
-            if (newBcc != "")
-              awAddRecipients(msgCompFields, "addr_bcc", newBcc);
-          }
-
-          if (needToCleanUp)
-            awCleanupRows();
-        */
-            // start of specific code
-            if (newReplyTo != prevReplyTo)
-            {
-                if (prevReplyTo != "") {
-                    mrcAComplete._removeRecipient('fieldREPLY', prevReplyTo);
-                }
-                if (newReplyTo != "") {
-                    mrcAComplete._insertRecipient('fieldREPLY', newReplyTo);
-                }
-                mrcAComplete.updateFieldVisibilityOnLoad('fieldREPLY');
+            if (prevCc != "") {
+                mrcAComplete._removeRecipient('fieldCC', prevCc);
             }
-
-            if (newCc != prevCc)
-            {
-                if (prevCc != "") {
-                    mrcAComplete._removeRecipient('fieldCC', prevCc);
-                }
-                if (newCc != "") {
-                    mrcAComplete._insertRecipient('fieldCC', newCc);
-                }
-                mrcAComplete.updateFieldVisibilityOnLoad('fieldCC');
+            if (newCc != "") {
+                mrcAComplete._insertRecipient('fieldCC', newCc);
             }
-
-            if (newBcc != prevBcc)
-            {
-                if (prevBcc != "") {
-                    mrcAComplete._removeRecipient('fieldBCC', prevBcc);
-                }
-                if (newBcc != "") {
-                    mrcAComplete._insertRecipient('fieldBCC', newBcc);
-                }
-                mrcAComplete.updateFieldVisibilityOnLoad('fieldBCC');
-            }
-            // end of specific code
-          try {
-            gMsgCompose.identity = gCurrentIdentity;
-          } catch (ex) {
-            dump("### Cannot change the identity: " + ex + "\n");
-          }
-
-          var event = document.createEvent('Events');
-          event.initEvent('compose-from-changed', false, true);
-          document.getElementById("msgcomposeWindow").dispatchEvent(event);
+            mrcAComplete.updateFieldVisibilityOnLoad('fieldCC');
         }
 
-      if (!startup) {
-          getPref = Components.classes["@mozilla.org/preferences-service;1"]
-                              .getService(Components.interfaces.nsIPrefService)
-          if (getPref.getBoolPref("mail.autoComplete.highlightNonMatches")) {
-            document.getElementById('addressCol2#1').highlightNonMatches = true;
-          }
+        if (newBcc != prevBcc)
+        {
+            if (prevBcc != "") {
+                mrcAComplete._removeRecipient('fieldBCC', prevBcc);
+            }
+            if (newBcc != "") {
+                mrcAComplete._insertRecipient('fieldBCC', newBcc);
+            }
+            mrcAComplete.updateFieldVisibilityOnLoad('fieldBCC');
+        }
+        // end of specific code
 
-          addRecipientsToIgnoreList(gCurrentIdentity.identityName);  // only do this if we aren't starting up....it gets done as part of startup already
+
+      try {
+        gMsgCompose.identity = gCurrentIdentity;
+      } catch (ex) {
+        dump("### Cannot change the identity: " + ex + "\n");
+      }
+
+      var event = document.createEvent("Events");
+      event.initEvent("compose-from-changed", false, true);
+      document.getElementById("msgcomposeWindow").dispatchEvent(event);
+
+      gComposeNotificationBar.clearIdentityWarning();
+    }
+
+    if (!startup) {
+      if (Services.prefs.getBoolPref("mail.autoComplete.highlightNonMatches"))
+        document.getElementById("addressCol2#1").highlightNonMatches = true;
+
+      // Only do this if we aren't starting up...
+      // It gets done as part of startup already.
+      addRecipientsToIgnoreList(gCurrentIdentity.fullAddress);
+
+      // If the From field is editable, reset the address from the identity.
+      if (identityElement.editable) {
+        identityElement.value = identityElement.selectedItem.value;
+        identityElement.placeholder = getComposeBundle().getFormattedString(
+          "msgIdentityPlaceholder", [identityElement.selectedItem.value]
+        );
       }
     }
+  }
 }
 
 // public method called by the address picker sidebar
