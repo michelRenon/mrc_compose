@@ -4,7 +4,7 @@
     "message": "MRC Compose"
   },
   "extensionDescription": {
-    "message": "Provides 3 standards fields (TO, CC, BCC) with autocomplete to Thunderbird's compose pane"
+    "message": "Fournit 3 champs de normes (TO, CC, BCC) avec la saisie semi-automatique dans le volet de composition de Thunderbird."
   }
 
 }
