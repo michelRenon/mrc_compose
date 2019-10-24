@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "__MSG_extensionName__",
-	"description": "__MSG_extensionDescription__",
+  "description": "__MSG_extensionDescription__",
   "applications": {
     "gecko": {
       "id": "mrc_compose@mr-consultant.net",
