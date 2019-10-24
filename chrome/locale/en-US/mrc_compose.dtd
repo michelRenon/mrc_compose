@@ -78,3 +78,51 @@
 <!ENTITY options.special_values.style "font-size:1.2em; font-style:italic"> 
 
 <!ENTITY options.ldap_search_version.label "Use LDAP API version :">
+
+
+
+<!-- help tooltips -->
+
+<!ENTITY options.add_comma.help "Add a coma after a new recipient.">
+<!ENTITY options.automatic_height.help "Adapt the height of field at each typed character.">
+<!ENTITY options.default_line_height.help "Reset fields 'First line height' and 'Line height'.">
+<!ENTITY options.first_line_height.help "Height of first line of each field (pixels).">
+<!ENTITY options.line_height.help "Height of other lines of each field (pixels).">
+<!ENTITY options.max_elements_part_menu.help "The max element number in each part of the list.
+    With 'Mode' '0', it's better to set 'Max nb line in each part' to 15-30.
+    With 'Mode' '1', it's better to set 'Max nb line in each part' to 15-30.
+    With 'Mode' '2', it's better to set 'Max nb line in each part' to 5-10.
+    With 'Mode' '3', it's better to set 'Max nb line in each part' to 5-10.">
+<!ENTITY options.max_nb_line.help "Max number of lines in each field. Above that number, scrolling is used.">
+<!ENTITY options.max_recipients_warning.help "For the fields 'To' and 'Cc', a warning is shown if the number of recipients is above that number.
+The warning tells the user it's better to use the field 'Bcc' instead.">
+<!ENTITY options.min_recipients_show.help "The number of recipients is indicated on the left of the label of each field.
+It is shown only if above that number.">
+<!ENTITY options.min_search_delay.help "The minimum delay between 2 identical searches (milliseconds).">
+<!ENTITY options.mode.help "'0' : the list contains 1 part :
+    'begin' :    contacts whose fields begin with X
+    With mode '0', it's better to set 'Max nb line in each part' to 15-30.
+
+'1' : the list contains 1 part :
+    'contains' : contacts &amp; lists whose fields contains X
+    With mode '1', it's better to set 'Max nb line in each part' to 15-30.
+
+'2' : the list contains 2 parts :
+    'begin' :    contacts whose fields begin with X
+    'contains' : contacts whose fields contains X (except those in part 1)
+    With mode '2', it's better to set 'Max nb line in each part' to 5-10.
+
+'3' : the list contains 1 part for each AddressBook :
+    contacts &amp; lists whose fields contains X
+    With mode '3', it's better to set 'Max nb line in each part' to 5-10.
+
+Searched fields are :
+- 'PrimaryEmail', 'FirstName', 'LastName', 'NickName' for contacts
+- fields is 'LastName' for list
+
+On slow machines, it's better to choose '1'.">
+<!ENTITY options.search_min_char.help "The search starts after this number of characters entered.
+On slow machines, it's better to choose '2' or '3'.">
+<!ENTITY options.search_timeout.help "Maximal waiting for LDAP searches (milliseconds).">
+<!ENTITY options.show_no_result.help "Even if there is no result, show panel with information.">
+<!ENTITY options.show_popularity.help "Show popularity of contacts.">

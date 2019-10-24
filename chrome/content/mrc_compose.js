@@ -98,7 +98,7 @@
 
 // "use strict";
 
-ChromeUtils.import("chrome://mrc_compose/content/mrc_tools.js");
+var mrcTools = ChromeUtils.import("chrome://mrc_compose/content/mrc_tools.js");
 
 
 
@@ -247,177 +247,197 @@ function CompFields2Recipients(msgCompFields)
   }
 }
 
-function LoadIdentity(startup)
-{
-    var identityElement = document.getElementById("msgIdentity");
-    var prevIdentity = gCurrentIdentity;
+function LoadIdentity(startup) {
+  var identityElement = document.getElementById("msgIdentity");
+  var prevIdentity = gCurrentIdentity;
 
-    if (identityElement) {
-        var idKey = identityElement.value; // TB24, TB31
-        var idKey = identityElement.selectedItem.getAttribute("identitykey"); // TB38
-        gCurrentIdentity = MailServices.accounts.getIdentity(idKey);
-        /*
-        let accountKey = null;
-        // Set the account key value on the menu list.
-        if (identityElement.selectedItem) {
-          accountKey = identityElement.selectedItem.getAttribute("accountkey");
-          identityElement.setAttribute("accountkey", accountKey);
-          hideIrrelevantAddressingOptions(accountKey);
+  if (identityElement) {
+    let idKey = null;
+    let accountKey = null;
+    if (identityElement.selectedItem) {
+      // Set the identity key value on the menu list.
+      idKey = identityElement.selectedItem.getAttribute("identitykey");
+      identityElement.setAttribute("identitykey", idKey);
+      gCurrentIdentity = MailServices.accounts.getIdentity(idKey);
+
+      // Set the account key value on the menu list.
+      accountKey = identityElement.selectedItem.getAttribute("accountkey");
+      identityElement.setAttribute("accountkey", accountKey);
+      hideIrrelevantAddressingOptions(accountKey);
+    }
+    /*
+    let maxRecipients = awGetNumberOfRecipients();
+    for (let i = 1; i <= maxRecipients; i++) {
+      let params = JSON.parse(awGetInputElement(i).searchParam);
+      params.idKey = idKey;
+      params.accountKey = accountKey;
+      awGetInputElement(i).searchParam = JSON.stringify(params);
+    }
+    */
+    if (!startup && prevIdentity && idKey != prevIdentity.key) {
+      var prevReplyTo = prevIdentity.replyTo;
+      var prevCc = "";
+      var prevBcc = "";
+      var prevReceipt = prevIdentity.requestReturnReceipt;
+      var prevDSN = prevIdentity.DSN;
+      var prevAttachVCard = prevIdentity.attachVCard;
+
+      if (prevIdentity.doCc)
+        prevCc += prevIdentity.doCcList;
+
+      if (prevIdentity.doBcc)
+        prevBcc += prevIdentity.doBccList;
+
+      var newReplyTo = gCurrentIdentity.replyTo;
+      var newCc = "";
+      var newBcc = "";
+      var newReceipt = gCurrentIdentity.requestReturnReceipt;
+      var newDSN = gCurrentIdentity.DSN;
+      var newAttachVCard = gCurrentIdentity.attachVCard;
+
+      if (gCurrentIdentity.doCc)
+        newCc += gCurrentIdentity.doCcList;
+
+      if (gCurrentIdentity.doBcc)
+        newBcc += gCurrentIdentity.doBccList;
+
+      var needToCleanUp = false;
+      var msgCompFields = gMsgCompose.compFields;
+
+      if (!gReceiptOptionChanged &&
+          prevReceipt == msgCompFields.returnReceipt &&
+          prevReceipt != newReceipt) {
+        msgCompFields.returnReceipt = newReceipt;
+        document.getElementById("returnReceiptMenu").setAttribute("checked", msgCompFields.returnReceipt);
+      }
+
+      if (!gDSNOptionChanged &&
+          prevDSN == msgCompFields.DSN &&
+          prevDSN != newDSN) {
+        msgCompFields.DSN = newDSN;
+        document.getElementById("dsnMenu").setAttribute("checked", msgCompFields.DSN);
+      }
+
+      if (!gAttachVCardOptionChanged &&
+          prevAttachVCard == msgCompFields.attachVCard &&
+          prevAttachVCard != newAttachVCard) {
+        msgCompFields.attachVCard = newAttachVCard;
+        document.getElementById("cmd_attachVCard").setAttribute("checked", msgCompFields.attachVCard);
+      }
+      /*
+      if (newReplyTo != prevReplyTo) {
+        needToCleanUp = true;
+        if (prevReplyTo != "")
+          awRemoveRecipients(msgCompFields, "addr_reply", prevReplyTo);
+        if (newReplyTo != "")
+          awAddRecipients(msgCompFields, "addr_reply", newReplyTo);
+      }
+
+      let toAddrs = new Set(msgCompFields.splitRecipients(
+        msgCompFields.to, true, {}));
+      let ccAddrs = new Set(msgCompFields.splitRecipients(
+        msgCompFields.cc, true, {}));
+
+      if (newCc != prevCc) {
+        needToCleanUp = true;
+        if (prevCc)
+          awRemoveRecipients(msgCompFields, "addr_cc", prevCc);
+        if (newCc) {
+          // Ensure none of the Ccs are already in To.
+          let cc2 = msgCompFields.splitRecipients(newCc, true, {});
+          newCc = cc2.filter(x => !toAddrs.has(x)).join(", ");
+          awAddRecipients(msgCompFields, "addr_cc", newCc);
         }
+      }
 
-        let maxRecipients = awGetMaxRecipients();
-        for (let i = 1; i <= maxRecipients; i++)
+      if (newBcc != prevBcc) {
+        needToCleanUp = true;
+        if (prevBcc)
+          awRemoveRecipients(msgCompFields, "addr_bcc", prevBcc);
+        if (newBcc) {
+          // Ensure none of the Bccs are already in To or Cc.
+          let bcc2 = msgCompFields.splitRecipients(newBcc, true, {});
+          let toCcAddrs = new Set([...toAddrs, ...ccAddrs]);
+          newBcc = bcc2.filter(x => !toCcAddrs.has(x)).join(", ");
+          awAddRecipients(msgCompFields, "addr_bcc", newBcc);
+        }
+      }
+
+      if (needToCleanUp)
+        awCleanupRows();
+      */
+        // start of specific code
+        if (newReplyTo != prevReplyTo)
         {
-          let params = JSON.parse(awGetInputElement(i).searchParam);
-          params.idKey = idKey;
-          params.accountKey = accountKey;
-          awGetInputElement(i).searchParam = JSON.stringify(params);
+            if (prevReplyTo != "") {
+                mrcAComplete._removeRecipient('fieldREPLY', prevReplyTo);
+            }
+            if (newReplyTo != "") {
+                mrcAComplete._insertRecipient('fieldREPLY', newReplyTo);
+            }
+            mrcAComplete.updateFieldVisibilityOnLoad('fieldREPLY');
         }
-        */
-        if (!startup && prevIdentity && idKey != prevIdentity.key)
+
+        if (newCc != prevCc)
         {
-          var prevReplyTo = prevIdentity.replyTo;
-          var prevCc = "";
-          var prevBcc = "";
-          var prevReceipt = prevIdentity.requestReturnReceipt;
-          var prevDSN = prevIdentity.DSN;
-          var prevAttachVCard = prevIdentity.attachVCard;
-
-          if (prevIdentity.doCc) {
-            prevCc += prevIdentity.doCcList;
-          }
-          if (prevIdentity.doBcc) {
-            prevBcc += prevIdentity.doBccList;
-          }
-          var newReplyTo = gCurrentIdentity.replyTo;
-          var newCc = "";
-          var newBcc = "";
-          var newReceipt = gCurrentIdentity.requestReturnReceipt;
-          var newDSN = gCurrentIdentity.DSN;
-          var newAttachVCard = gCurrentIdentity.attachVCard;
-
-          if (gCurrentIdentity.doCc) {
-            newCc += gCurrentIdentity.doCcList;
-          }
-          if (gCurrentIdentity.doBcc) {
-            newBcc += gCurrentIdentity.doBccList;
-          }
-          var needToCleanUp = false;
-          var msgCompFields = gMsgCompose.compFields;
-
-          if (!gReceiptOptionChanged &&
-              prevReceipt == msgCompFields.returnReceipt &&
-              prevReceipt != newReceipt)
-          {
-            msgCompFields.returnReceipt = newReceipt;
-            document.getElementById("returnReceiptMenu").setAttribute('checked',msgCompFields.returnReceipt);
-          }
-
-          if (!gDSNOptionChanged &&
-              prevDSN == msgCompFields.DSN &&
-              prevDSN != newDSN)
-          {
-            msgCompFields.DSN = newDSN;
-            document.getElementById("dsnMenu").setAttribute('checked',msgCompFields.DSN);
-          }
-
-          if (!gAttachVCardOptionChanged &&
-              prevAttachVCard == msgCompFields.attachVCard &&
-              prevAttachVCard != newAttachVCard)
-          {
-            msgCompFields.attachVCard = newAttachVCard;
-            document.getElementById("cmd_attachVCard").setAttribute('checked',msgCompFields.attachVCard);
-          }
-        /*
-          if (newReplyTo != prevReplyTo)
-          {
-            needToCleanUp = true;
-            if (prevReplyTo != "")
-              awRemoveRecipients(msgCompFields, "addr_reply", prevReplyTo);
-            if (newReplyTo != "")
-              awAddRecipients(msgCompFields, "addr_reply", newReplyTo);
-          }
-
-          if (newCc != prevCc)
-          {
-            needToCleanUp = true;
-            if (prevCc != "")
-              awRemoveRecipients(msgCompFields, "addr_cc", prevCc);
-            if (newCc != "")
-              awAddRecipients(msgCompFields, "addr_cc", newCc);
-          }
-
-          if (newBcc != prevBcc)
-          {
-            needToCleanUp = true;
-            if (prevBcc != "")
-              awRemoveRecipients(msgCompFields, "addr_bcc", prevBcc);
-            if (newBcc != "")
-              awAddRecipients(msgCompFields, "addr_bcc", newBcc);
-          }
-
-          if (needToCleanUp)
-            awCleanupRows();
-        */
-            // start of specific code
-            if (newReplyTo != prevReplyTo)
-            {
-                if (prevReplyTo != "") {
-                    mrcAComplete._removeRecipient('fieldREPLY', prevReplyTo);
-                }
-                if (newReplyTo != "") {
-                    mrcAComplete._insertRecipient('fieldREPLY', newReplyTo);
-                }
-                mrcAComplete.updateFieldVisibilityOnLoad('fieldREPLY');
+            if (prevCc != "") {
+                mrcAComplete._removeRecipient('fieldCC', prevCc);
             }
-
-            if (newCc != prevCc)
-            {
-                if (prevCc != "") {
-                    mrcAComplete._removeRecipient('fieldCC', prevCc);
-                }
-                if (newCc != "") {
-                    mrcAComplete._insertRecipient('fieldCC', newCc);
-                }
-                mrcAComplete.updateFieldVisibilityOnLoad('fieldCC');
+            if (newCc != "") {
+                mrcAComplete._insertRecipient('fieldCC', newCc);
             }
-
-            if (newBcc != prevBcc)
-            {
-                if (prevBcc != "") {
-                    mrcAComplete._removeRecipient('fieldBCC', prevBcc);
-                }
-                if (newBcc != "") {
-                    mrcAComplete._insertRecipient('fieldBCC', newBcc);
-                }
-                mrcAComplete.updateFieldVisibilityOnLoad('fieldBCC');
-            }
-            // end of specific code
-          try {
-            gMsgCompose.identity = gCurrentIdentity;
-          } catch (ex) {
-            dump("### Cannot change the identity: " + ex + "\n");
-          }
-
-          var event = document.createEvent('Events');
-          event.initEvent('compose-from-changed', false, true);
-          document.getElementById("msgcomposeWindow").dispatchEvent(event);
+            mrcAComplete.updateFieldVisibilityOnLoad('fieldCC');
         }
 
-      if (!startup) {
-          if (getPref("mail.autoComplete.highlightNonMatches")) {
-            document.getElementById('addressCol2#1').highlightNonMatches = true;
-          }
+        if (newBcc != prevBcc)
+        {
+            if (prevBcc != "") {
+                mrcAComplete._removeRecipient('fieldBCC', prevBcc);
+            }
+            if (newBcc != "") {
+                mrcAComplete._insertRecipient('fieldBCC', newBcc);
+            }
+            mrcAComplete.updateFieldVisibilityOnLoad('fieldBCC');
+        }
+        // end of specific code
 
-          addRecipientsToIgnoreList(gCurrentIdentity.identityName);  // only do this if we aren't starting up....it gets done as part of startup already
+
+      try {
+        gMsgCompose.identity = gCurrentIdentity;
+      } catch (ex) {
+        dump("### Cannot change the identity: " + ex + "\n");
+      }
+
+      var event = document.createEvent("Events");
+      event.initEvent("compose-from-changed", false, true);
+      document.getElementById("msgcomposeWindow").dispatchEvent(event);
+
+      gComposeNotificationBar.clearIdentityWarning();
+    }
+
+    if (!startup) {
+      if (Services.prefs.getBoolPref("mail.autoComplete.highlightNonMatches"))
+        document.getElementById("addressCol2#1").highlightNonMatches = true;
+
+      // Only do this if we aren't starting up...
+      // It gets done as part of startup already.
+      addRecipientsToIgnoreList(gCurrentIdentity.fullAddress);
+
+      // If the From field is editable, reset the address from the identity.
+      if (identityElement.editable) {
+        identityElement.value = identityElement.selectedItem.value;
+        identityElement.placeholder = getComposeBundle().getFormattedString(
+          "msgIdentityPlaceholder", [identityElement.selectedItem.value]
+        );
       }
     }
+  }
 }
 
 // public method called by the address picker sidebar
 function AddRecipient(recipientType, address)
 {
-    // mrcLog("AddRecipient("+recipientType+", "+address+")");
+    // mrcTools.mrcLog("AddRecipient("+recipientType+", "+address+")");
     switch(recipientType) {
         case "addr_to" :
             mrcAComplete._insertRecipient('fieldTO', address);
@@ -453,7 +473,7 @@ function AddRecipient(recipientType, address)
 // Public method called by the contants sidebar.
 function AddRecipientsArray(aRecipientType, aAddressArray)
 {
-    mrcLog("AddRecipientsArray("+aRecipientType+", "+aAddressArray+")");
+    mrcTools.mrcLog("AddRecipientsArray("+aRecipientType+", "+aAddressArray+")");
     switch(aRecipientType) {
         case "addr_to" :
             mrcAComplete._insertRecipient('fieldTO', aAddressArray);
@@ -536,7 +556,7 @@ function debug_obj(obj){
     for (let i in obj) {
         txt += i+":"+obj[i]+"||";
     }
-    mrcLog(txt);
+    mrcTools.mrcLog(txt);
 }
 
 function _get(obj, field_name, default_value) {
@@ -915,13 +935,13 @@ var mrcAComplete = {
         // Get the name of the application running us
         // info.name; // Returns "Firefox" for Firefox or "Thunderbird" for TB
         // info.version; // Returns "2.0.0.1" for Firefox version 2.0.0.1, "24.5.0"
-        // mrcLog("APP NAME="+info.name+" ; APP VERSION="+info.version);
+        // mrcTools.mrcLog("APP NAME="+info.name+" ; APP VERSION="+info.version);
         // APP NAME=Thunderbird ; APP VERSION=24.5.0
 
         var xulRuntime = Components.classes["@mozilla.org/xre/app-info;1"]
                            .getService(Components.interfaces.nsIXULRuntime);
         var os_name = xulRuntime.OS.toLowerCase();
-        // mrcLog("OS = "+xulRuntime.OS);
+        // mrcTools.mrcLog("OS = "+xulRuntime.OS);
         // 'Linux', 'WINNT', 'Darwin'
 
         // Adapt visibility of placeholders, based on prefs.
@@ -966,7 +986,7 @@ var mrcAComplete = {
          *  method to implement nsIPrefBranch interface
          *
          */
-        mrcLog("nsIPrefBranch::observe : "+subject+","+topic+","+data);
+        mrcTools.mrcLog("nsIPrefBranch::observe : "+subject+","+topic+","+data);
         if (topic != "nsPref:changed") {
             return;
         }
@@ -974,14 +994,20 @@ var mrcAComplete = {
             case "line_height":
                 this.param_line_height = this.prefs.getIntPref("line_height");
                 this.param_max_height = this.param_first_line_height + (this.param_max_nb_line-1)*this.param_line_height;
+                // live update of all fields
+                mrcMaximizeFields(null);
                 break;
             case "first_line_height":
                 this.param_first_line_height = this.prefs.getIntPref("first_line_height");
                 this.param_max_height = this.param_first_line_height + (this.param_max_nb_line-1)*this.param_line_height;
+                // live update of all fields
+                mrcMaximizeFields(null);
                 break;
             case "max_nb_line":
                 this.param_max_nb_line = this.prefs.getIntPref("max_nb_line");
                 this.param_max_height = this.param_first_line_height + (this.param_max_nb_line-1)*this.param_line_height;
+                // live update of all fields
+                mrcMaximizeFields(null);
                 break;
             case "sort_field_level_1":
                 this.param_sort_field_level_1 = this.prefs.getCharPref("sort_field_level_1");
@@ -1154,13 +1180,13 @@ var mrcAComplete = {
         }
         return output;
         */
-        // mrcLog("_splitEmailList:'"+data+"'");
+        // mrcTools.mrcLog("_splitEmailList:'"+data+"'");
         let output1 = this._splitEmail_cache_output;
         if (data != this._splitEmail_cache_data) {
 
             output1 = this._splitEmailList_js_version(data);
-            // mrcLog("1 : "+output1.join("||"));
-            // mrcLog("2 : "+output.join("||"));
+            // mrcTools.mrcLog("1 : "+output1.join("||"));
+            // mrcTools.mrcLog("2 : "+output.join("||"));
 
             this._splitEmail_cache_data = data;
             this._splitEmail_cache_output = output1;
@@ -1196,9 +1222,9 @@ var mrcAComplete = {
          * returns :
          *    array of emails, still quoted and backslashed
          */
-        separator = mrcPick(separator, ',');
-        quote = mrcPick(quote, '"');
-        escaper = mrcPick(escaper, '\\');
+        separator = mrcTools.mrcPick(separator, ',');
+        quote = mrcTools.mrcPick(quote, '"');
+        escaper = mrcTools.mrcPick(escaper, '\\');
 
         // separator and escaper MUST BE 1 char length
 
@@ -1643,7 +1669,7 @@ var mrcAComplete = {
     _makeFullAddress : function(a, b) {
         let res = "";
         let temp = typeof mrcAComplete.mhParser.makeFullAddressString;
-        // mrcLog("typeof makeFullAddressString ="+temp);
+        // mrcTools.mrcLog("typeof makeFullAddressString ="+temp);
 
         if (typeof mrcAComplete.mhParser.makeFullAddress === "function") {
             // TB 24
@@ -1670,7 +1696,7 @@ var mrcAComplete = {
             // then we add the email
             res = res + " <" + b + ">";
         }
-        // mrcLog("_makeFullAddress="+res);
+        // mrcTools.mrcLog("_makeFullAddress="+res);
         return res;
     },
 
@@ -1778,7 +1804,7 @@ var mrcAComplete = {
                 }
 
             } catch (e) {
-                mrcLogError(e, "_removeDuplicatecards()");
+                mrcTools.mrcLogError(e, "_removeDuplicatecards()");
             }
         }
         // obj nows contains unique properties
@@ -1845,7 +1871,7 @@ var mrcAComplete = {
          * Reinit internal fields for a future search
          */
         this.searchID++;
-        // mrcLog(now()+" _initSearchID : "+this.searchID);
+        // mrcTools.mrcLog(now()+" _initSearchID : "+this.searchID);
         this.search_res1 = [];
         this.search_res2 = [];
         this.search_res3 = [];
@@ -1882,10 +1908,10 @@ var mrcAComplete = {
         // SPECIAL :
         // As it is a call-back, we can't use 'this'
         // instead, we must use the let 'mrcAComplete'
-        // mrcLog("AVANT purge:"+mrcAComplete.searchedAB_archiv.join("||"));
+        // mrcTools.mrcLog("AVANT purge:"+mrcAComplete.searchedAB_archiv.join("||"));
         let l = mrcAComplete.searchedAB_archiv.length;
         mrcAComplete.searchedAB_archiv.splice(0, l);
-        // mrcLog("APRES purge:"+mrcAComplete.searchedAB_archiv.join("||"));
+        // mrcTools.mrcLog("APRES purge:"+mrcAComplete.searchedAB_archiv.join("||"));
     },
 
     _createHashSearchListener : function(searchListener) {
@@ -1896,7 +1922,7 @@ var mrcAComplete = {
         let temp = searchListener.addressBook.dirName + searchListener.searchID;
         // let hash = this._hashCode(temp); // no need to create a real hash
         let hash = temp;
-        // mrcLog("_createHashSearchListener : "+hash);
+        // mrcTools.mrcLog("_createHashSearchListener : "+hash);
         return hash;
     },
 
@@ -1904,7 +1930,7 @@ var mrcAComplete = {
         this.allListenersStarted = false;
         this._archiveSearchListeners();
         this._initSearchID();
-        // mrcLog(now()+" _initSearchListeners : "+this.searchID);
+        // mrcTools.mrcLog(now()+" _initSearchListeners : "+this.searchID);
     },
 
 
@@ -1912,14 +1938,14 @@ var mrcAComplete = {
         abSearchListener.hash = this._createHashSearchListener(abSearchListener);
         let key = abSearchListener.hash;
         this.searchedAB[key] = abSearchListener;
-        // mrcLog("_addSearchListener : "+abSearchListener.addressBook.URI+":"+abSearchListener.hash+", "+this.allListenersStarted);
+        // mrcTools.mrcLog("_addSearchListener : "+abSearchListener.addressBook.URI+":"+abSearchListener.hash+", "+this.allListenersStarted);
     },
 
     _completeSearchListener : function(abSearchListener) {
         /*
          * Perform actions when a search is finished on ONE addressbook.
          */
-        // mrcLog(now()+" _completeSearchListener : "+abSearchListener.searchID+"/"+this.searchID+":"+abSearchListener.addressBook.dirName);
+        // mrcTools.mrcLog(now()+" _completeSearchListener : "+abSearchListener.searchID+"/"+this.searchID+":"+abSearchListener.addressBook.dirName);
         if (abSearchListener.searchID == this.searchID) {
             // OK, it's a searchListener for current search
             switch(this.param_mode) {
@@ -1965,12 +1991,12 @@ var mrcAComplete = {
             }
 
 
-            // mrcLog("_completeSearchListener : "+abSearchListener.addressBook.URI+":"+this.searchedAB+", "+this.allListenersStarted);
+            // mrcTools.mrcLog("_completeSearchListener : "+abSearchListener.addressBook.URI+":"+this.searchedAB+", "+this.allListenersStarted);
             // Then test if search is complete for all addressbooks.
             this._testSearchComplete();
         } else {
             // it's an obsolete searchListener :
-            // mrcLog("_completeSearchListener : "+abSearchListener.addressBook.URI+":obsolete = "+abSearchListener.searchID);
+            // mrcTools.mrcLog("_completeSearchListener : "+abSearchListener.addressBook.URI+":obsolete = "+abSearchListener.searchID);
         }
     },
 
@@ -1985,13 +2011,13 @@ var mrcAComplete = {
         if (originalSearchID == this.searchID) {
             // make any search obsolete
             this._obsoleteSearchID();
-            // mrcLog(now()+" _timeOutSearchListener : "+this.searchID);
+            // mrcTools.mrcLog(now()+" _timeOutSearchListener : "+this.searchID);
 
             let keys = Object.keys(this.searchedAB);
-            // mrcLog("_timeOutSearchListener() keys="+keys+":"+(typeof keys));
+            // mrcTools.mrcLog("_timeOutSearchListener() keys="+keys+":"+(typeof keys));
             for (let i=0, l=keys.length ; i<l; i++) {
                 let k = keys[i];
-                // mrcLog("k="+k);
+                // mrcTools.mrcLog("k="+k);
                 this._addWarningTimeout(this.searchedAB[k].addressBook.dirName);
             }
 
@@ -2004,7 +2030,7 @@ var mrcAComplete = {
     },
 
     _testSearchComplete : function() {
-        // mrcLog(now()+" _testSearchComplete : "+this.searchID);
+        // mrcTools.mrcLog(now()+" _testSearchComplete : "+this.searchID);
         let keys = Object.keys(this.searchedAB);
         if (keys.length == 0 && this.allListenersStarted == true) {
             /*
@@ -2016,7 +2042,7 @@ var mrcAComplete = {
 
             // stop the current timeout
             clearTimeout(this.searchTimeOut);
-            // mrcLog("clearTimeout() ");
+            // mrcTools.mrcLog("clearTimeout() ");
 
             // then handle results
             switch(this.param_mode) {
@@ -2077,7 +2103,7 @@ var mrcAComplete = {
             if (this.cbSearch) {
                 this.cbSearch();
             }
-            // mrcLog("archiv="+this.searchedAB_archiv.length);
+            // mrcTools.mrcLog("archiv="+this.searchedAB_archiv.length);
         }
     },
 
@@ -2094,7 +2120,7 @@ var mrcAComplete = {
                 mrcAComplete._timeOutSearchListener(tempSearchID);
             }, this.param_search_timeout);
 
-        // mrcLog("_startWaitingSearchListeners ");
+        // mrcTools.mrcLog("_startWaitingSearchListeners ");
         this._testSearchComplete();
     },
 
@@ -2184,7 +2210,7 @@ var mrcAComplete = {
             let ab = allAddressBooks.getNext();
             if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
                 // recherche 1
-                // mrcLog("AB LOCAL = " + ab.dirName);
+                // mrcTools.mrcLog("AB LOCAL = " + ab.dirName);
                 let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                 if (doSearch) {
                     try {
@@ -2216,21 +2242,21 @@ var mrcAComplete = {
                         this._completeSearchListener(abSearchListener);
                     } catch (e) {
                         this._addErrorAddressBook(ab.dirName);
-                        mrcLogError(e, "_search_mode_1()");
+                        mrcTools.mrcLogError(e, "_search_mode_1()");
                     }
                 }
             } else {
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
-                    // mrcLog("param_search="+this.param_search_ab_URI+" ; ab.URI="+ab.URI)
+                    // mrcTools.mrcLog("param_search="+this.param_search_ab_URI+" ; ab.URI="+ab.URI)
                     // check if user wants to search in this AB
                     let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                     if (doSearch) {
                         try {
-                            // mrcLog("AB LDAP = " + ab.dirName);
+                            // mrcTools.mrcLog("AB LDAP = " + ab.dirName);
                             /* CODE FOR TB 24 to 31? */
                             // if (this.param_ldap_search_version == 'TB24') {
                             if (true) {
-                                // mrcLog(ab.dirName+" : LDAP search TB24");
+                                // mrcTools.mrcLog(ab.dirName+" : LDAP search TB24");
                                 let query =
                                     Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
                                             .createInstance(Components.interfaces.nsIAbDirectoryQuery);
@@ -2290,7 +2316,7 @@ var mrcAComplete = {
                                 this._addSearchListener(abDirSearchListener);
                                 query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
                             } else {
-                                // mrcLog(ab.dirName+" : LDAP search TB31");
+                                // mrcTools.mrcLog(ab.dirName+" : LDAP search TB31");
                                 /* CODE FOR TB >= 29 */
                                 /*
                                 let that = this;
@@ -2333,7 +2359,7 @@ var mrcAComplete = {
                             }
                         } catch (e) {
                             this._addErrorAddressBook(ab.dirName);
-                            mrcLogError(e, "_search_mode_1()");
+                            mrcTools.mrcLogError(e, "_search_mode_1()");
                         }
                     }
                 }
@@ -2435,7 +2461,7 @@ var mrcAComplete = {
                         // unused
                         /*
                         let childCards3 = mrcAbManager.getDirectory(ab.URI + "?" + searchQuery3).childCards;
-                        // mrcLog(ab.dirName+" : "+searchResult.toString());
+                        // mrcTools.mrcLog(ab.dirName+" : "+searchResult.toString());
                         msg = "";
                         while (childCards3.hasMoreElements()) {
                             card = childCards3.getNext();
@@ -2448,7 +2474,7 @@ var mrcAComplete = {
                         this._completeSearchListener(abSearchListener);
                     } catch (e) {
                         this._addErrorAddressBook(ab.dirName);
-                        mrcLogError(e, "_search_mode_1()");
+                        mrcTools.mrcLogError(e, "_search_mode_1()");
                     }
                 }
             } else {
@@ -2650,7 +2676,7 @@ var mrcAComplete = {
                             */
                         } catch (e) {
                             this._addErrorAddressBook(ab.dirName);
-                            mrcLogError(e, "_search_mode_2()");
+                            mrcTools.mrcLogError(e, "_search_mode_2()");
                         }
                     }
                 }
@@ -2719,7 +2745,7 @@ var mrcAComplete = {
                         this._completeSearchListener(abSearchListener);
                     } catch (e) {
                         this._addErrorAddressBook(ab.dirName);
-                        mrcLogError(e, "_search_mode_1()");
+                        mrcTools.mrcLogError(e, "_search_mode_1()");
                     }
                 }
             } else {
@@ -2730,7 +2756,7 @@ var mrcAComplete = {
                         try {
                             // if (this.param_ldap_search_version == 'TB24') {
                             if (true) {
-                                // mrcLog(ab.dirName+" : LDAP search TB24");
+                                // mrcTools.mrcLog(ab.dirName+" : LDAP search TB24");
                                 /* CODE FOR TB 24-31? */
 
                                 let query =
@@ -2793,7 +2819,7 @@ var mrcAComplete = {
                                 query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
 
                             } else {
-                                // mrcLog(ab.dirName+" : LDAP search TB31");
+                                // mrcTools.mrcLog(ab.dirName+" : LDAP search TB31");
                                 /* CODE FOR TB >= 29 */
                                 /*
                                 let that = this;
@@ -2836,8 +2862,8 @@ var mrcAComplete = {
                             }
                         } catch (e) {
                             this._addErrorAddressBook(ab.dirName);
-                            mrcLogError(e, "_search_mode_3()");
-                            // mrcLog(ab.dirName+" : LDAP _search_mode_3 ERROR");
+                            mrcTools.mrcLogError(e, "_search_mode_3()");
+                            // mrcTools.mrcLog(ab.dirName+" : LDAP _search_mode_3 ERROR");
                         }
                     }
                 }
@@ -2878,7 +2904,7 @@ var mrcAComplete = {
             let ab = allAddressBooks.getNext();
             if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
                 // recherche 1
-                // mrcLog("AB LOCAL = " + ab.dirName);
+                // mrcTools.mrcLog("AB LOCAL = " + ab.dirName);
                 let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                 if (doSearch) {
                     try {
@@ -2911,21 +2937,21 @@ var mrcAComplete = {
                         this._completeSearchListener(abSearchListener);
                     } catch (e) {
                         this._addErrorAddressBook(ab.dirName);
-                        mrcLogError(e, "_search_mode_4()");
+                        mrcTools.mrcLogError(e, "_search_mode_4()");
                     }
                 }
             } else {
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
-                    // mrcLog("param_search="+this.param_search_ab_URI+" ; ab.URI="+ab.URI)
+                    // mrcTools.mrcLog("param_search="+this.param_search_ab_URI+" ; ab.URI="+ab.URI)
                     // check if user wants to search in this AB
                     let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                     if (doSearch) {
                         try {
-                            // mrcLog("AB LDAP = " + ab.dirName);
+                            // mrcTools.mrcLog("AB LDAP = " + ab.dirName);
                             /* CODE FOR TB 24 to 31? */
                             // if (this.param_ldap_search_version == 'TB24') {
                             if (true) {
-                                // mrcLog(ab.dirName+" : LDAP search TB24");
+                                // mrcTools.mrcLog(ab.dirName+" : LDAP search TB24");
                                 let query =
                                     Components.classes["@mozilla.org/addressbook/ldap-directory-query;1"]
                                             .createInstance(Components.interfaces.nsIAbDirectoryQuery);
@@ -2985,7 +3011,7 @@ var mrcAComplete = {
                                 this._addSearchListener(abDirSearchListener);
                                 query.doQuery(ab, args, abDirSearchListener, ab.maxHits, 0);
                             } else {
-                                // mrcLog(ab.dirName+" : LDAP search TB31");
+                                // mrcTools.mrcLog(ab.dirName+" : LDAP search TB31");
                                 /* CODE FOR TB >= 29 */
                                 /*
                                 let that = this;
@@ -3028,7 +3054,7 @@ var mrcAComplete = {
                             }
                         } catch (e) {
                             this._addErrorAddressBook(ab.dirName);
-                            mrcLogError(e, "_search_mode_4()");
+                            mrcTools.mrcLogError(e, "_search_mode_4()");
                         }
                     }
                 }
@@ -3672,7 +3698,7 @@ var mrcAComplete = {
                 // to be coherent : inform TB that content of current Msg has really changed
                 gContentChanged=true;
             } catch (e) {
-                mrcLogError(e, " _removeRecipient()");
+                mrcTools.mrcLogError(e, " _removeRecipient()");
             }
         }
     },
@@ -3682,7 +3708,7 @@ var mrcAComplete = {
         if (this.FIELDS[field]) {
             try {
                 if (email != null && email != "") {
-                    // mrcLog("DEBUG _insertRecipient() : "+field+", "+email);
+                    // mrcTools.mrcLog("DEBUG _insertRecipient() : "+field+", "+email);
                     let element = document.getElementById(this.FIELDS[field].txtId);
                     this._elementInsertInPart(element, element.value.length, email);
                     this.updateNbRecipients(element);
@@ -3691,7 +3717,7 @@ var mrcAComplete = {
                     gContentChanged=true;
                 }
             } catch (e) {
-                mrcLogError(e, " _insertRecipient()");
+                mrcTools.mrcLogError(e, " _insertRecipient()");
             }
         }
     },
@@ -3716,9 +3742,9 @@ var mrcAComplete = {
          */
         let res = key;
         try {
-            let bundle = document.getElementById("mrcComposeStringBundle");
+            let bundle = Services.strings.createBundle("chrome://mrc_compose/locale/mrc_compose.properties");
             if (bundle) {
-                res = bundle.getString(key);
+                res = bundle.GetStringFromName(key);
             } else {
                 res = key;
             }
@@ -3847,7 +3873,7 @@ var mrcAComplete = {
          * return :
          *   none
          */
-        // mrcLog(now()+" search() "+this.searchID);
+        mrcTools.mrcLog(now()+" search() "+this.searchID);
         this.datas = {}; // TODO : check if it's the right way to empty dictionary
         this.errors = [];
         this.warnings = [];
@@ -3855,7 +3881,7 @@ var mrcAComplete = {
         this.nbDatas = 0;
         let meth = "_search_mode_"+this.param_mode;
         this.cbSearch = cbSearch
-
+        mrcTools.mrcLog("meth="+meth);
         // stop the purge timeout
         clearTimeout(this.timeout_archiv);
 
@@ -3872,7 +3898,7 @@ var mrcAComplete = {
             // For LDAP searches, it brings some crashes until all variables where referenced.
             // Components.utils.forceGC();
         } catch (e) {
-            mrcLogError(e, "SEARCH()");
+            mrcTools.mrcLogError(e, "SEARCH()");
         }
     },
 
@@ -3891,7 +3917,7 @@ var mrcAComplete = {
         this.lastQueryTime = new Date().getTime()
         // Is there something to show ? results, infos, warnings or errors ?
         let nb = this.nbDatas + this.infos.length + this.warnings.length + this.errors.length;
-        // mrcLog(nb, "finishSearch, nb=");
+        // mrcTools.mrcLog(nb, "finishSearch, nb=");
         if (nb > 0) {
             this.buildResultList(aString);
             this.openPopup(event, element);
@@ -3910,10 +3936,10 @@ var mrcAComplete = {
                 // SPECIAL :
                 // As it is a call-back, we can't use 'this'
                 // instead, we must use the let 'mrcAComplete'
-                // mrcLog("AVANT purge:"+mrcAComplete.searchedAB_archiv.join("||"));
+                // mrcTools.mrcLog("AVANT purge:"+mrcAComplete.searchedAB_archiv.join("||"));
                 let l = mrcAComplete.searchedAB_archiv.length;
                 mrcAComplete.searchedAB_archiv.splice(0, l);
-                // mrcLog("APRES purge:"+mrcAComplete.searchedAB_archiv.join("||"));
+                // mrcTools.mrcLog("APRES purge:"+mrcAComplete.searchedAB_archiv.join("||"));
             }, this.DELAY_PURGE_ARCHIV);
     },
 
@@ -4037,7 +4063,7 @@ var mrcAComplete = {
                 }
                 this._updateFieldAction(field);
             } catch (e) {
-                mrcLogError(e, "updateFieldVisibility()");
+                mrcTools.mrcLogError(e, "updateFieldVisibility()");
             }
         }
     },
@@ -4104,7 +4130,7 @@ var mrcAComplete = {
                     txt.focus();
                 }
             } catch (e) {
-                mrcLogError(e, "changeFieldVisibility("+field+")");
+                mrcTools.mrcLogError(e, "changeFieldVisibility("+field+")");
             }
         }
     },
@@ -4124,7 +4150,7 @@ var mrcAComplete = {
                     this.changeFieldVisibility(field);
                 }
             } catch (e) {
-                mrcLogError(e, "forceFieldVisibility()");
+                mrcTools.mrcLogError(e, "forceFieldVisibility()");
             }
         }
     },
@@ -4140,7 +4166,7 @@ var mrcAComplete = {
          *   none
          */
         // optional parameter
-        collapseIfZero = mrcPick(collapseIfZero, false);
+        collapseIfZero = mrcTools.mrcPick(collapseIfZero, false);
 
         // check the element : is it one of the 3 fields ?
         let field = this._getFieldFromTextElement(element);
@@ -4197,7 +4223,7 @@ var mrcAComplete = {
         let card = this.panelCards[this.indexSelectedCard-1];
         if (typeof card !== "undefined") {
             // console.log(" debug validate:", card);
-            mrcLog(card, " debug validate:");
+            mrcTools.mrcLog(card, " debug validate:");
             if (card.isMailList) {
                 // add emails of every member of the list
                 let childs = MailServices.ab.getDirectory(card.mailListURI).addressLists;
@@ -4211,7 +4237,7 @@ var mrcAComplete = {
             } else {
                 // --> enter his email in the text
                 email = card.text;
-                // mrcLog("EMAIL = "+email);
+                // mrcTools.mrcLog("EMAIL = "+email);
             }
             this._elementInsertInPart(this.currentTextBox, this.currentTextBox.selectionStart, email);
             this.updateNbRecipients(this.currentTextBox);
@@ -4435,6 +4461,7 @@ function mrcRecipientKeyPress(event, element) {
 
             case KeyEvent.DOM_VK_TAB:
             case KeyEvent.DOM_VK_RETURN:
+            case KeyEvent.DOM_VK_ENTER:
                 // validate current element of autocomplete div
                 mrcAComplete.validate();
                 // then close popup
@@ -4445,6 +4472,13 @@ function mrcRecipientKeyPress(event, element) {
         }
     } else {
         // default behaviour
+        switch(event.keyCode) {
+            case KeyEvent.DOM_VK_RETURN:
+            case KeyEvent.DOM_VK_ENTER:
+                event.stopPropagation();
+                event.preventDefault(); // MOST IMPORTANT LINE : avoid the handling by the textbox
+                break;
+        }
 
         // update the # of recipients of the current textbox
         // mrcAComplete.updateNbRecipients(element);
@@ -4461,7 +4495,7 @@ function mrcRecipientKeyUp(event, element) {
      */
     // www.the-art-of-web.com/javascript/escape
     gContentChanged = true;
-    // mrcLog("keyCode="+event.keyCode);
+    // mrcTools.mrcLog("keyCode="+event.keyCode);
     let sel = element.selectionStart;
     let textPart = mrcAComplete.getCurrentPart(element.value, sel).trim();
     let canUpdatePanel = true;
@@ -4521,7 +4555,7 @@ function mrcRecipientKeyUp(event, element) {
                 // no need to search
                 canUpdatePanel = false;
             } else {
-                // mrcLog("texPart changed:"+textPart);
+                // mrcTools.mrcLog("texPart changed:"+textPart);
                 // no need to update UI
                 canUpdateUI = false;
                 // need to search
@@ -4529,6 +4563,8 @@ function mrcRecipientKeyUp(event, element) {
             }
             break;
     }
+
+    mrcTools.mrcLog("mrcRecipientKeyUp : keyCode="+event.keyCode+" canUpdateUI="+canUpdateUI+" canUpdatePanel="+canUpdatePanel);
 
     // fill cache for next keyups
     mrcAComplete._textPart_cache = textPart;
@@ -4565,22 +4601,22 @@ function mrcRecipientKeyUp(event, element) {
 
             */
 
-            // mrcLog("textPart:'"+textPart+"'");
+            // mrcTools.mrcLog("textPart:'"+textPart+"'");
             let re = /<\S+@\S+\.\S+>$/;
             let res = re.exec(textPart);
             if (res && res.length > 0) {
                 // we extract the pure email
                 let raw = res[0];
-                // mrcLog("raw:'"+raw+"'");
+                // mrcTools.mrcLog("raw:'"+raw+"'");
                 textPart = raw.slice(1,-1);
-                // mrcLog("new textPart:'"+textPart+"'");
+                // mrcTools.mrcLog("new textPart:'"+textPart+"'");
 
             }
 
 
             if (mrcAComplete.needSearch(textPart)) {
                 // perform search
-                // mrcLog("searching:'"+textPart+"'");
+                mrcTools.mrcLog("searching:'"+textPart+"'");
                 mrcAComplete.search(textPart, event, element, function callback_search() {
                         mrcAComplete.finishSearch(textPart, event, element)
                     });
@@ -4601,25 +4637,42 @@ function mrcRecipientResize(element, maxi) {
      *
      */
     try {
-        // maxi = mrcAComplete._pick(maxi, mrcAComplete.param_max_height);
-        maxi = mrcAComplete.param_max_height;
-
         // Ensure height can change.
         mrcCompose_WORKAROUND_Height();
 
-        let sh1 = element.inputField.scrollHeight;
-        element.height = 'auto'; // ==> forces the textbox to recompute scrollHeight to adapt to current value
-        let sh2 = element.inputField.scrollHeight;
-        let fnbLines = sh2 / mrcAComplete.param_line_height;
-        let nbLines = Math.round(fnbLines);
-        let nHeight = mrcAComplete.param_first_line_height + (nbLines-1)*mrcAComplete.param_line_height;
-        let h = Math.min(Math.max(nHeight,mrcAComplete.param_first_line_height), maxi);
-        // dump("h1="+sh1+"  h2="+sh2+"  fnbLines="+fnbLines+"  nbLines="+nbLines+"  nHeight="+nHeight+"  h="+h+"\n");
-        element.height = h;
-        let sh3 = element.inputField.scrollHeight;
-        mrcLog("Resize : "+element.id+" : h1="+sh1+"  h2="+sh2+"  fnbLines="+fnbLines+"  nbLines="+nbLines+"  nHeight="+nHeight+"  h="+h+"  h3="+sh3);
+        // New resize algo  with hidden clone div
+        let idCopy = element.id + "_COPY";
+        let element_COPY = document.getElementById(idCopy);
+
+        mrcTools.mrcLog("mrcAComplete.param_first_line_height:", mrcAComplete.param_first_line_height);
+        mrcTools.mrcLog("mrcAComplete.param_max_height:", mrcAComplete.param_max_height);
+
+        element_COPY.innerHTML = mrcAComplete._myEncode(element.value);
+        // Briefly make the hidden div block but invisible
+        // This is in order to read the height
+        element_COPY.style.visibility = 'hidden';
+        element_COPY.style.display = 'block';
+        let fullHeight = element_COPY.offsetHeight;
+        // Make the hidden div display:none again
+        element_COPY.style.visibility = 'visible';
+        element_COPY.style.display = 'none';
+
+        let nbLinesCopy = fullHeight / mrcAComplete.param_line_height;
+        mrcTools.mrcLog("nbLinesCopy : ", nbLinesCopy);
+        nbLinesCopy = Math.floor(nbLinesCopy);
+        mrcTools.mrcLog("int(nbLinesCopy) : ", nbLinesCopy);
+        if (nbLinesCopy < 1)
+            nbLinesCopy = 1;
+        if (nbLinesCopy > mrcAComplete.param_max_nb_line)
+            nbLinesCopy = mrcAComplete.param_max_nb_line;
+        mrcTools.mrcLog("nbLinesCopy (recadré) : ", nbLinesCopy);
+
+        newHeight = mrcAComplete.param_first_line_height + (nbLinesCopy-1)*mrcAComplete.param_line_height;
+        mrcTools.mrcLog("newHeight : ", newHeight);
+        element.style.height = newHeight + 'px';
+
     } catch (e) {
-        mrcLogError(e, "mrcRecipientResize()");
+        mrcTools.mrcLogError(e, "mrcRecipientResize()");
     }
 }
 
@@ -4659,55 +4712,20 @@ function mrcMinimizeFields(event) {
      */
     try {
         for (let i in mrcAComplete.FIELDS) {
-            let element = document.getElementById(mrcAComplete.FIELDS[i].txtId);
-            // mrcLog(i+", height="+element.height+", sh="+element.inputField.scrollHeight);
+            let txtId = mrcAComplete.FIELDS[i].txtId;
+            let element = document.getElementById(txtId);
+            let oldHeight = element.style.height;
+            let t = mrcAComplete.param_first_line_height.toString()+'px';
+            element.style.height = t;
+
             /*
-             * TODO : BUG : DOES NOT WORK IF THE TEXTFIELD HAS >1 LINE AND NO SCROLLBAR
-             * CAN'T FIND WHY... SEEMS AN INTERNAL BEHAVIOUR OF XUL ???
+             * It seems that TB doesn't show the scrollbar in a textarea of one line height.
              *
-             * AND CAN'T FORCE THE SCROLLBAR TO APPEAR BEFORE NEEDED
-             *
-             *
-             * TESTED WITH A RESIZER IN XUL :
-             *     <resizer element="msgTO" dir="bottomright" left="0" top="0" width="16" height="16"/>
-             * ...WORKS PERFECTLY WITH THE MOUSE !
              */
-
-            // HACK : force scrollHeight AND delay some processing...
-            if (element.scrollHeight <= element.height) {
-                element.height = 'auto'; // ==> forces the textbox to recompute scrollHeight to adapt to current value
-                // we just force the scrollheight to force the appearance of scrollbar
-                element.inputField.scrollHeight = 1000;
-                element.scrollHeight = 1000;
-
-                // let t = mrcAComplete.param_first_line_height.toString()+'px';
-                // element.setAttribute("height", t);
-
-                // HACK continue after a delay...
-                let t = setTimeout( function() {mrcMinimizeFields_2(element)}, 10);
-            } else {
-
-                element.height = 'auto'; // ==> forces the textbox to recompute scrollHeight to adapt to current value
-                element.height = mrcAComplete.param_first_line_height;
-            }
+            mrcTools.mrcLog(i+", txtId="+txtId+", old="+oldHeight+", newHeight="+t+", real height="+element.style.height);
         }
     } catch (e) {
-        mrcLogError(e, "mrcMinimizeFields()");
-    }
-}
-
-function mrcMinimizeFields_2(element) {
-    /*
-     * call-back for button 'Minimize' :
-     *
-     * reduce all fields to one-line-height
-     *
-     */
-    try {
-        let t = mrcAComplete.param_first_line_height.toString()+'px';
-        element.setAttribute("height", t);
-    } catch (e) {
-        mrcLogError(e, "mrcMinimizeFields_2()");
+        mrcTools.mrcLogError(e, "mrcMinimizeFields()");
     }
 }
 
@@ -4723,7 +4741,7 @@ function mrcMaximizeFields(event) {
             mrcRecipientResize(element);
         }
     } catch (e) {
-        mrcLogError(e, "mrcMaximizeFields()");
+        mrcTools.mrcLogError(e, "mrcMaximizeFields()");
     }
 }
 
@@ -4736,6 +4754,6 @@ function mrcOpenPreferences(event) {
     try {
         window.openDialog('chrome://mrc_compose/content/options.xul',' My Option Dialog','chrome,toolbar');
     } catch (e) {
-        mrcLogError(e, "mrcOpenPreferences()");
+        mrcTools.mrcLogError(e, "mrcOpenPreferences()");
     }
 }

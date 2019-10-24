@@ -45,55 +45,19 @@
  *
  */
 
-ChromeUtils.import("chrome://mrc_compose/content/mrc_tools.js");
+var mrcTools = ChromeUtils.import("chrome://mrc_compose/content/mrc_tools.js");
 
 
 function mrcOnPrefLoaded() {
 
-    mrcLog("mrcOnPrefLoaded()");
+    mrcTools.mrcLog("mrcOnPrefLoaded()");
     buildABList();
-    // mrcLoadHelp(); no need anymore with with help through tooltips.
 
     window.addEventListener("activate", mrcOnPrefActivate); 
 }
 
 
-function mrcTooltip() {
-    /*
-     * Defines content of default tooltip in pref window.
-     *
-     * 'this' is the tooltip object
-     * 'document.tooltipNode' is the element being hovered.
-     *
-     */
-    mrcLog("tooltip="+document.tooltipNode.id+"\n");
-    let div = document.getElementById("helptip");
-    if (div) {
-        let hid = document.tooltipNode.id;
-        if (hid == "")
-            hid = document.tooltipNode.control;
-        let txt = "no help";
-        try {
-            txt = getContents("chrome://mrc_compose/locale/help_"+hid+".txt");
-        } catch(e) {
-            mrcLogError("getContents() ="+e);
-            txt = hid;
-        }
-        mrcLog("hid="+hid+"\n");
-        mrcLog("txt="+txt+"\n");
 
-        //clear the HTML div element of any prior shown custom HTML 
-        while(div.firstChild)
-            div.removeChild(div.firstChild);
-
-        let injectHTML = Components.classes["@mozilla.org/feed-unescapehtml;1"]
-        .getService(Components.interfaces.nsIScriptableUnescapeHTML) 
-        .parseFragment(txt, false, null, div);
-
-        //attach the DOM object to the HTML div element 
-        div.appendChild(injectHTML);
-    }
-}
 function onSaveWhiteList() {
     /**
      * Propagate changes to the whitelist menu list back to
@@ -101,16 +65,22 @@ function onSaveWhiteList() {
      */
     var wList = document.getElementById("search_ab_URI_list");
     var wlArray = [];
+    // mrcTools.mrcLog("onSaveWhiteList() : wList.getRowCount()="+wList.getRowCount());
 
     for (var i = 0; i < wList.getRowCount(); i++) {
         var wlNode = wList.getItemAtIndex(i);
-        if (wlNode.checked) {
+        // mrcTools.mrcLog("onSaveWhiteList() : wlNode="+wlNode);
+        var checkbox = wlNode.getElementsByClassName("check")[0];
+        // mrcTools.mrcLog("onSaveWhiteList() : checkbox="+checkbox);
+        // mrcTools.mrcLog("onSaveWhiteList() : checkbox.checked="+checkbox.checked);
+        if (checkbox.checked) {
             let abURI = wlNode.getAttribute("value");
+            // mrcTools.mrcLog("onSaveWhiteList() : abURI="+abURI);
             wlArray.push(abURI);
         }
     }
     var wlValue = wlArray.join(";;;");
-    mrcLog("onSaveWhiteList() : wlValue="+wlValue);
+    mrcTools.mrcLog("onSaveWhiteList() : wlValue="+wlValue);
     var elt = document.getElementById("search_ab_URI");
     elt.setAttribute("value", wlValue);
     elt.value = wlValue;
@@ -124,12 +94,12 @@ function onSaveWhiteList() {
 
 
 function mrcOnPrefUnloaded(){
-    mrcLog("mrcOnPrefUnloaded()");
+    mrcTools.mrcLog("mrcOnPrefUnloaded()");
 
 }
 
 function mrcToggleCheckAB(element) {
-    mrcLog("mrcToggleChekAB() : "+element.label+";"+element.value);
+    mrcTools.mrcLog("mrcToggleChekAB() : "+element.label+";"+element.value);
     onSaveWhiteList();
 }
 
@@ -174,7 +144,7 @@ function mrcEditDirectories() {
 
 function mrcOnPrefActivate() {
 
-    mrcLog("mrcOnPrefActivate()");
+    mrcTools.mrcLog("mrcOnPrefActivate()");
     // force rebuild of addressbooks list
     buildABList();
 }
@@ -187,7 +157,7 @@ function mrcOnPrefActivate() {
 
 function buildABList() {
 
-    mrcLog("buildABList()");
+    mrcTools.mrcLog("buildABList()");
 
     let prefs = Components.classes["@mozilla.org/preferences-service;1"]
                          .getService(Components.interfaces.nsIPrefService)
@@ -197,6 +167,8 @@ function buildABList() {
 
     let currentArray = [];
     currentArray = document.getElementById("search_ab_URI").value.split(";;;");
+    // mrcTools.mrcLog("currentArray : "+currentArray);
+
 
     // set up the whitelist UI
     let wList = document.getElementById("search_ab_URI_list");
@@ -214,29 +186,33 @@ function buildABList() {
         if ( !(ab instanceof Components.interfaces.nsIAbDirectory))
             continue;
 
-        let abItem = document.createElement("listitem");
-        abItem.setAttribute("type", "checkbox");
-        abItem.setAttribute("class", "listitem-iconic");
-        abItem.setAttribute("label", ab.dirName);
-        abItem.setAttribute("value", ab.URI);
+        ab_type = "?";
+        if (ab instanceof Components.interfaces.nsIAbDirectory && !ab.isRemote) {
+            ab_type = "Thunderbird";
+        } else {
+            if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
+                ab_type = "LDAP";
+            }
+        }
 
-        abItem.addEventListener("click", mrcToggleCheckAB, false);
-
-        // Due to bug 448582, we have to use setAttribute to set the
-        // checked value of the listitem.
         if (!first_load_done)
             // we force all ab
-            abItem.setAttribute("checked", true);
+            checked = true;
         else
-            abItem.setAttribute("checked", (currentArray.indexOf(ab.URI) != -1));
+            checked = currentArray.indexOf(ab.URI) != -1;
 
+        abItem = createABItemList(checked, ab.dirName, ab.URI, ab_type);
         abItems.push(abItem);
     }
 
+    // TODO
+    // build items for Cardbook ABs
+
+
     // Sort the list
     function sortFunc(a, b) {
-        return a.getAttribute("label").toLowerCase()
-           > b.getAttribute("label").toLowerCase();
+        return a.getAttribute("sort_label").toLowerCase()
+           > b.getAttribute("sort_label").toLowerCase();
     }
 
     abItems.sort(sortFunc);
@@ -250,6 +226,39 @@ function buildABList() {
         onSaveWhiteList();
     }
 
+}
+
+function createABItemList(ab_check, ab_name, ab_uri, ab_type) {
+
+
+    let abItem = document.createElement("richlistitem");
+
+    let abHboxItem = document.createElement("hbox");
+    abHboxItem.setAttribute("flex", "1");
+
+    let newCheck = document.createElement("checkbox");
+    newCheck.setAttribute("class", "check");
+    newCheck.setAttribute("checked", ab_check);
+    newCheck.addEventListener("click", mrcToggleCheckAB, false);
+    abHboxItem.appendChild(newCheck);
+
+    let newLabel = document.createElement("label");
+    newLabel.setAttribute("flex", "1");
+    newLabel.value = ab_name;
+    // debug
+    // newLabel.value += " ("+ab_uri+")";
+    abHboxItem.appendChild(newLabel);
+
+    let newLabelType = document.createElement("label");
+    newLabelType.value = ab_type;
+    newLabelType.setAttribute("style", "color: gray");
+    abHboxItem.appendChild(newLabelType);
+
+    abItem.appendChild(abHboxItem);
+    abItem.setAttribute("sort_label", ab_name);
+    abItem.setAttribute("value", ab_uri);
+
+    return abItem;
 }
 
 function getLineHeight() {
@@ -277,74 +286,6 @@ function getLineHeight() {
     }
     return v;
 }
-
-
-
-function getContents(aURL){
-    /*
-     * Read a file from a chrome path.
-     * from http://forums.mozillazine.org/viewtopic.php?p=921150
-     *
-     */
-  var ioService=Components.classes["@mozilla.org/network/io-service;1"]
-    .getService(Components.interfaces.nsIIOService);
-  var scriptableStream=Components
-    .classes["@mozilla.org/scriptableinputstream;1"]
-    .getService(Components.interfaces.nsIScriptableInputStream);
-
-  var channel=ioService.newChannel(aURL,null,null);
-  // var channel=ioService.newChannel2(aURL,null,null, null, document, document, null, null);
-  var input=channel.open();
-  scriptableStream.init(input);
-  var str=scriptableStream.read(input.available());
-  scriptableStream.close();
-  input.close();
-  return str;
-}
-
-
-function mrcLoadHelp() {
-    /*
-     * Obsolete.
-     */
-
-    for (let i = 1 ; i <= 4 ; i++) {
-        let hid = "help"+i;
-        let div = document.getElementById(hid);
-        if (div) {
-            let txt = "";
-            try {
-                txt = getContents("chrome://mrc_compose/locale/"+hid+".txt");
-            } catch(e) {}
-
-            //clear the HTML div element of any prior shown custom HTML
-            while(div.firstChild) 
-                div.removeChild(div.firstChild);
-
-            //safely convert HTML string to a simple DOM object, striping it of javascript and more complex tags
-            var parserUtils = Components.classes["@mozilla.org/parserutils;1"]
-                  .getService(Components.interfaces.nsIParserUtils);
-            let injectHTML = "";
-            // special : Gecko 13 does not have 'parseFragment()'
-            if (parserUtils.parseFragment)
-                injectHTML = parserUtils.parseFragment(txt, 0, false, null, div);
-            else {
-                // Old API to parse html, xml, svg.
-                var parser = Components.classes["@mozilla.org/xmlextras/domparser;1"]
-                            .createInstance(Components.interfaces.nsIDOMParser);
-                var htmlDoc = parser.parseFromString(txt, "text/html");
-                injectHTML = htmlDoc.firstChild;
-            }
-
-            //attach the DOM object to the HTML div element 
-            div.appendChild(injectHTML); 
-        }
-    }
-}
-
-
-
-
 
 function mrcOnPrefComposeLoaded() {
 

@@ -33,7 +33,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-ChromeUtils.import("chrome://mrc_compose/content/mrc_tools.js");
+var mrcTools = ChromeUtils.import("chrome://mrc_compose/content/mrc_tools.js");
 
 
 /*
@@ -95,17 +95,17 @@ window.addEventListener("load", function(e) {
         */
         let text = getString('autocomplete');
         let text2 = getString('autocomplete2');
-        // mrcLog("text="+text+"     text2="+text2);
+        // mrcTools.mrcLog("text="+text+"     text2="+text2);
 
         let src = document.getElementById('emailCollectionOutgoing');
-        // mrcLog("src="+src.nodeName);
+        // mrcTools.mrcLog("src="+src.nodeName);
         let tab = src.parentNode.parentNode;
-        // mrcLog("tab="+tab.nodeName);
+        // mrcTools.mrcLog("tab="+tab.nodeName);
         let groupbox = tab.childNodes[0];
         let description = groupbox.childNodes[1];
-        // mrcLog("description="+description.value);
+        // mrcTools.mrcLog("description="+description.value);
         description.value = text;
-        // mrcLog("description apres="+description.value);
+        // mrcTools.mrcLog("description apres="+description.value);
 
         var hbox = document.createElement("hbox");
 
@@ -130,4 +130,4 @@ window.addEventListener("load", function(e) {
 
     }, false);
 
-// mrcLog("window.addEventListener()");
+// mrcTools.mrcLog("window.addEventListener()");

@@ -79,3 +79,49 @@
 <!ENTITY options.special_values.style "font-size:1.2em; font-style:italic"> 
 
 <!ENTITY options.ldap_search_version.label "Utiliser l'API LDAP pour :">
+
+<!-- help tooltips -->
+
+<!ENTITY options.add_comma.help "Ajoute une virgule après un nouveau destinataire.">
+<!ENTITY options.automatic_height.help "Adapte la hauteur du champ à chaque caractère.">
+<!ENTITY options.default_line_height.help "Initialise les valeurs des 2 champs 'Hauteur première ligne' et 'Hauteur ligne'.">
+<!ENTITY options.first_line_height.help "Hauteur en pixels de la première ligne de chaque champ.">
+<!ENTITY options.line_height.help "Hauteur en pixels des lignes suivantes de chaque champ.">
+<!ENTITY options.max_elements_part_menu.help "Le nombre d'éléments maximum dans chaque partie de la liste.
+
+    Avec le 'Mode' '0', il est préférable de le mettre à 15-30.
+    Avec le 'Mode' '1', il est préférable de le mettre à 15-30.
+    Avec le 'Mode' '2', il est préférable de le mettre à 5-10.
+    Avec le 'Mode' '3', il est préférable de le mettre à 5-10.">
+<!ENTITY options.max_nb_line.help "Nombre lignes maximum dans chaque champ. Au delà, un ascenseur est affiché.">
+<!ENTITY options.max_recipients_warning.help "Pour les champs 'Pour' et 'Copie à', un warning est affiché si le nombre de destinataires est supérieur à cette limite. 
+Le warning indique à l'utilisateur qu'il est préférable d'utiliser le champ 'Copie cachée à'.">
+<!ENTITY options.min_recipients_show.help "Le nombre de destinataires est affiché à gauche du titre de chaque champ.
+Seulement s'il est supérieur à cette limite.">
+<!ENTITY options.min_search_delay.help "L'intervalle minimum entre 2 recherches identiques (en millisecondes).">
+<!ENTITY options.mode.help "'0' : La liste contient 1 partie :
+    'begin' :    contacts dont les champs commencent par X
+    Avec le mode '0', il est préférable de mettre 'Nb ligne max dans chaque partie' à 15-30.
+
+'1' : La liste contient 1 partie :
+    'contains' : contacts et groupes dont les champs contiennent X
+    Avec le mode '1', il est préférable de mettre 'Nb ligne max dans chaque partie' à 15-30.
+
+'2' : La liste contient 2 parties :
+    'begin' :    contacts dont les champs commencent par X
+    'contains' : contacts dont les champs contiennent X (excepté ceux de la partie 1)
+    Avec le mode '2', il est préférable de mettre 'Nb ligne max dans chaque partie' à 5-10.
+
+'3' : La liste contient 1 partie pour chaque carnet d'adresses :
+    contacts et groupes dont les champs contiennent X
+    Avec le mode '3', il est préférable de mettre 'Nb ligne max dans chaque partie' à 5-10.
+
+Les champs de recherche sont :
+- 'PrimaryEmail', 'FirstName', 'LastName', 'NickName' pour les contacts,
+- 'LastName' pour les groupes.
+
+Pour les machines lentes, il est préférable de choisir le mode '1'.">
+<!ENTITY options.search_min_char.help "La recherche commence après que l'utilisateur ait entré ce nombre de caractères. Sur les machines lentes, il est préférable de choisir '2' ou '3'.">
+<!ENTITY options.search_timeout.help "L'attente maximale pour les recherches LDAP (en millisecondes).">
+<!ENTITY options.show_no_result.help "Quand il n'y aucun résultat, affiche quand même le panneau de résultat avec l'information.">
+<!ENTITY options.show_popularity.help "Affiche l'indice de popularité des contacts.">
