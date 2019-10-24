@@ -994,14 +994,20 @@ var mrcAComplete = {
             case "line_height":
                 this.param_line_height = this.prefs.getIntPref("line_height");
                 this.param_max_height = this.param_first_line_height + (this.param_max_nb_line-1)*this.param_line_height;
+                // live update of all fields
+                mrcMaximizeFields(null);
                 break;
             case "first_line_height":
                 this.param_first_line_height = this.prefs.getIntPref("first_line_height");
                 this.param_max_height = this.param_first_line_height + (this.param_max_nb_line-1)*this.param_line_height;
+                // live update of all fields
+                mrcMaximizeFields(null);
                 break;
             case "max_nb_line":
                 this.param_max_nb_line = this.prefs.getIntPref("max_nb_line");
                 this.param_max_height = this.param_first_line_height + (this.param_max_nb_line-1)*this.param_line_height;
+                // live update of all fields
+                mrcMaximizeFields(null);
                 break;
             case "sort_field_level_1":
                 this.param_sort_field_level_1 = this.prefs.getCharPref("sort_field_level_1");
