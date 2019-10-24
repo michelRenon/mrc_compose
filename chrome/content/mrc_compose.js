@@ -4465,6 +4465,13 @@ function mrcRecipientKeyPress(event, element) {
         }
     } else {
         // default behaviour
+        switch(event.keyCode) {
+            case KeyEvent.DOM_VK_RETURN:
+            case KeyEvent.DOM_VK_ENTER:
+                event.stopPropagation();
+                event.preventDefault(); // MOST IMPORTANT LINE : avoid the handling by the textbox
+                break;
+        }
 
         // update the # of recipients of the current textbox
         // mrcAComplete.updateNbRecipients(element);
