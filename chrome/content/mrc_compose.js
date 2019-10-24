@@ -4623,23 +4623,40 @@ function mrcRecipientResize(element, maxi) {
      *
      */
     try {
-        // maxi = mrcAComplete._pick(maxi, mrcAComplete.param_max_height);
-        maxi = mrcAComplete.param_max_height;
-
         // Ensure height can change.
         mrcCompose_WORKAROUND_Height();
 
-        let sh1 = element.inputField.scrollHeight;
-        element.height = 'auto'; // ==> forces the textbox to recompute scrollHeight to adapt to current value
-        let sh2 = element.inputField.scrollHeight;
-        let fnbLines = sh2 / mrcAComplete.param_line_height;
-        let nbLines = Math.round(fnbLines);
-        let nHeight = mrcAComplete.param_first_line_height + (nbLines-1)*mrcAComplete.param_line_height;
-        let h = Math.min(Math.max(nHeight,mrcAComplete.param_first_line_height), maxi);
-        // dump("h1="+sh1+"  h2="+sh2+"  fnbLines="+fnbLines+"  nbLines="+nbLines+"  nHeight="+nHeight+"  h="+h+"\n");
-        element.height = h;
-        let sh3 = element.inputField.scrollHeight;
-        mrcTools.mrcLog("Resize : "+element.id+" : h1="+sh1+"  h2="+sh2+"  fnbLines="+fnbLines+"  nbLines="+nbLines+"  nHeight="+nHeight+"  h="+h+"  h3="+sh3);
+        // New resize algo  with hidden clone div
+        let idCopy = element.id + "_COPY";
+        let element_COPY = document.getElementById(idCopy);
+
+        mrcTools.mrcLog("mrcAComplete.param_first_line_height:", mrcAComplete.param_first_line_height);
+        mrcTools.mrcLog("mrcAComplete.param_max_height:", mrcAComplete.param_max_height);
+
+        element_COPY.innerHTML = mrcAComplete._myEncode(element.value);
+        // Briefly make the hidden div block but invisible
+        // This is in order to read the height
+        element_COPY.style.visibility = 'hidden';
+        element_COPY.style.display = 'block';
+        let fullHeight = element_COPY.offsetHeight;
+        // Make the hidden div display:none again
+        element_COPY.style.visibility = 'visible';
+        element_COPY.style.display = 'none';
+
+        let nbLinesCopy = fullHeight / mrcAComplete.param_line_height;
+        mrcTools.mrcLog("nbLinesCopy : ", nbLinesCopy);
+        nbLinesCopy = Math.floor(nbLinesCopy);
+        mrcTools.mrcLog("int(nbLinesCopy) : ", nbLinesCopy);
+        if (nbLinesCopy < 1)
+            nbLinesCopy = 1;
+        if (nbLinesCopy > mrcAComplete.param_max_nb_line)
+            nbLinesCopy = mrcAComplete.param_max_nb_line;
+        mrcTools.mrcLog("nbLinesCopy (recadré) : ", nbLinesCopy);
+
+        newHeight = mrcAComplete.param_first_line_height + (nbLinesCopy-1)*mrcAComplete.param_line_height;
+        mrcTools.mrcLog("newHeight : ", newHeight);
+        element.style.height = newHeight + 'px';
+
     } catch (e) {
         mrcTools.mrcLogError(e, "mrcRecipientResize()");
     }

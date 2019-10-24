@@ -139,14 +139,14 @@
             </hbox>
 
             <vbox flex="1">
-                <textbox id="msgTO" flex="1" class="toolbar" disableonsend="true" spellcheck="false"
-                             multiline="true"
+                <html:textarea id="msgTO" flex="1" class="toolbar" disableonsend="true" spellcheck="false"
                              placeholder="&field.placeholder;"
                              onkeypress="mrcRecipientKeyPress(event, this)"
                              onkeyup="mrcRecipientKeyUp(event, this)"
                              onoverflow="mrcRecipientResize(this)"
                              onresize="mrcRecipientResize(this)"
                           />
+                <html:div id="msgTO_COPY" class="txta"/>
                 <hbox class="notificationRecipient" id="warning_nbTO"  hidden="true">
                     <label value="&field.warning_number;" />
                 </hbox>
@@ -158,14 +158,14 @@
                 <label value="&ccAddr.label;" />
             </hbox>
             <vbox flex="1">
-                <textbox id="msgCC" flex="1" class="toolbar" disableonsend="true" spellcheck="false" focus="false"
-                             multiline="true"
+                <html:textarea id="msgCC" flex="1" class="toolbar" disableonsend="true" spellcheck="false" focus="false"
                              placeholder="&field.placeholder;"
                              onkeypress="mrcRecipientKeyPress(event, this)"
                              onkeyup="mrcRecipientKeyUp(event, this)"
                              onoverflow="mrcRecipientResize(this)"
                              onresize="mrcRecipientResize(this)"
                           />
+                <html:div id="msgCC_COPY" class="txta"/>
                 <hbox class="notificationRecipient" id="warning_nbCC" hidden="true">
                     <label value="&field.warning_number;"/>
                 </hbox>
@@ -177,14 +177,14 @@
                 <label value="&bccAddr.label;" />
             </hbox>
             <vbox flex="1">
-                <textbox id="msgBCC" flex="1" class="toolbar" disableonsend="true" spellcheck="false"
-                             multiline="true"
+                <html:textarea id="msgBCC" flex="1" class="toolbar" disableonsend="true" spellcheck="false"
                              placeholder="&field.placeholder;"
                              onkeypress="mrcRecipientKeyPress(event, this)"
                              onkeyup="mrcRecipientKeyUp(event, this)"
                              onoverflow="mrcRecipientResize(this)"
                              onresize="mrcRecipientResize(this)"
                          />
+                <html:div id="msgBCC_COPY" class="txta"/>
                 <hbox>
                 </hbox>
             </vbox>
@@ -196,14 +196,14 @@
                 <label value="&replyAddr.label;" />
             </hbox>
             <vbox flex="1">
-                <textbox id="msgREPLY" flex="1" class="toolbar" disableonsend="true" spellcheck="false"
-                             multiline="true"
+                <html:textarea id="msgREPLY" flex="1" class="toolbar" disableonsend="true" spellcheck="false"
                              placeholder="&field.placeholder;"
                              onkeypress="mrcRecipientKeyPress(event, this)"
                              onkeyup="mrcRecipientKeyUp(event, this)"
                              onoverflow="mrcRecipientResize(this)"
                              onresize="mrcRecipientResize(this)"
                          />
+                <html:div id="msgREPLY_COPY" class="txta"/>
                 <hbox>
                 </hbox>
             </vbox>
@@ -214,14 +214,14 @@
                 <label value="&newsgroupsAddr.label;" />
             </hbox>
             <vbox flex="1">
-                <textbox id="msgNG" flex="1" class="toolbar" disableonsend="true" spellcheck="false"
-                             multiline="true"
+                <html:textarea id="msgNG" flex="1" class="toolbar" disableonsend="true" spellcheck="false"
                              placeholder="&field.placeholder;"
                              onkeypress="mrcRecipientKeyPress(event, this)"
                              onkeyup="mrcRecipientKeyUp(event, this)"
                              onoverflow="mrcRecipientResize(this)"
                              onresize="mrcRecipientResize(this)"
                          />
+                <html:div id="msgNG_COPY" class="txta"/>
                 <hbox>
                 </hbox>
             </vbox>
@@ -232,14 +232,14 @@
                 <label value="&followupAddr.label;" />
             </hbox>
             <vbox flex="1">
-                <textbox id="msgFOLLOW" flex="1" class="toolbar" disableonsend="true" spellcheck="false"
-                             multiline="true"
+                <html:textarea id="msgFOLLOW" flex="1" class="toolbar" disableonsend="true" spellcheck="false"
                              placeholder="&field.placeholder;"
                              onkeypress="mrcRecipientKeyPress(event, this)"
                              onkeyup="mrcRecipientKeyUp(event, this)"
                              onoverflow="mrcRecipientResize(this)"
                              onresize="mrcRecipientResize(this)"
                          />
+                <html:div id="msgFOLLOW_COPY" class="txta"/>
                 <hbox>
                 </hbox>
             </vbox>
