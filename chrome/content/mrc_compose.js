@@ -4698,55 +4698,20 @@ function mrcMinimizeFields(event) {
      */
     try {
         for (let i in mrcAComplete.FIELDS) {
-            let element = document.getElementById(mrcAComplete.FIELDS[i].txtId);
-            // mrcTools.mrcLog(i+", height="+element.height+", sh="+element.inputField.scrollHeight);
+            let txtId = mrcAComplete.FIELDS[i].txtId;
+            let element = document.getElementById(txtId);
+            let oldHeight = element.style.height;
+            let t = mrcAComplete.param_first_line_height.toString()+'px';
+            element.style.height = t;
+
             /*
-             * TODO : BUG : DOES NOT WORK IF THE TEXTFIELD HAS >1 LINE AND NO SCROLLBAR
-             * CAN'T FIND WHY... SEEMS AN INTERNAL BEHAVIOUR OF XUL ???
+             * It seems that TB doesn't show the scrollbar in a textarea of one line height.
              *
-             * AND CAN'T FORCE THE SCROLLBAR TO APPEAR BEFORE NEEDED
-             *
-             *
-             * TESTED WITH A RESIZER IN XUL :
-             *     <resizer element="msgTO" dir="bottomright" left="0" top="0" width="16" height="16"/>
-             * ...WORKS PERFECTLY WITH THE MOUSE !
              */
-
-            // HACK : force scrollHeight AND delay some processing...
-            if (element.scrollHeight <= element.height) {
-                element.height = 'auto'; // ==> forces the textbox to recompute scrollHeight to adapt to current value
-                // we just force the scrollheight to force the appearance of scrollbar
-                element.inputField.scrollHeight = 1000;
-                element.scrollHeight = 1000;
-
-                // let t = mrcAComplete.param_first_line_height.toString()+'px';
-                // element.setAttribute("height", t);
-
-                // HACK continue after a delay...
-                let t = setTimeout( function() {mrcMinimizeFields_2(element)}, 10);
-            } else {
-
-                element.height = 'auto'; // ==> forces the textbox to recompute scrollHeight to adapt to current value
-                element.height = mrcAComplete.param_first_line_height;
-            }
+            mrcTools.mrcLog(i+", txtId="+txtId+", old="+oldHeight+", newHeight="+t+", real height="+element.style.height);
         }
     } catch (e) {
         mrcTools.mrcLogError(e, "mrcMinimizeFields()");
-    }
-}
-
-function mrcMinimizeFields_2(element) {
-    /*
-     * call-back for button 'Minimize' :
-     *
-     * reduce all fields to one-line-height
-     *
-     */
-    try {
-        let t = mrcAComplete.param_first_line_height.toString()+'px';
-        element.setAttribute("height", t);
-    } catch (e) {
-        mrcTools.mrcLogError(e, "mrcMinimizeFields_2()");
     }
 }
 
