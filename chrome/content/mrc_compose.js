@@ -4455,6 +4455,7 @@ function mrcRecipientKeyPress(event, element) {
 
             case KeyEvent.DOM_VK_TAB:
             case KeyEvent.DOM_VK_RETURN:
+            case KeyEvent.DOM_VK_ENTER:
                 // validate current element of autocomplete div
                 mrcAComplete.validate();
                 // then close popup
