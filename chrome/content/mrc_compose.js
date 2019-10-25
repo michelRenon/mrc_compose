@@ -2747,7 +2747,7 @@ var mrcAComplete = {
                         this._completeSearchListener(abSearchListener);
                     } catch (e) {
                         this._addErrorAddressBook(ab.dirName);
-                        mrcTools.mrcLogError(e, "_search_mode_1()");
+                        mrcTools.mrcLogError(e, "_search_mode_3()");
                     }
                 }
             } else {
@@ -2891,7 +2891,7 @@ var mrcAComplete = {
         // use DisplayName and NickName
         let baseQuery = "(or(PrimaryEmail,@C,@V)(SecondEmail,@C,@V)(FirstName,@C,@V)(LastName,@C,@V)(DisplayName,@C,@V)(NickName,@C,@V))";
 
-        // one search : CONTAINS
+        // one search : BEGIN WITH
         let searchQuery1 = baseQuery.replace(/@C/g, 'bw');
         searchQuery1 = searchQuery1.replace(/@V/g, encodeURIComponent(aString));
         // ldap query template
