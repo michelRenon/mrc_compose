@@ -1972,7 +1972,7 @@ var mrcAComplete = {
                     abSearchListener.localRes = this._removeDuplicatecards(abSearchListener.localRes);
                     abSearchListener.localRes.sort(this._sort_card);
 
-                    this.datas[abSearchListener.addressBook.dirName] = abSearchListener.localRes;
+                    this.datas[abSearchListener.addressBook.name] = abSearchListener.localRes;
                     this.nbDatas += abSearchListener.localRes.length;
                     break;
 
@@ -2220,7 +2220,10 @@ var mrcAComplete = {
                         let that = this;
                         let abSearchListener = {
                             searchID : this.searchID,
-                            addressBook : ab,
+                            addressBook : {
+                                name: ab.dirName,
+                                uri: ab.URI,
+                            },
                             isRemote : false,
                             cbObject : that,
                             localRes : [],
@@ -2294,7 +2297,10 @@ var mrcAComplete = {
                                 let that = this;
                                 let abDirSearchListener = {
                                     searchID : this.searchID,
-                                    addressBook : ab,
+                                    addressBook : {
+                                        name: ab.dirName,
+                                        uri: ab.URI,
+                                    },
                                     isRemote : true,
                                     cbObject : that,
                                     localRes : [],
@@ -2426,7 +2432,10 @@ var mrcAComplete = {
                         let that = this;
                         let abSearchListener = {
                             searchID : this.searchID,
-                            addressBook : ab,
+                            addressBook : {
+                                name: ab.dirName,
+                                uri: ab.URI,
+                            },
                             isRemote : false,
                             cbObject : that,
                             localRes1 : [],
@@ -2545,7 +2554,10 @@ var mrcAComplete = {
                             // add an async search listener
                             let abDirSearchListener1 = {
                                 searchID : this.searchID,
-                                addressBook : ab,
+                                addressBook : {
+                                    name: ab.dirName,
+                                    uri: ab.URI,
+                                },
                                 isRemote : true,
                                 cbObject : that,
                                 localRes1 : [],
@@ -2724,7 +2736,10 @@ var mrcAComplete = {
                         let that = this;
                         let abSearchListener = {
                             searchID : this.searchID,
-                            addressBook : ab,
+                            addressBook : {
+                                name: ab.dirName,
+                                uri: ab.URI,
+                            },
                             isRemote : false,
                             cbObject : that,
                             localRes : [],
@@ -2796,7 +2811,10 @@ var mrcAComplete = {
                                 let that = this;
                                 let abDirSearchListener = {
                                     searchID : this.searchID,
-                                    addressBook : ab,
+                                    addressBook : {
+                                        name: ab.dirName,
+                                        uri: ab.URI,
+                                    },
                                     isRemote : true,
                                     cbObject : that,
                                     localRes : [],
@@ -2914,7 +2932,10 @@ var mrcAComplete = {
                         let that = this;
                         let abSearchListener = {
                             searchID : this.searchID,
-                            addressBook : ab,
+                            addressBook : {
+                                name: ab.dirName,
+                                uri: ab.URI,
+                            },
                             isRemote : false,
                             cbObject : that,
                             localRes : [],
@@ -2989,7 +3010,10 @@ var mrcAComplete = {
                                 let that = this;
                                 let abDirSearchListener = {
                                     searchID : this.searchID,
-                                    addressBook : ab,
+                                    addressBook : {
+                                        name: ab.dirName,
+                                        uri: ab.URI,
+                                    },
                                     isRemote : true,
                                     cbObject : that,
                                     localRes : [],
