@@ -45,6 +45,8 @@
  *
  */
 
+
+
 var mrcTools = ChromeUtils.import("chrome://mrc_compose/content/mrc_tools.js");
 
 
@@ -206,8 +208,22 @@ function buildABList() {
     }
 
     // TODO
-    // build items for Cardbook ABs
+    if (mrcTools.mrcCommons.cardbookRepository) {
+        // build items for Cardbook ABs
+        for (let account of mrcTools.mrcCommons.cardbookRepository.cardbookAccounts) {
+            console.log("test du CB : "+account);
+            if (account[1] && account[5] && account[6] != "SEARCH") {
+                let myDirName = account[0];
+                let myDirPrefId = account[4];
 
+                checked = currentArray.indexOf(myDirPrefId) != -1;
+                ab_type = "CardBook (" + account[6].toLowerCase() + ")";
+
+                abItem = createABItemList(checked, myDirName, myDirPrefId, ab_type);
+                abItems.push(abItem);
+            }
+        }
+    }
 
     // Sort the list
     function sortFunc(a, b) {
