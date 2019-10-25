@@ -972,6 +972,15 @@ var mrcAComplete = {
             let styleSheetURI = Services.io.newURI(styleSheets[i], null, null);
             styleSheetService.loadAndRegisterSheet(styleSheetURI, styleSheetService.AUTHOR_SHEET);
         }
+
+
+        /*
+         *
+         * STEP 8 : test link with Cardbook
+         *
+         */
+         this._testCardbookLoaded();
+
     },
 
     shutdown: function() {
@@ -1084,6 +1093,37 @@ var mrcAComplete = {
      *
      *
      */
+
+
+    _testCardbookLoaded : function() {
+
+        try {
+            if (window.hasOwnProperty("cardbookRepository")) {
+                // on peut utiliser la variable 'cardBookRepository'
+                mrcTools.mrcCommons.cardbookRepository = window.cardbookRepository;
+                console.log("CARDBOOK INSTALLE");
+
+                var accounts = window.cardbookRepository.cardbookAccounts;
+                for (var j = 0; j < accounts.length; j++) {
+                    var account = accounts[j];
+                    console.log("account : "+account);
+                    if (account[1] && account[5] && account[6] != "SEARCH") {
+                        console.log("    OK");
+                    }
+                }
+            } else {
+                mrcTools.mrcCommons.cardbookRepository = null;
+                console.log("CARDBOOK non installé");
+            }
+
+        } catch {
+            // gestion erreur ou Cardbook non installé
+            mrcTools.mrcCommons.cardbookRepository = null;
+            console.log("CARDBOOK non installé");
+        }
+    },
+
+
 
     /*
      * hash method
