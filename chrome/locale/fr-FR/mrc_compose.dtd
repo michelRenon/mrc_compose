@@ -1,5 +1,9 @@
 <!ENTITY field.placeholder "entrez un ou plusieurs emails séparés par des virgules" >
 <!ENTITY field.warning_number "Attention : il est conseillé de déplacer les destinataires dans '&bccAddr.label;'." >
+<!ENTITY field.info_first_cardbook "Vous venez d'installer CardBook. Nous vous conseillons d'ouvrir les préférences afin de mettre à jour les carnets d'adresses que MRC Compose va lire (désactiver les carnets de type 'Thunderbird' et activer les carnets de type 'LDAP' et 'Cardbook')." >
+
+<!ENTITY field.open_prefs_cardbook "Ouvrir les préférences" >
+<!ENTITY field.close_info_cardbook "Non merci" >
 
 <!ENTITY fieldcc.show "Montrer '&ccAddr.label;'" >
 <!ENTITY fieldbcc.show "Montrer '&bccAddr.label;'" >

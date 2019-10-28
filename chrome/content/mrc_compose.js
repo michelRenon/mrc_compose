@@ -627,6 +627,8 @@ var mrcAComplete = {
     ALERT_ERROR_CLASSNAME : "alert-error",
     ALERT_WARNING_CLASSNAME : "alert-warning",
 
+    ID_INFO_CARDBOOK : "info-first-cardbook",
+
     // html namespace in order to integrate html elements into xul
     HTMLNS : "http://www.w3.org/1999/xhtml",
 
@@ -1110,6 +1112,15 @@ var mrcAComplete = {
                     if (account[1] && account[5] && account[6] != "SEARCH") {
                         console.log("    OK");
                     }
+                }
+
+                let first_launch_cardbook = this.prefs.getBoolPref("first_launch_cardbook_done");
+                if (first_launch_cardbook === false) {
+                    // show info about CardBook addressbooks
+                    let elt = document.getElementById(this.ID_INFO_CARDBOOK);
+                    elt.style.display = "block";
+
+                    this.prefs.setBoolPref("first_launch_cardbook_done", true);
                 }
             } else {
                 mrcTools.mrcCommons.cardbookRepository = null;
@@ -5105,4 +5116,16 @@ function mrcOpenPreferences(event) {
     } catch (e) {
         mrcTools.mrcLogError(e, "mrcOpenPreferences()");
     }
+}
+
+
+function mrcCardbookOpenPrefs() {
+    mrcOpenPreferences(null);
+    mrcCardbookClose();
+}
+
+
+function mrcCardbookClose() {
+    let element = document.getElementById(mrcAComplete.ID_INFO_CARDBOOK);
+    element.style.display = "none";
 }

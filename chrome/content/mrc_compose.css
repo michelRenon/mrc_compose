@@ -247,6 +247,17 @@
 }
 
 
+#info-first-cardbook {
+    margin: 6px;
+    display: none;
+
+    background-color: #d9edf7;
+    border: 1px solid #d1cfea; /* #9acfe */
+    border-radius: 4px;
+    color: #31708f;
+    padding: 6px 10px 6px 10px;
+
+}
 
 #helptip {
     display:block;

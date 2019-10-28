@@ -1,5 +1,9 @@
 <!ENTITY field.placeholder "escriba uno o mas destinatarios separados por comas" >
 <!ENTITY field.warning_number "Advertencia : deberías mover tus destinarios en '&bccAddr.label;'." >
+<!ENTITY field.info_first_cardbook "Vous venez d'installer CardBook. Nous vous conseillons d'ouvrir les préférences afin de mettre à jour les carnets d'adresses que MRC Compose va lire (désactiver les carnets de type 'Thunderbird' et activer les carnets de type 'LDAP' et 'Cardbook')." >
+
+<!ENTITY field.open_prefs_cardbook "Open prefs" >
+<!ENTITY field.close_info_cardbook "No gracias" >
 
 <!ENTITY fieldcc.show "Mostrar '&ccAddr.label;'" >
 <!ENTITY fieldbcc.show "Mostrar '&bccAddr.label;'" >
