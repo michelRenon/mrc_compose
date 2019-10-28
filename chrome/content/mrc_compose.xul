@@ -113,7 +113,7 @@
         <hbox id="box-to" >
             <hbox align="center" pack="end" style="&headersSpace.style;">
                 <hbox align="left" pack="start" flex="1">
-                    <toolbarbutton id="mrc-compose-options-button" type="menu" label="" >
+                    <toolbarbutton id="mrc-compose-options-button" type="menu" label="" image="chrome://mrc_compose/content/icon_options.svg">
                         <menupopup id="mrc-compose-options-menu">
                             <menuitem id="menu-box-cc" label="&fieldcc.show;" type="checkbox" checked="false"
                                         oncommand="mrcChangeFieldVisibility(event, 'fieldCC');"/>

@@ -211,7 +211,6 @@
 	/* width: 28px; */
 	-moz-context-properties: fill;
 	fill: currentColor;
-    list-style-image: url("chrome://mrc_compose/content/icon_options.svg");
 }
 
 #MsgHeadersToolbar {
