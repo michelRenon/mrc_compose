@@ -30,4 +30,7 @@ Preferences.addAll([
 
     { id: "extensions.mrccompose.show_no_result", type: "bool" },
     { id: "extensions.mrccompose.show_placeholder", type: "bool" },
+
+    { id: "extensions.mrccompose.first_launch_cardbook_done", type: "bool" },
+
 ]);

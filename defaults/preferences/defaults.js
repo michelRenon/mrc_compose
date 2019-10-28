@@ -32,3 +32,5 @@ pref("extensions.mrccompose.ldap_search_version", 'TB24');
 
 pref("extensions.mrccompose.show_no_result", false);
 pref("extensions.mrccompose.show_placeholder", true);
+
+pref("extensions.mrccompose.first_launch_cardbook_done", false);
