@@ -31,6 +31,7 @@
 <!-- tab 1 -->
 <!ENTITY options.search_ab_URI_list.label "Search in addressbook: ">
 <!ENTITY options.edit_directories.label     "&editDirectories.label;">
+<!ENTITY options.remove_duplicates.label "Supprime les doublons avant l'affichage (?) : ">
 <!ENTITY options.mode.label "Mode (?): ">
 <!ENTITY options.mode_value1.label "1 : All contacts contain">
 <!ENTITY options.mode_value2.label "2 : All contacts begin with / All contacts contain">
@@ -130,3 +131,4 @@ On slow machines, it's better to choose '2' or '3'.">
 <!ENTITY options.search_timeout.help "Maximal waiting for LDAP searches (milliseconds).">
 <!ENTITY options.show_no_result.help "Even if there is no result, show panel with information.">
 <!ENTITY options.show_popularity.help "Show popularity of contacts.">
+<!ENTITY options.remove_duplicates.help "les doublons sont définis par l'email principal.">

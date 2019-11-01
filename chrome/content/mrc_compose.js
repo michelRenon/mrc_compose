@@ -1840,31 +1840,36 @@ var mrcAComplete = {
          * return:
          *   array of cards
          */
-        // bizarre way of doing :
-        // store cards as properties of an object, the name of property being the unique field !!
-        let obj = {};
-        for (let i=0, l=arr.length ; i<l; i++) {
-            try {
-                // we store only the first occurence of duplicates
-                // if (!obj[arr[i].primaryEmail])
-                //    obj[arr[i].primaryEmail] = arr[i];
-                let prop = _get(arr[i], "primaryEmail", "");
-                let prop2 = _get(obj, prop, "");
-                if (prop2 == "") {
-                    obj[prop] = arr[i];
-                }
+        if (this.prefs.getBoolPref("remove_duplicates")) {
 
-            } catch (e) {
-                mrcTools.mrcLogError(e, "_removeDuplicatecards()");
+            // bizarre way of doing :
+            // store cards as properties of an object, the name of property being the unique field !!
+            let obj = {};
+            for (let i=0, l=arr.length ; i<l; i++) {
+                try {
+                    // we store only the first occurence of duplicates
+                    // if (!obj[arr[i].primaryEmail])
+                    //    obj[arr[i].primaryEmail] = arr[i];
+                    let prop = _get(arr[i], "primaryEmail", "");
+                    let prop2 = _get(obj, prop, "");
+                    if (prop2 == "") {
+                        obj[prop] = arr[i];
+                    }
+
+                } catch (e) {
+                    mrcTools.mrcLogError(e, "_removeDuplicatecards()");
+                }
             }
+            // obj nows contains unique properties
+            // build a std array cards
+            let out = [];
+            for (let i in obj) {
+                out.push(obj[i]);
+            }
+            return out;
+        } else {
+            return arr;
         }
-        // obj nows contains unique properties
-        // build a std array cards
-        let out = [];
-        for (let i in obj) {
-            out.push(obj[i]);
-        }
-        return out;
     },
 
     _createMyCard : function(abcard) {
