@@ -122,18 +122,9 @@ function mrcDefaultLineHeight(event) {
 
 
     v = getLineHeight();
-    /*
-    tb1 = document.getElementById('first_line_height');
-    tb1.value = v['first'];
-    tb2 = document.getElementById('line_height');
-    tb2.value = v['line'];
-    */
     let prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
     prefs.setIntPref("extensions.mrccompose.first_line_height", v["first"]);
     prefs.setIntPref("extensions.mrccompose.line_height", v["line"]);
-
-
-
 }
 
 function mrcEditDirectories() {
@@ -207,11 +198,10 @@ function buildABList() {
         abItems.push(abItem);
     }
 
-    // TODO
     if (mrcTools.mrcCommons.cardbookRepository) {
         // build items for Cardbook ABs
         for (let account of mrcTools.mrcCommons.cardbookRepository.cardbookAccounts) {
-            console.log("test du CB : "+account);
+            mrcTools.mrcLog("test du CB : "+account);
             if (account[1] && account[5] && account[6] != "SEARCH") {
                 let myDirName = account[0];
                 let myDirPrefId = account[4];
