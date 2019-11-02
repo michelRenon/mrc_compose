@@ -1103,17 +1103,7 @@ var mrcAComplete = {
             if (window.hasOwnProperty("cardbookRepository")) {
                 // on peut utiliser la variable 'cardBookRepository'
                 mrcTools.mrcCommons.cardbookRepository = window.cardbookRepository;
-                console.log("CARDBOOK INSTALLE");
-
-                var accounts = window.cardbookRepository.cardbookAccounts;
-                for (var j = 0; j < accounts.length; j++) {
-                    var account = accounts[j];
-                    console.log("account : "+account);
-                    if (account[1] && account[5] && account[6] != "SEARCH") {
-                        console.log("    OK");
-                    }
-                }
-
+                mrcTools.mrcLog("CARDBOOK INSTALLE");
                 let first_launch_cardbook = this.prefs.getBoolPref("first_launch_cardbook_done");
                 if (first_launch_cardbook === false) {
                     // show info about CardBook addressbooks
@@ -1124,13 +1114,13 @@ var mrcAComplete = {
                 }
             } else {
                 mrcTools.mrcCommons.cardbookRepository = null;
-                console.log("CARDBOOK non installé");
+                mrcTools.mrcLog("CARDBOOK non installé");
             }
 
         } catch {
             // gestion erreur ou Cardbook non installé
             mrcTools.mrcCommons.cardbookRepository = null;
-            console.log("CARDBOOK non installé");
+            mrcTools.mrcLog("CARDBOOK non installé");
         }
     },
 
@@ -2298,7 +2288,6 @@ var mrcAComplete = {
         // init listeners
         this._initSearchListeners();
 
-        console.log("recherche dans AB Thunderbird");
         while (allAddressBooks.hasMoreElements()) {
             let ab = allAddressBooks.getNext();
             if (ab instanceof Components.interfaces.nsIAbDirectory &&  !ab.isRemote) {
@@ -2469,14 +2458,13 @@ var mrcAComplete = {
             // search in Cardbooks
             // one search : CONTAINS
             let patt = new RegExp(aString, "i");
-            // console.log("recherche dans CB : "+window.cardbookRepository.cardbookAccounts);
             for (let account of window.cardbookRepository.cardbookAccounts) {
-                console.log("test du CB : "+account);
+                mrcTools.mrcLog("test du CB : "+account);
                 if (account[1] && account[5] && account[6] != "SEARCH") {
                     var myDirPrefId = account[4];
                     let doSearch = this.param_search_ab_URI.indexOf(myDirPrefId) >= 0;
                     if (doSearch) {
-                        console.log("  on cherche dans le CB : "+account);
+                        mrcTools.mrcLog("  on cherche dans le CB : "+account);
                         try {
                             // add a sync search listener
                             let that = this;
@@ -2493,12 +2481,12 @@ var mrcAComplete = {
                             this._addSearchListener(abSearchListener);
 
                             for (var txtKey in window.cardbookRepository.cardbookCardLongSearch[myDirPrefId]) {
-                                console.log("test de la clé : "+txtKey);
+                                mrcTools.mrcLog("test de la clé : "+txtKey);
                                 let res = patt.test(txtKey);
                                 if (res) {
-                                    console.log("    clé OK : "+txtKey);
+                                    mrcTools.mrcLog("    clé OK : "+txtKey);
                                     for (let card of window.cardbookRepository.cardbookCardLongSearch[myDirPrefId][txtKey]) {
-                                        console.log("    ajout de la Card : "+card);
+                                        mrcTools.mrcLog("    ajout de la Card : "+card);
                                         abSearchListener.localRes.push(this._createMyCardFromCardBook(card));
                                     }
                                 }
@@ -2847,14 +2835,13 @@ var mrcAComplete = {
             // We will make the exclusion manually, after all searches completed.
             let patt2 = new RegExp(aString, "i");
 
-            // console.log("recherche dans CB : "+window.cardbookRepository.cardbookAccounts);
             for (let account of window.cardbookRepository.cardbookAccounts) {
-                console.log("test du CB : "+account);
+                mrcTools.mrcLog("test du CB : "+account);
                 if (account[1] && account[5] && account[6] != "SEARCH") {
                     var myDirPrefId = account[4];
                     let doSearch = this.param_search_ab_URI.indexOf(myDirPrefId) >= 0;
                     if (doSearch) {
-                        console.log("  on cherche dans le CB : "+account);
+                        mrcTools.mrcLog("  on cherche dans le CB : "+account);
                         try {
                             // add a sync search listener
                             let that = this;
@@ -2875,16 +2862,16 @@ var mrcAComplete = {
 
                             // search 1 : BEGIN WITH
                             for (var txtKey in window.cardbookRepository.cardbookCardLongSearch[myDirPrefId]) {
-                                console.log("test de la clé : "+txtKey);
+                                mrcTools.mrcLog("test de la clé : "+txtKey);
                                 // We have to make a specific test for first field:
                                 // Cardbook does not put "|" before the first field of key.
                                 let res = patt0.test(txtKey);
                                 if (res === false)
                                     res = patt1.test(txtKey);
                                 if (res) {
-                                    console.log("    clé OK : "+txtKey);
+                                    mrcTools.mrcLog("    clé OK : "+txtKey);
                                     for (let card of window.cardbookRepository.cardbookCardLongSearch[myDirPrefId][txtKey]) {
-                                        console.log("    ajout de la Card : "+card);
+                                        mrcTools.mrcLog("    ajout de la Card : "+card);
                                         abSearchListener.localRes1.push(this._createMyCardFromCardBook(card));
                                     }
                                 }
@@ -2892,12 +2879,12 @@ var mrcAComplete = {
 
                             // search 2 : CONTAINS
                             for (var txtKey in window.cardbookRepository.cardbookCardLongSearch[myDirPrefId]) {
-                                console.log("test de la clé : "+txtKey);
+                                mrcTools.mrcLog("test de la clé : "+txtKey);
                                 let res = patt2.test(txtKey);
                                 if (res) {
-                                    console.log("    clé OK : "+txtKey);
+                                    mrcTools.mrcLog("    clé OK : "+txtKey);
                                     for (let card of window.cardbookRepository.cardbookCardLongSearch[myDirPrefId][txtKey]) {
-                                        console.log("    ajout de la Card : "+card);
+                                        mrcTools.mrcLog("    ajout de la Card : "+card);
                                         abSearchListener.localRes2.push(this._createMyCardFromCardBook(card));
                                     }
                                 }
@@ -2906,12 +2893,12 @@ var mrcAComplete = {
                             // search 3 : TODO ????
                             /*
                             for (var txtKey in window.cardbookRepository.cardbookCardLongSearch[myDirPrefId]) {
-                                console.log("test de la clé : "+txtKey);
+                                mrcTools.mrcLog("test de la clé : "+txtKey);
                                 let res = patt2.test(txtKey);
                                 if (res) {
-                                    console.log("    clé OK : "+txtKey);
+                                    mrcTools.mrcLog("    clé OK : "+txtKey);
                                     for (let card of window.cardbookRepository.cardbookCardLongSearch[myDirPrefId][txtKey]) {
-                                        console.log("    ajout de la Card : "+card);
+                                        mrcTools.mrcLog("    ajout de la Card : "+card);
                                         abSearchListener.localRes.push(this._createMyCardFromCardBook(card));
                                     }
                                 }
@@ -3126,14 +3113,13 @@ var mrcAComplete = {
             // search in Cardbooks
             // one search : CONTAINS
             let patt = new RegExp(aString, "i");
-            // console.log("recherche dans CB : "+window.cardbookRepository.cardbookAccounts);
             for (let account of window.cardbookRepository.cardbookAccounts) {
-                console.log("test du CB : "+account);
+                mrcTools.mrcLog("test du CB : "+account);
                 if (account[1] && account[5] && account[6] != "SEARCH") {
                     var myDirPrefId = account[4];
                     let doSearch = this.param_search_ab_URI.indexOf(myDirPrefId) >= 0;
                     if (doSearch) {
-                        console.log("  on cherche dans le CB : "+account);
+                        mrcTools.mrcLog("  on cherche dans le CB : "+account);
                         try {
                             // add a sync search listener
                             let that = this;
@@ -3151,12 +3137,12 @@ var mrcAComplete = {
                             this._addSearchListener(abSearchListener);
 
                             for (var txtKey in window.cardbookRepository.cardbookCardLongSearch[myDirPrefId]) {
-                                console.log("test de la clé : "+txtKey);
+                                mrcTools.mrcLog("test de la clé : "+txtKey);
                                 let res = patt.test(txtKey);
                                 if (res) {
-                                    console.log("    clé OK : "+txtKey);
+                                    mrcTools.mrcLog("    clé OK : "+txtKey);
                                     for (let card of window.cardbookRepository.cardbookCardLongSearch[myDirPrefId][txtKey]) {
-                                        console.log("    ajout de la Card : "+card);
+                                        mrcTools.mrcLog("    ajout de la Card : "+card);
                                         abSearchListener.localRes.push(this._createMyCardFromCardBook(card));
                                     }
                                 }
@@ -3375,14 +3361,13 @@ var mrcAComplete = {
             // one search : BEGIN WITH
             let patt0 = new RegExp("^"+aString, "i");
             let patt = new RegExp("\\|"+aString, "i");
-            // console.log("recherche dans CB : "+window.cardbookRepository.cardbookAccounts);
             for (let account of window.cardbookRepository.cardbookAccounts) {
-                console.log("test du CB : "+account);
+                mrcTools.mrcLog("test du CB : "+account);
                 if (account[1] && account[5] && account[6] != "SEARCH") {
                     var myDirPrefId = account[4];
                     let doSearch = this.param_search_ab_URI.indexOf(myDirPrefId) >= 0;
                     if (doSearch) {
-                        console.log("  on cherche dans le CB : "+account);
+                        mrcTools.mrcLog("  on cherche dans le CB : "+account);
                         try {
                             // add a sync search listener
                             let that = this;
@@ -3400,16 +3385,16 @@ var mrcAComplete = {
                             this._addSearchListener(abSearchListener);
 
                             for (var txtKey in window.cardbookRepository.cardbookCardLongSearch[myDirPrefId]) {
-                                console.log("test de la clé : "+txtKey);
+                                mrcTools.mrcLog("test de la clé : "+txtKey);
                                 // We have to make a specific test for first field:
                                 // Cardbook does not put "|" before the first field of key.
                                 let res = patt0.test(txtKey);
                                 if (res === false)
                                     res = patt.test(txtKey);
                                 if (res) {
-                                    console.log("    clé OK : "+txtKey);
+                                    mrcTools.mrcLog("    clé OK : "+txtKey);
                                     for (let card of window.cardbookRepository.cardbookCardLongSearch[myDirPrefId][txtKey]) {
-                                        console.log("    ajout de la Card : "+card);
+                                        mrcTools.mrcLog("    ajout de la Card : "+card);
                                         abSearchListener.localRes.push(this._createMyCardFromCardBook(card));
                                     }
                                 }
@@ -4587,8 +4572,6 @@ var mrcAComplete = {
         // get current card
         let card = this.panelCards[this.indexSelectedCard-1];
         if (typeof card !== "undefined") {
-            // console.log(" debug validate:", card);
-            mrcTools.mrcLog(card, " debug validate:");
             if (card.isMailList) {
                 // add emails of every member of the list
                 let childs = MailServices.ab.getDirectory(card.mailListURI).addressLists;
