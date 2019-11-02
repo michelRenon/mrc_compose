@@ -125,7 +125,10 @@
 
                                 </hbox>
                             </row>
-
+                            <row>
+                                <label control="remove_duplicates" value="&options.remove_duplicates.label;" tooltiptext="&options.remove_duplicates.help;"/>
+                                <checkbox id="remove_duplicates" preference="extensions.mrccompose.remove_duplicates" tooltiptext="&options.remove_duplicates.help;"/>
+                            </row>
 
                             <row>
                                 <label control="mode" value="&options.mode.label;" tooltip="mrctip_mode"/>

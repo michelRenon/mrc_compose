@@ -245,6 +245,11 @@
             </vbox>
         </hbox>
 
+        <html:div id="info-first-cardbook">
+            &field.info_first_cardbook;
+            <html:button type="button" onclick="mrcCardbookOpenPrefs()">&field.open_prefs_cardbook;</html:button>
+            <html:button type="button" onclick="mrcCardbookClose()">&field.close_info_cardbook;</html:button>
+        </html:div>
 
 
 

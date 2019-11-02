@@ -20,6 +20,7 @@ pref("extensions.mrccompose.automatic_height", true);
 pref("extensions.mrccompose.show_popularity", false);
 pref("extensions.mrccompose.search_ab_URI", "");
 pref("extensions.mrccompose.first_load_done", false);
+pref("extensions.mrccompose.remove_duplicates", true);
 
 pref("extensions.mrccompose.force_cc", false);
 pref("extensions.mrccompose.force_bcc", true);
@@ -32,3 +33,5 @@ pref("extensions.mrccompose.ldap_search_version", 'TB24');
 
 pref("extensions.mrccompose.show_no_result", false);
 pref("extensions.mrccompose.show_placeholder", true);
+
+pref("extensions.mrccompose.first_launch_cardbook_done", false);

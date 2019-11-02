@@ -47,7 +47,13 @@
 
 
 
-var EXPORTED_SYMBOLS = ["mrcLog", "mrcLogError", "mrcPick"];
+var EXPORTED_SYMBOLS = ["mrcLog", "mrcLogError", "mrcPick", "mrcCommons"];
+
+
+
+var mrcCommons = {
+    carbookrepository : null,
+};
 
 
 

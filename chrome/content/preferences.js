@@ -18,6 +18,7 @@ Preferences.addAll([
     { id: "extensions.mrccompose.automatic_height", type: "bool" },
     { id: "extensions.mrccompose.show_popularity", type: "bool" },
     { id: "extensions.mrccompose.search_ab_URI", type: "string" },
+    { id: "extensions.mrccompose.remove_duplicates", type: "bool" },
 
     { id: "extensions.mrccompose.force_cc", type: "bool" },
     { id: "extensions.mrccompose.force_bcc", type: "bool" },
@@ -30,4 +31,7 @@ Preferences.addAll([
 
     { id: "extensions.mrccompose.show_no_result", type: "bool" },
     { id: "extensions.mrccompose.show_placeholder", type: "bool" },
+
+    { id: "extensions.mrccompose.first_launch_cardbook_done", type: "bool" },
+
 ]);
