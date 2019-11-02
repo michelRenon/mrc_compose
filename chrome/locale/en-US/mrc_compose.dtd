@@ -1,9 +1,9 @@
 <!ENTITY field.placeholder "enter one or multiple emails separated by commas" >
 <!ENTITY field.warning_number "Warning : you should move recipients in '&bccAddr.label;'." >
-<!ENTITY field.info_first_cardbook "Vous venez d'installer CardBook. Nous vous conseillons d'ouvrir les préférences afin de mettre à jour les carnets d'adresses que MRC Compose va lire (désactiver les carnets de type 'Thunderbird' et activer les carnets de type 'LDAP' et 'Cardbook')." >
+<!ENTITY field.info_first_cardbook "It's the first launch of MRC Compose with CardBook. We recommend that you open the preferences to update the address books that MRC Compose will read (deactivate 'Thunderbird' type notebooks and activate 'LDAP' and 'Cardbook' notebooks)." >
 
-<!ENTITY field.open_prefs_cardbook "Open prefs" >
-<!ENTITY field.close_info_cardbook "No thank you" >
+<!ENTITY field.open_prefs_cardbook "Open preferences" >
+<!ENTITY field.close_info_cardbook "No thanks" >
 
 <!ENTITY fieldcc.show "Show '&ccAddr.label;'" >
 <!ENTITY fieldbcc.show "Show '&bccAddr.label;'" >
@@ -31,7 +31,7 @@
 <!-- tab 1 -->
 <!ENTITY options.search_ab_URI_list.label "Search in addressbook: ">
 <!ENTITY options.edit_directories.label     "&editDirectories.label;">
-<!ENTITY options.remove_duplicates.label "Supprime les doublons avant l'affichage (?) : ">
+<!ENTITY options.remove_duplicates.label "Remove duplicates (?) : ">
 <!ENTITY options.mode.label "Mode (?): ">
 <!ENTITY options.mode_value1.label "1 : All contacts contain">
 <!ENTITY options.mode_value2.label "2 : All contacts begin with / All contacts contain">
@@ -131,4 +131,4 @@ On slow machines, it's better to choose '2' or '3'.">
 <!ENTITY options.search_timeout.help "Maximal waiting for LDAP searches (milliseconds).">
 <!ENTITY options.show_no_result.help "Even if there is no result, show panel with information.">
 <!ENTITY options.show_popularity.help "Show popularity of contacts.">
-<!ENTITY options.remove_duplicates.help "les doublons sont définis par l'email principal.">
+<!ENTITY options.remove_duplicates.help "Duplicates are defined by the main email.">

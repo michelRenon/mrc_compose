@@ -1,8 +1,8 @@
 <!ENTITY field.placeholder "escriba uno o mas destinatarios separados por comas" >
 <!ENTITY field.warning_number "Advertencia : deberías mover tus destinarios en '&bccAddr.label;'." >
-<!ENTITY field.info_first_cardbook "Vous venez d'installer CardBook. Nous vous conseillons d'ouvrir les préférences afin de mettre à jour les carnets d'adresses que MRC Compose va lire (désactiver les carnets de type 'Thunderbird' et activer les carnets de type 'LDAP' et 'Cardbook')." >
+<!ENTITY field.info_first_cardbook "Este es el primer lanzamiento de MRC Compose con CardBook. Le recomendamos que abra las preferencias para actualizar las libretas de direcciones que AAA leerá (desactivar los cuadernos tipo 'Thunderbird' y activar los cuadernos 'LDAP' y 'Cardbook')." >
 
-<!ENTITY field.open_prefs_cardbook "Open prefs" >
+<!ENTITY field.open_prefs_cardbook "Preferencias abiertas" >
 <!ENTITY field.close_info_cardbook "No gracias" >
 
 <!ENTITY fieldcc.show "Mostrar '&ccAddr.label;'" >
@@ -31,7 +31,7 @@
 <!-- tab 1 -->
 <!ENTITY options.search_ab_URI_list.label "Buscar en libreta de direcciones: ">
 <!ENTITY options.edit_directories.label     "&editDirectories.label;">
-<!ENTITY options.remove_duplicates.label "Supprime les doublons avant l'affichage (?) : ">
+<!ENTITY options.remove_duplicates.label "Eliminar duplicados (?) : ">
 <!ENTITY options.mode.label "Modo (?): ">
 <!ENTITY options.mode_value1.label "1 : Todos los que contienen">
 <!ENTITY options.mode_value2.label "2 : Todos los que inician con / Todos los que contienen">
@@ -131,4 +131,4 @@ En equipos lentos, es mejor elegir 2 o 3.">
 <!ENTITY options.search_timeout.help "Tiempo máx. de espera para busquedas en LDAP (milisegundos).">
 <!ENTITY options.show_no_result.help "Si no hay resultados, muestra una panel informativo.">
 <!ENTITY options.show_popularity.help "Muestra la popularidad de los contactos.">
-<!ENTITY options.remove_duplicates.help "les doublons sont définis par l'email principal.">
+<!ENTITY options.remove_duplicates.help "Los duplicados se definen por el correo electrónico principal.">
