@@ -1903,7 +1903,7 @@ var mrcAComplete = {
         let primaryEmail = "";
         let secondEmail = "";
         if (cbcard.email.length >= 1) primaryEmail = cbcard.email[0][0].join();
-        if (cbcard.email.length >= 2) primaryEmail = cbcard.email[1][0].join();
+        if (cbcard.email.length >= 2) secondEmail = cbcard.email[1][0].join();
 
         let temp = {
             'primaryEmail' : primaryEmail,
