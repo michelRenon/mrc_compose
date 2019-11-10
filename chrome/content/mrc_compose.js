@@ -1838,14 +1838,16 @@ var mrcAComplete = {
             for (let i=0, l=arr.length ; i<l; i++) {
                 try {
                     // we store only the first occurence of duplicates
-                    // if (!obj[arr[i].primaryEmail])
-                    //    obj[arr[i].primaryEmail] = arr[i];
-                    let prop = _get(arr[i], "primaryEmail", "");
+                    let prop = "";
+                    let emails = _get(arr[i], "emailList", []);
+                    if (emails.length > 0) {
+                        prop = emails[0];
+                    }
+
                     let prop2 = _get(obj, prop, "");
                     if (prop2 == "") {
                         obj[prop] = arr[i];
                     }
-
                 } catch (e) {
                     mrcTools.mrcLogError(e, "_removeDuplicatecards()");
                 }
@@ -1871,9 +1873,12 @@ var mrcAComplete = {
          * return
          *   object
          */
+        let emails = [abcard.primaryEmail];
+        let secondEmail = abcard.getProperty("SecondEmail", "");
+        if (secondEmail)
+            emails.push(secondEmail);
         let temp = {
-            'primaryEmail' : abcard.primaryEmail,
-            'secondEmail' : abcard.getProperty("SecondEmail", ""),
+            'emailList' : emails,
             'displayName' : abcard.displayName,
             'firstName' : abcard.firstName,
             'lastName' : abcard.lastName,
@@ -1900,14 +1905,12 @@ var mrcAComplete = {
          * return
          *   object
          */
-        let primaryEmail = "";
-        let secondEmail = "";
-        if (cbcard.email.length >= 1) primaryEmail = cbcard.email[0][0].join();
-        if (cbcard.email.length >= 2) secondEmail = cbcard.email[1][0].join();
-
+        let emails = [];
+        for (let i=0, l=cbcard.email.length ; i<l; i++) {
+            emails.push(cbcard.email[i][0].join());
+        }
         let temp = {
-            'primaryEmail' : primaryEmail,
-            'secondEmail' : secondEmail,
+            'emailList' : emails,
             'displayName' : cbcard.fn,
             'firstName' : cbcard.firstname,
             'lastName' : cbcard.lastname,
@@ -3414,7 +3417,7 @@ var mrcAComplete = {
         this._startWaitingSearchListeners();
     },
 
-    _buildOneResult_Card : function(card, textBold, typeSearch, primaryEmail) {
+    _buildOneResult_Card : function(card, textBold, typeSearch, emailIndex) {
         /*
          * call-back to build text for one card.
          * we suppose that the email will always be defined.
@@ -3423,7 +3426,7 @@ var mrcAComplete = {
          *   card : the current card (not LIST)
          *   textBold : the searched text that will be in bold
          *   typeSearch : the type of search : 'begin' or 'contains'
-         *   primaryEmail : true or false, indicate that we force the primary email or second
+         *   emailIndex : int, the index of email in the list (0-based)
          * return:
          *   a dict :
          *     'text' : the text built for the card : name <email>
@@ -3440,7 +3443,8 @@ var mrcAComplete = {
         let cardNodes = [];
         // we assemble the fields with html styling
         let fields = mrcAComplete.getFieldsForCardName(card);
-        if (primaryEmail) {
+        if (emailIndex == 0) {
+            // it is the primary email
             // ----------------
             // text version
             let names = []; // build the list of non-empty text fields
@@ -3449,7 +3453,7 @@ var mrcAComplete = {
                     names.push(card[fields['name'][i]]);
                 }
             }
-            cardText = mrcAComplete._makeFullAddress(names.join(" "), card['primaryEmail']);
+            cardText = mrcAComplete._makeFullAddress(names.join(" "), card['emailList'][emailIndex]);
 
             // ----------------
             // node version
@@ -3460,7 +3464,7 @@ var mrcAComplete = {
             let aspan = document.createElementNS(mrcAComplete.HTMLNS, "span");
             aspan.setAttribute("class", mrcAComplete.EMAIL_CLASSNAME);
             aspan.appendChild(document.createTextNode("<"));
-            appendChildrenList(aspan,  mrcAComplete._applyBoldNode(card['primaryEmail'], textBold, typeSearch));
+            appendChildrenList(aspan,  mrcAComplete._applyBoldNode(card['emailList'][emailIndex], textBold, typeSearch));
             aspan.appendChild(document.createTextNode(">"));
             cardNodes.push(aspan);
 
@@ -3473,6 +3477,7 @@ var mrcAComplete = {
                 cardNodes.push(aspan);
             }
         } else {
+            // other emails
             // ----------------
             // text version
             let names = []; // build the list of non-empty text fields
@@ -3481,7 +3486,7 @@ var mrcAComplete = {
                     names.push(card[fields['name'][i]]);
                 }
             }
-            cardText = mrcAComplete._makeFullAddress(names.join(" "), card['secondEmail']);
+            cardText = mrcAComplete._makeFullAddress(names.join(" "), card['emailList'][emailIndex]);
 
             // ----------------
             // node version
@@ -3496,7 +3501,7 @@ var mrcAComplete = {
             let aspan2 = document.createElementNS(mrcAComplete.HTMLNS, "span");
             aspan2.setAttribute("class", mrcAComplete.EMAIL_CLASSNAME);
             aspan2.appendChild(document.createTextNode("<"));
-            appendChildrenList(aspan2, mrcAComplete._applyBoldNode(card['secondEmail'], textBold, typeSearch));
+            appendChildrenList(aspan2, mrcAComplete._applyBoldNode(card['emailList'][emailIndex], textBold, typeSearch));
             aspan2.appendChild(document.createTextNode(">"));
             cardNodes.push(aspan2);
 
@@ -3504,7 +3509,7 @@ var mrcAComplete = {
         return {'text': cardText, 'html': cardHtml, 'node' : cardNodes};
     },
 
-    _buildOneResult_List : function(card, textBold, typeSearch, primaryEmail) {
+    _buildOneResult_List : function(card, textBold, typeSearch, emailIndex) {
         /*
          * call-back to build text for one card of type LIST
          *
@@ -3512,7 +3517,7 @@ var mrcAComplete = {
          *   card : the current card of type LIST
          *   textBold : the searched text that will be in bold
          *   typeSearch : the type of search : 'begin' or 'contains'
-         *   primaryEmail : true or false, indicate that we force the primary email or second
+         *   emailIndex : int, the index of email in the list (0-based)
          * return:
          *   a dict :
          *     'text' : the text built for the card : name <email>
@@ -3553,7 +3558,7 @@ var mrcAComplete = {
         return {'text': cardText, 'html': cardHtml, 'node' : cardNodes};
     },
 
-    _buildOneResult_CardList : function(card, textBold, typeSearch, primaryEmail) {
+    _buildOneResult_CardList : function(card, textBold, typeSearch, emailIndex) {
         /*
          * call-back to build text for one card
          *
@@ -3561,7 +3566,7 @@ var mrcAComplete = {
          *   card : the current card (LIST or not)
          *   textBold : the searched text that will be in bold
          *   typeSearch : the type of search : 'begin' or 'contains'
-         *   primaryEmail : true or false, indicate that we force the primary email or second
+         *   emailIndex : int, the index of email in the list (0-based)
          * return:
          *   a dict :
          *     'text' : the text built for the card : name <email>
@@ -3572,9 +3577,9 @@ var mrcAComplete = {
         // As it is a call-back, we can't use 'this'
         // instead, we must use the let 'mrcAComplete'
         if (card.isMailList) {
-            return mrcAComplete._buildOneResult_List(card, textBold, typeSearch, primaryEmail);
+            return mrcAComplete._buildOneResult_List(card, textBold, typeSearch, emailIndex);
         } else {
-            return mrcAComplete._buildOneResult_Card(card, textBold, typeSearch, primaryEmail);
+            return mrcAComplete._buildOneResult_Card(card, textBold, typeSearch, emailIndex);
         }
     },
 
@@ -3608,23 +3613,13 @@ var mrcAComplete = {
             // we add elements
             for (let i=0 ; i < nb_limited ; i++) {
                 let card = this.datas[params['data']][i];
-                // show the card with the primary email
-                let div = document.createElementNS(this.HTMLNS, "div");
-                let rv = params['cb'](card, params['text_part'], params['search'], true);
-                this.panelCards.push(this._createResCard(card, true, rv.text));
-                appendChildrenList(div, rv.node);
-                div.setAttribute("class", " "+this.ITEM_CLASSNAME);
-                div.addEventListener("click", mrcRecipientClick, false);
-                div.setAttribute("id", this.ID_PREFIX+this.panelCards.length);
-                partDiv.appendChild(div);
 
-                // show the card with the optional second email
-                if (card.secondEmail) {
+                // show a card for each email
+                for (let i_email=0, l_email=card.emailList.length ; i_email<l_email; i_email++) {
                     let div = document.createElementNS(this.HTMLNS, "div");
-                    let rv = params['cb'](card, params['text_part'], params['search'], false);
-                    this.panelCards.push(this._createResCard(card, false, rv.text));
+                    let rv = params['cb'](card, params['text_part'], params['search'], i_email);
+                    this.panelCards.push(this._createResCard(card, true, rv.text));
                     appendChildrenList(div, rv.node);
-                    div.className += " "+this.ITEM_CLASSNAME;
                     div.setAttribute("class", " "+this.ITEM_CLASSNAME);
                     div.addEventListener("click", mrcRecipientClick, false);
                     div.setAttribute("id", this.ID_PREFIX+this.panelCards.length);
