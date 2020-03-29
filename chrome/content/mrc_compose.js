@@ -2004,7 +2004,7 @@ var mrcAComplete = {
          *
          *
          */
-        let temp = searchListener.addressBook.dirName + searchListener.searchID;
+        let temp = searchListener.addressBook.name + searchListener.searchID;
         // let hash = this._hashCode(temp); // no need to create a real hash
         let hash = temp;
         // mrcTools.mrcLog("_createHashSearchListener : "+hash);
@@ -2103,7 +2103,7 @@ var mrcAComplete = {
             for (let i=0, l=keys.length ; i<l; i++) {
                 let k = keys[i];
                 // mrcTools.mrcLog("k="+k);
-                this._addWarningTimeout(this.searchedAB[k].addressBook.dirName);
+                this._addWarningTimeout(this.searchedAB[k].addressBook.name);
             }
 
             // force search complete
