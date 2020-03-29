@@ -1954,7 +1954,7 @@ var mrcAComplete = {
          * Reinit internal fields for a future search
          */
         this.searchID++;
-        // mrcTools.mrcLog(now()+" _initSearchID : "+this.searchID);
+        mrcTools.mrcLog(" _initSearchID : "+this.searchID);
         this.search_res1 = [];
         this.search_res2 = [];
         this.search_res3 = [];
@@ -1965,6 +1965,7 @@ var mrcAComplete = {
          * Mark current search as obsolete
          */
         this.searchID++;
+        mrcTools.mrcLog(" _obsoleteSearchID : "+this.searchID);
     },
 
     _archiveSearchListeners : function() {
@@ -2007,7 +2008,7 @@ var mrcAComplete = {
         let temp = searchListener.addressBook.name + searchListener.searchID;
         // let hash = this._hashCode(temp); // no need to create a real hash
         let hash = temp;
-        // mrcTools.mrcLog("_createHashSearchListener : "+hash);
+        mrcTools.mrcLog("_createHashSearchListener : hash="+hash);
         return hash;
     },
 
@@ -2015,28 +2016,33 @@ var mrcAComplete = {
         this.allListenersStarted = false;
         this._archiveSearchListeners();
         this._initSearchID();
-        // mrcTools.mrcLog(now()+" _initSearchListeners : "+this.searchID);
+        mrcTools.mrcLog("_initSearchListeners : this.searchID="+this.searchID);
     },
 
 
     _addSearchListener : function(abSearchListener) {
+        mrcTools.mrcLog("> _addSearchListener");
         abSearchListener.hash = this._createHashSearchListener(abSearchListener);
         let key = abSearchListener.hash;
         this.searchedAB[key] = abSearchListener;
-        // mrcTools.mrcLog("_addSearchListener : "+abSearchListener.addressBook.URI+":"+abSearchListener.hash+", "+this.allListenersStarted);
+        mrcTools.mrcLog("abSearchListener.aB.uri="+abSearchListener.addressBook.uri+", abSearchListener.hash="+abSearchListener.hash+", this.allListenersStarted="+this.allListenersStarted);
+        mrcTools.mrcLog("< _addSearchListener");
     },
 
     _completeSearchListener : function(abSearchListener) {
         /*
          * Perform actions when a search is finished on ONE addressbook.
          */
-        // mrcTools.mrcLog(now()+" _completeSearchListener : "+abSearchListener.searchID+"/"+this.searchID+":"+abSearchListener.addressBook.dirName);
+        mrcTools.mrcLog("> _completeSearchListener : ");
+        mrcTools.mrcLog(" abSearchListener.searchID="+abSearchListener.searchID+" / this.searchID="+this.searchID+": ab.name="+abSearchListener.addressBook.name);
         if (abSearchListener.searchID == this.searchID) {
             // OK, it's a searchListener for current search
             switch(this.param_mode) {
                 case 1:
                     // Add results for current searchListenet in global results
                     // this.search_res1.mrc_extend(abSearchListener.localRes);
+                    mrcTools.mrcLog("nb abSearchListener.localRes="+abSearchListener.localRes.length);
+
                     array_extend(this.search_res1, abSearchListener.localRes);
                     break;
 
@@ -2045,6 +2051,9 @@ var mrcAComplete = {
                     // this.search_res1.mrc_extend(abSearchListener.localRes1);
                     // this.search_res2.mrc_extend(abSearchListener.localRes2);
                     // this.search_res3.mrc_extend(abSearchListener.localRes3);
+                    mrcTools.mrcLog("nb abSearchListener.localRes1="+abSearchListener.localRes1.length);
+                    mrcTools.mrcLog("nb abSearchListener.localRes2="+abSearchListener.localRes2.length);
+                    mrcTools.mrcLog("nb abSearchListener.localRes3="+abSearchListener.localRes3.length);
                     array_extend(this.search_res1, abSearchListener.localRes1);
                     array_extend(this.search_res2, abSearchListener.localRes2);
                     array_extend(this.search_res3, abSearchListener.localRes3);
@@ -2054,6 +2063,7 @@ var mrcAComplete = {
                     // sum localRes in global res
                     abSearchListener.localRes = this._removeDuplicatecards(abSearchListener.localRes);
                     abSearchListener.localRes.sort(this._sort_card);
+                    mrcTools.mrcLog("nb abSearchListener.localRes="+abSearchListener.localRes.length);
 
                     this.datas[abSearchListener.addressBook.name] = abSearchListener.localRes;
                     this.nbDatas += abSearchListener.localRes.length;
@@ -2062,6 +2072,7 @@ var mrcAComplete = {
                 case 4:
                     // Add results for current searchListenet in global results
                     // this.search_res1.mrc_extend(abSearchListener.localRes);
+                    mrcTools.mrcLog("nb abSearchListener.localRes="+abSearchListener.localRes.length);
                     array_extend(this.search_res1, abSearchListener.localRes);
                     break;
             }
@@ -2076,13 +2087,14 @@ var mrcAComplete = {
             }
 
 
-            // mrcTools.mrcLog("_completeSearchListener : "+abSearchListener.addressBook.URI+":"+this.searchedAB+", "+this.allListenersStarted);
+            mrcTools.mrcLog("abSearchListener.aB.uri="+abSearchListener.addressBook.uri+", this.searchedAB="+this.searchedAB+", this.allListenersStarted="+this.allListenersStarted);
             // Then test if search is complete for all addressbooks.
             this._testSearchComplete();
         } else {
             // it's an obsolete searchListener :
-            // mrcTools.mrcLog("_completeSearchListener : "+abSearchListener.addressBook.URI+":obsolete = "+abSearchListener.searchID);
+            mrcTools.mrcLog("obsolete : abSearchListener.aB.uri="+abSearchListener.addressBook.uri+", abSearchListener.searchID="+abSearchListener.searchID);
         }
+        mrcTools.mrcLog("< _completeSearchListener : ");
     },
 
     _timeOutSearchListener : function(originalSearchID) {
@@ -2096,10 +2108,10 @@ var mrcAComplete = {
         if (originalSearchID == this.searchID) {
             // make any search obsolete
             this._obsoleteSearchID();
-            // mrcTools.mrcLog(now()+" _timeOutSearchListener : "+this.searchID);
+            mrcTools.mrcLog(" _timeOutSearchListener : "+this.searchID);
 
             let keys = Object.keys(this.searchedAB);
-            // mrcTools.mrcLog("_timeOutSearchListener() keys="+keys+":"+(typeof keys));
+            mrcTools.mrcLog("_timeOutSearchListener() keys="+keys+":"+(typeof keys));
             for (let i=0, l=keys.length ; i<l; i++) {
                 let k = keys[i];
                 // mrcTools.mrcLog("k="+k);
@@ -2115,19 +2127,20 @@ var mrcAComplete = {
     },
 
     _testSearchComplete : function() {
-        // mrcTools.mrcLog(now()+" _testSearchComplete : "+this.searchID);
+        mrcTools.mrcLog("> _testSearchComplete,  this.searchID="+this.searchID);
         let keys = Object.keys(this.searchedAB);
         if (keys.length == 0 && this.allListenersStarted == true) {
             /*
              * Perform actions when ALL searches are completed.
              */
 
+            mrcTools.mrcLog(" search is Complete");
             // make any search obsolete
             this._obsoleteSearchID();
 
             // stop the current timeout
             clearTimeout(this.searchTimeOut);
-            // mrcTools.mrcLog("clearTimeout() ");
+            mrcTools.mrcLog("clearTimeout() ");
 
             // then handle results
             switch(this.param_mode) {
@@ -2181,6 +2194,7 @@ var mrcAComplete = {
 
             }
 
+            mrcTools.mrcLog("nb datas found ="+this.nbDatas);
             if (this.nbDatas == 0 && this.param_show_no_result) {
                 this._addInfoNoResult();
             }
@@ -2188,11 +2202,13 @@ var mrcAComplete = {
             if (this.cbSearch) {
                 this.cbSearch();
             }
-            // mrcTools.mrcLog("archiv="+this.searchedAB_archiv.length);
+            mrcTools.mrcLog("nb this.searchedAB_archiv="+this.searchedAB_archiv.length);
         }
+        mrcTools.mrcLog("< _testSearchComplete");
     },
 
     _startWaitingSearchListeners : function() {
+        mrcTools.mrcLog("> _startWaitingSearchListeners ");
         this.allListenersStarted = true;
         // clear previous timeout
         if (this.searchTimeOut) {
@@ -2205,8 +2221,8 @@ var mrcAComplete = {
                 mrcAComplete._timeOutSearchListener(tempSearchID);
             }, this.param_search_timeout);
 
-        // mrcTools.mrcLog("_startWaitingSearchListeners ");
         this._testSearchComplete();
+        mrcTools.mrcLog("< _startWaitingSearchListeners ");
     },
 
     _addInfoNoResult : function() {
@@ -2335,12 +2351,12 @@ var mrcAComplete = {
                 }
             } else {
                 if (ab instanceof Components.interfaces.nsIAbLDAPDirectory) {
-                    // mrcTools.mrcLog("param_search="+this.param_search_ab_URI+" ; ab.URI="+ab.URI)
+                    mrcTools.mrcLog("param_search="+this.param_search_ab_URI+" ; ab.URI="+ab.URI)
                     // check if user wants to search in this AB
                     let doSearch = this.param_search_ab_URI.indexOf(ab.URI) >= 0;
                     if (doSearch) {
                         try {
-                            // mrcTools.mrcLog("AB LDAP = " + ab.dirName);
+                            mrcTools.mrcLog("AB LDAP = " + ab.dirName);
                             /* CODE FOR TB 24 to 31? */
                             // if (this.param_ldap_search_version == 'TB24') {
                             if (true) {
@@ -4218,7 +4234,8 @@ var mrcAComplete = {
          * return :
          *   none
          */
-        mrcTools.mrcLog(now()+" search() "+this.searchID);
+        mrcTools.mrcLog("> search()");
+        mrcTools.mrcLog("searchID="+this.searchID);
         this.datas = {}; // TODO : check if it's the right way to empty dictionary
         this.errors = [];
         this.warnings = [];
@@ -4907,7 +4924,7 @@ function mrcRecipientKeyUp(event, element) {
             break;
     }
 
-    mrcTools.mrcLog("mrcRecipientKeyUp : keyCode="+event.keyCode+" canUpdateUI="+canUpdateUI+" canUpdatePanel="+canUpdatePanel);
+    // mrcTools.mrcLog("mrcRecipientKeyUp : keyCode="+event.keyCode+" canUpdateUI="+canUpdateUI+" canUpdatePanel="+canUpdatePanel);
 
     // fill cache for next keyups
     mrcAComplete._textPart_cache = textPart;
@@ -4987,8 +5004,8 @@ function mrcRecipientResize(element, maxi) {
         let idCopy = element.id + "_COPY";
         let element_COPY = document.getElementById(idCopy);
 
-        mrcTools.mrcLog("mrcAComplete.param_first_line_height:", mrcAComplete.param_first_line_height);
-        mrcTools.mrcLog("mrcAComplete.param_max_height:", mrcAComplete.param_max_height);
+        // mrcTools.mrcLog("mrcAComplete.param_first_line_height:", mrcAComplete.param_first_line_height);
+        // mrcTools.mrcLog("mrcAComplete.param_max_height:", mrcAComplete.param_max_height);
 
         element_COPY.innerHTML = mrcAComplete._myEncode(element.value);
         // Briefly make the hidden div block but invisible
@@ -5001,17 +5018,17 @@ function mrcRecipientResize(element, maxi) {
         element_COPY.style.display = 'none';
 
         let nbLinesCopy = fullHeight / mrcAComplete.param_line_height;
-        mrcTools.mrcLog("nbLinesCopy : ", nbLinesCopy);
+        // mrcTools.mrcLog("nbLinesCopy : ", nbLinesCopy);
         nbLinesCopy = Math.floor(nbLinesCopy);
-        mrcTools.mrcLog("int(nbLinesCopy) : ", nbLinesCopy);
+        // mrcTools.mrcLog("int(nbLinesCopy) : ", nbLinesCopy);
         if (nbLinesCopy < 1)
             nbLinesCopy = 1;
         if (nbLinesCopy > mrcAComplete.param_max_nb_line)
             nbLinesCopy = mrcAComplete.param_max_nb_line;
-        mrcTools.mrcLog("nbLinesCopy (recadré) : ", nbLinesCopy);
+        // mrcTools.mrcLog("nbLinesCopy (recadré) : ", nbLinesCopy);
 
         newHeight = mrcAComplete.param_first_line_height + (nbLinesCopy-1)*mrcAComplete.param_line_height;
-        mrcTools.mrcLog("newHeight : ", newHeight);
+        // mrcTools.mrcLog("newHeight : ", newHeight);
         element.style.height = newHeight + 'px';
 
     } catch (e) {
