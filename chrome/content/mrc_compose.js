@@ -2770,7 +2770,7 @@ var mrcAComplete = {
 
                                 onSearchFoundCard : function(aCard) {
                                     // TODO : check if "card.isMailList" is OK
-                                    if (card.isMailList) {
+                                    if (aCard.isMailList) {
                                         this.localRes3.push(this.cbObject._createMyCard(aCard));
                                     } else {
                                         this.localRes2.push(this.cbObject._createMyCard(aCard));
