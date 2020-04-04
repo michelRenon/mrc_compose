@@ -2280,6 +2280,36 @@ var mrcAComplete = {
 
      */
 
+
+    /*
+     * Code from CardBook addon
+     *
+
+    normalizeString: function (aString) {
+        return aString.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+    },
+
+    makeSearchString: function (aString) {
+        return cardbookRepository.normalizeString(aString.replace(/[\s+\-+\.+\,+\;+]/g, "").toUpperCase());
+    },
+    */
+    getCardBookString : function(aString) {
+        /*
+         * Return the string fo a cardbook search.
+         *
+         * The string must not contain some caracters.
+         * The code is copied from CardBook addon.
+         *
+         * params :
+         *   aString : the text to search in fields of address book
+         * return:
+         *   string transformed for cardbook search
+         */
+        aString = aString.replace(/[\s+\-+\.+\,+\;+]/g, "").toUpperCase();
+        aString = aString.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+        return aString;
+    },
+
     _search_mode_1 : function(aString) {
         /*
          * search for mode 1, put results in internal fields
@@ -2476,7 +2506,8 @@ var mrcAComplete = {
         if (window.hasOwnProperty("cardbookRepository")) {
             // search in Cardbooks
             // one search : CONTAINS
-            let patt = new RegExp(aString, "i");
+            let cb_string = this.getCardBookString(aString);
+            let patt = new RegExp(cb_string, "i");
             for (let account of window.cardbookRepository.cardbookAccounts) {
                 mrcTools.mrcLog("test du CB : "+account);
                 if (account[1] && account[5] && account[6] != "SEARCH") {
@@ -2848,11 +2879,12 @@ var mrcAComplete = {
         if (window.hasOwnProperty("cardbookRepository")) {
             // search in Cardbooks
             // first search : BEGIN WITH
-            let patt0 = new RegExp("^"+aString, "i");
-            let patt1 = new RegExp("\\|"+aString, "i");
+            let cb_string = this.getCardBookString(aString);
+            let patt0 = new RegExp("^"+cb_string, "i");
+            let patt1 = new RegExp("\\|"+cb_string, "i");
             // second search : CONTAINS
             // We will make the exclusion manually, after all searches completed.
-            let patt2 = new RegExp(aString, "i");
+            let patt2 = new RegExp(cb_string, "i");
 
             for (let account of window.cardbookRepository.cardbookAccounts) {
                 mrcTools.mrcLog("test du CB : "+account);
@@ -3131,7 +3163,8 @@ var mrcAComplete = {
         if (window.hasOwnProperty("cardbookRepository")) {
             // search in Cardbooks
             // one search : CONTAINS
-            let patt = new RegExp(aString, "i");
+            let cb_string = this.getCardBookString(aString);
+            let patt = new RegExp(cb_string, "i");
             for (let account of window.cardbookRepository.cardbookAccounts) {
                 mrcTools.mrcLog("test du CB : "+account);
                 if (account[1] && account[5] && account[6] != "SEARCH") {
@@ -3378,8 +3411,9 @@ var mrcAComplete = {
         if (window.hasOwnProperty("cardbookRepository")) {
             // search in Cardbooks
             // one search : BEGIN WITH
-            let patt0 = new RegExp("^"+aString, "i");
-            let patt = new RegExp("\\|"+aString, "i");
+            let cb_string = this.getCardBookString(aString);
+            let patt0 = new RegExp("^"+cb_string, "i");
+            let patt = new RegExp("\\|"+cb_string, "i");
             for (let account of window.cardbookRepository.cardbookAccounts) {
                 mrcTools.mrcLog("test du CB : "+account);
                 if (account[1] && account[5] && account[6] != "SEARCH") {
