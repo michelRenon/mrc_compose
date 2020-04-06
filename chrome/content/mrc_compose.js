@@ -1905,17 +1905,41 @@ var mrcAComplete = {
          * return
          *   object
          */
-        let emails = [];
+
+        // the popularity of a card is max of popularity of each email
+        let card_pop_i = 0;
+        let cb_emails = [];
         for (let i=0, l=cbcard.email.length ; i<l; i++) {
-            emails.push(cbcard.email[i][0].join());
+            let email = cbcard.email[i][0].join();
+            let email_pop_i = 0;
+            if (window.cardbookRepository.cardbookMailPopularityIndex.hasOwnProperty(email)) {
+                email_pop_i = Number(window.cardbookRepository.cardbookMailPopularityIndex[email]);
+                if (email_pop_i > card_pop_i) {
+                    card_pop_i = email_pop_i;
+                }
+            }
+            cb_emails.push({'email':email, 'pop': email_pop_i});
         }
+
+        // now reverse sort emails by popularity
+        let fct = function(a, b) {
+            return b['pop'] - a['pop'];
+        };
+        cb_emails.sort(fct);
+
+        // extract emails only
+        let emails = [];
+        for (let i=0 ; i < cb_emails.length ; i++) {
+            emails.push(cb_emails[i]['email']);
+        }
+
         let temp = {
             'emailList' : emails,
             'displayName' : cbcard.fn,
             'firstName' : cbcard.firstname,
             'lastName' : cbcard.lastname,
             'nickName' : cbcard.nickname,
-            'mrcPopularity' : "0",
+            'mrcPopularity' : String(card_pop_i),
             'isMailList' : false,
             'mailListURI' : "",
             };
