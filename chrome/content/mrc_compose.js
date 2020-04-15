@@ -4670,7 +4670,7 @@ var mrcAComplete = {
             } else {
                 // --> enter his email in the text
                 email = card.text;
-                // mrcTools.mrcLog("EMAIL = "+email);
+                mrcTools.mrcLog("validate() : EMAIL = '"+email + "'");
             }
             this._elementInsertInPart(this.currentTextBox, this.currentTextBox.selectionStart, email);
             this.updateNbRecipients(this.currentTextBox);
