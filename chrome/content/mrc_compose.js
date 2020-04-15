@@ -208,17 +208,32 @@ function CompFields2Recipients(msgCompFields)
 
     // define values of fields
     let f = function(elt_id, value, field) {
+        let headerParser = MailServices.headerParser;
         let recipient = null;
-        if (mimeConvert) {
-            try {
-                recipient = value;
-                recipient = mimeConvert.decodeMimeHeader(recipient, null, false, true);
-            } catch (ex) {
+        let l_recipients = Array();
+        let rcp = msgCompFields.splitRecipients(value, false, {});
+        if (rcp.length) {
+            mrcTools.mrcLog("f() :     msgCompFields.splitRecipients()");
+            for (let i=0 ; i < rcp.length ; i++) {
+                mrcTools.mrcLog("f() :     rcp "+i+" : '"+rcp[i]+"'");
+                // check for quotes
+                fieldValue = rcp[i];
+                try {
+                    rcp_ok = headerParser
+                      .makeFromDisplayAddress(fieldValue, {})
+                      .map(fullValue =>
+                        headerParser.makeMimeAddress(fullValue.name, fullValue.email)
+                      )
+                      [0];
+                } catch (ex) {
+                    rcp_ok = fieldValue;
+                }
+                l_recipients.push(rcp_ok);
             }
         }
-        if (!recipient) {
-            recipient = value;
-        }
+        recipient = l_recipients.join(mrcAComplete.PART_SUFFIX+mrcAComplete.SEP+mrcAComplete.PART_PREFIX);
+        mrcTools.mrcLog("f() : "+elt_id+" recipient='"+recipient+"'");
+
         let inputField = document.getElementById(elt_id);
         inputField.value = recipient;
         if (recipient != "" && mrcAComplete.param_add_comma) {
